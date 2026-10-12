@@ -1,17 +1,16 @@
 // Progressive enhancement: the site works without this file.
-document.documentElement.classList.add('js');
-
 (function () {
-  // Theme toggle: remembers the choice, otherwise follows the system preference
   const root = document.documentElement;
   const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+
+  // Theme toggle: remembers the choice, otherwise follows the system preference
   const toggle = document.getElementById('theme-toggle');
   const effectiveTheme = () => root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
   if (toggle) {
     toggle.addEventListener('click', () => {
       const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
       root.dataset.theme = next;
-      try { localStorage.setItem('theme', next); } catch (e) { /* private mode: keep it for this page only */ }
+      try { localStorage.setItem('theme', next); } catch (e) { /* storage blocked: keep it for this page only */ }
     });
   }
 
@@ -28,6 +27,8 @@ document.documentElement.classList.add('js');
   });
 
   // Pointer-driven light sheen and slight tilt on glass cards
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (reduce) return;
   document.querySelectorAll('.card, .row').forEach((el) => {
     el.addEventListener('pointermove', (ev) => {
       const r = el.getBoundingClientRect();
@@ -43,18 +44,4 @@ document.documentElement.classList.add('js');
     });
     el.addEventListener('pointerleave', () => { el.style.transform = ''; });
   });
-
-  // Scroll reveal with GSAP (loaded with defer; skip if it failed to load)
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const start = () => {
-    if (!window.gsap || reduce) {
-      document.querySelectorAll('.reveal').forEach((el) => (el.style.opacity = 1));
-      return;
-    }
-    gsap.utils.toArray('.reveal').forEach((el) => {
-      gsap.to(el, { opacity: 1, y: 0, duration: .8, ease: 'power3.out', delay: 0.05 });
-    });
-    gsap.from('.hero h1', { y: 30, opacity: 0, duration: 1, ease: 'power4.out' });
-  };
-  window.addEventListener('load', start);
 })();

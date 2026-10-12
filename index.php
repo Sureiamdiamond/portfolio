@@ -186,7 +186,6 @@ $ghostWord = $words[0] ?? '';
   <footer class="muted">© <?= date('Y') ?> <?= e($name) ?></footer>
 </main>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
 <script src="assets/app.js" defer></script>
 </body>
 </html>

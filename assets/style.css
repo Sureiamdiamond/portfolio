@@ -211,8 +211,13 @@ html[dir="rtl"] .row:hover { transform: translateX(-8px); }
 html[dir="rtl"] .actions, html[dir="rtl"] .filters, html[dir="rtl"] .links { justify-content: flex-start; }
 html[dir="rtl"] .stats { justify-content: start; }
 
-/* Reveal: JS sets the start state; without JS everything is visible */
-.js .reveal { opacity: 0; transform: translateY(28px); }
+/* Section entrance: pure CSS, so content is always visible even if scripts fail */
+.reveal { animation: rise .9s var(--ease) both; }
+.hero-text > * { animation: rise .9s var(--ease) both; }
+.hero-text > *:nth-child(2) { animation-delay: .08s; }
+.hero-text > *:nth-child(3) { animation-delay: .16s; }
+.hero-text > *:nth-child(4) { animation-delay: .24s; }
+@keyframes rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
 
 @media (max-width: 860px) {
   .hero { grid-template-columns: 1fr; min-height: 0; }
@@ -232,5 +237,5 @@ html[dir="rtl"] .stats { justify-content: start; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation: none !important; transition: none !important; }
-  .js .reveal { opacity: 1; transform: none; }
+  .reveal, .hero-text > * { animation: none; }
 }
