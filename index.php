@@ -22,10 +22,15 @@ $headline = loc($profile, 'headline', $lang) ?: t('default_headline', $lang);
 $about = loc($profile, 'about', $lang);
 $switchLang = $lang === 'fa' ? 'en' : 'fa';
 
-// Initials for the logo and the portrait panel, e.g. "Parsa Banitaba" -> "PB"
+// Initials for the logo and hero card, e.g. "Parsa Banitaba" -> "PB"
 $words = preg_split('/\s+/u', trim($name)) ?: [];
 $initials = mb_strtoupper(implode('', array_map(fn($w) => mb_substr($w, 0, 1), array_slice($words, 0, 2))));
-$ghostWord = $words[0] ?? '';
+// The last word of the name gets the gradient highlight
+$lastWord = count($words) > 1 ? array_pop($words) : '';
+$firstWords = implode(' ', $words);
+
+// Content hash of the CSS and JS: changes whenever the files change, so caches can't serve an old build
+$assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.css') . (string) file_get_contents(__DIR__ . '/assets/app.js')), 0, 8);
 ?>
 <!doctype html>
 <html lang="<?= $lang ?>" dir="<?= $dir ?>">
@@ -38,64 +43,59 @@ $ghostWord = $words[0] ?? '';
   // Apply the saved theme before first paint to avoid a flash.
   try { var s = localStorage.getItem('theme'); if (s) document.documentElement.dataset.theme = s; } catch (e) {}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap">
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=<?= $assetVersion ?>">
 </head>
 <body>
-<div class="bg" aria-hidden="true"><span></span><span></span><span></span></div>
 
-<nav class="topbar glass" aria-label="Main">
-  <a class="logo" href="#top"><span class="logo-mark"><?= e($initials) ?></span><span class="logo-name"><?= e($name) ?></span></a>
-  <div class="links">
-    <a href="#journey"><?= e(t('journey', $lang)) ?></a>
-    <a href="#projects"><?= e(t('projects', $lang)) ?></a>
-    <a href="#papers"><?= e(t('papers', $lang)) ?></a>
-    <a href="#slides"><?= e(t('presentations', $lang)) ?></a>
+<a class="skip" href="#main"><?= e($lang === 'fa' ? 'رفتن به محتوا' : 'Skip to content') ?></a>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><?= e($initials) ?></span><span><?= e($name) ?></span></a>
+    <nav class="nav-links" aria-label="<?= e(t('projects', $lang)) ?>">
+      <a href="#journey"><?= e(t('journey', $lang)) ?></a>
+      <a href="#projects"><?= e(t('projects', $lang)) ?></a>
+      <a href="#papers"><?= e(t('papers', $lang)) ?></a>
+      <a href="#slides"><?= e(t('presentations', $lang)) ?></a>
+    </nav>
+    <div class="nav-actions">
+      <a class="tool" href="?lang=<?= $switchLang ?>" hreflang="<?= $switchLang ?>"><?= e(t('lang_switch', $lang)) ?></a>
+      <button type="button" class="tool" id="theme-toggle" aria-label="<?= e(t('toggle_theme', $lang)) ?>">◐</button>
+      <a class="btn btn-primary" href="#contact"><?= e(t('lets_chat', $lang)) ?></a>
+    </div>
   </div>
-  <a class="pill-btn" href="#contact"><?= e(t('lets_chat', $lang)) ?></a>
-</nav>
+</header>
 
-<div class="side-tools glass" aria-label="Preferences">
-  <button type="button" id="theme-toggle" aria-label="<?= e(t('toggle_theme', $lang)) ?>">◐</button>
-  <a class="lang" href="?lang=<?= $switchLang ?>" hreflang="<?= $switchLang ?>"><?= e(t('lang_switch', $lang)) ?></a>
-</div>
-
-<main id="top">
-  <section class="hero">
+<main id="main">
+  <section id="top" class="hero">
     <div class="hero-text">
-      <span class="pill-tag"><?= e($headline) ?></span>
-      <h1><?= e($name) ?></h1>
+      <span class="pill"><span class="dot" aria-hidden="true"></span><?= e($headline) ?></span>
+      <h1><?= e($firstWords) ?><?php if ($lastWord !== ''): ?> <span class="grad"><?= e($lastWord) ?></span><?php endif; ?></h1>
       <?php if ($about !== ''): ?><p class="lead"><?= nl2br(e($about)) ?></p><?php endif; ?>
       <div class="actions">
         <?php if (!empty($profile['cv'])): ?><a class="btn btn-primary" href="<?= e($profile['cv']) ?>" download><?= e(t('download_cv', $lang)) ?></a><?php endif; ?>
         <?php if (!empty($profile['email'])): ?><a class="btn btn-outline" href="mailto:<?= e($profile['email']) ?>"><?= e(t('email_me', $lang)) ?></a><?php endif; ?>
       </div>
-      <dl class="stats">
-        <div><dt><?= count($projects) ?></dt><dd><?= e(t('stat_projects', $lang)) ?></dd></div>
-        <div><dt><?= count($papers) ?></dt><dd><?= e(t('stat_papers', $lang)) ?></dd></div>
-        <div><dt><?= count($slides) ?></dt><dd><?= e(t('stat_presentations', $lang)) ?></dd></div>
-      </dl>
     </div>
-    <div class="hero-visual" aria-hidden="true">
-      <span class="ghost-name"><?= e($ghostWord) ?></span>
-      <div class="portrait glass"><span class="initials"><?= e($initials) ?></span></div>
+    <div class="hero-art" aria-hidden="true">
+      <span class="ring"></span>
+      <div class="hero-card"><span class="initials"><?= e($initials) ?></span></div>
+      <span class="chip chip-a"><?= count($projects) ?> <?= e(t('stat_projects', $lang)) ?></span>
+      <span class="chip chip-b"><?= count($papers) ?> <?= e(t('stat_papers', $lang)) ?></span>
     </div>
   </section>
 
-  <hr class="divider">
-
   <section id="journey" class="block reveal">
+    <p class="label"><span>01</span><?= e(t('journey', $lang)) ?></p>
     <h2><?= e(t('journey', $lang)) ?></h2>
     <div class="timeline">
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
-        <h3><?= e(t($label, $lang)) ?></h3>
+        <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
         <?php foreach ($items as $item): ?>
-          <div class="node glass">
-            <span class="muted"><?= e(loc($item, 'period', $lang)) ?></span>
+          <div class="node">
+            <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
             <strong><?= e(loc($item, 'title', $lang)) ?></strong>
-            <?php if ($item['org'] || $item['org_fa']): ?><span><?= e(loc($item, 'org', $lang)) ?></span><?php endif; ?>
+            <?php if ($item['org'] || $item['org_fa']): ?><span class="muted"><?= e(loc($item, 'org', $lang)) ?></span><?php endif; ?>
             <?php if ($item['details'] || $item['details_fa']): ?><p><?= nl2br(e(loc($item, 'details', $lang))) ?></p><?php endif; ?>
           </div>
         <?php endforeach; ?>
@@ -103,22 +103,21 @@ $ghostWord = $words[0] ?? '';
     </div>
   </section>
 
-  <hr class="divider">
-
   <section id="projects" class="block reveal">
-    <h2><span class="file">lib/projects.dart</span> <?= e(t('projects', $lang)) ?></h2>
+    <p class="label"><span>02</span><?= e(t('projects', $lang)) ?></p>
+    <h2><?= e(t('projects', $lang)) ?></h2>
     <div class="filters" role="group" aria-label="<?= e(t('projects', $lang)) ?>">
-      <button class="on" data-filter="all"><?= e(t('filter_all', $lang)) ?></button>
-      <button data-filter="work"><?= e(t('filter_work', $lang)) ?></button>
-      <button data-filter="academic"><?= e(t('filter_academic', $lang)) ?></button>
+      <button type="button" class="on" data-filter="all" aria-pressed="true"><?= e(t('filter_all', $lang)) ?></button>
+      <button type="button" data-filter="work" aria-pressed="false"><?= e(t('filter_work', $lang)) ?></button>
+      <button type="button" data-filter="academic" aria-pressed="false"><?= e(t('filter_academic', $lang)) ?></button>
     </div>
     <div class="grid">
-      <?php foreach ($projects as $p): ?>
-        <article class="card glass" data-kind="<?= e($p['kind']) ?>">
+      <?php foreach ($projects as $i => $p): ?>
+        <article class="card<?= $i === 0 ? ' featured grad-border' : '' ?>" data-kind="<?= e($p['kind']) ?>">
           <span class="tag"><?= e($p['kind']) ?></span>
           <h3><?= e(loc($p, 'title', $lang)) ?></h3>
-          <p><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
-          <?php if ($p['tags']): ?><p class="muted"><?= e($p['tags']) ?></p><?php endif; ?>
+          <p class="muted"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
+          <?php if ($p['tags']): ?><p class="muted mono"><?= e($p['tags']) ?></p><?php endif; ?>
           <?php if ($p['url']): ?><a href="<?= e($p['url']) ?>" target="_blank" rel="noopener"><?= e(t('view_project', $lang)) ?> →</a><?php endif; ?>
         </article>
       <?php endforeach; ?>
@@ -126,12 +125,11 @@ $ghostWord = $words[0] ?? '';
     </div>
   </section>
 
-  <hr class="divider">
-
   <section id="papers" class="block reveal">
+    <p class="label"><span>03</span><?= e(t('papers', $lang)) ?></p>
     <h2><?= e(t('papers', $lang)) ?></h2>
     <?php foreach ($papers as $paper): ?>
-      <article class="row glass">
+      <article class="row">
         <div>
           <h3><?= e(loc($paper, 'title', $lang)) ?></h3>
           <p class="muted"><?= e(trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? ''))) ?></p>
@@ -145,12 +143,11 @@ $ghostWord = $words[0] ?? '';
     <?php if (!$papers): ?><p class="muted"><?= e(t('empty_papers', $lang)) ?></p><?php endif; ?>
   </section>
 
-  <hr class="divider">
-
   <section id="slides" class="block reveal">
+    <p class="label"><span>04</span><?= e(t('presentations', $lang)) ?></p>
     <h2><?= e(t('presentations', $lang)) ?></h2>
     <?php foreach ($slides as $s): ?>
-      <details class="glass slide">
+      <details class="slide">
         <summary>
           <strong><?= e(loc($s, 'title', $lang)) ?></strong>
           <span class="muted"><?= e(trim(($s['event'] ?? '') . ' ' . ($s['year'] ?? ''))) ?></span>
@@ -167,25 +164,33 @@ $ghostWord = $words[0] ?? '';
     <?php if (!$slides): ?><p class="muted"><?= e(t('empty_slides', $lang)) ?></p><?php endif; ?>
   </section>
 
-  <hr class="divider">
-
-  <section id="contact" class="block reveal">
-    <div class="contact-card glass">
-      <h2><?= e(t('contact', $lang)) ?></h2>
-      <?php if (!empty($profile['email'])): ?><p><a href="mailto:<?= e($profile['email']) ?>"><?= e($profile['email']) ?></a></p><?php endif; ?>
-      <?php if (!empty($profile['phone'])): ?>
-        <p><span class="muted"><?= e(t('phone', $lang)) ?>:</span> <a href="tel:<?= e(preg_replace('/\s+/', '', $profile['phone'])) ?>"><?= e($profile['phone']) ?></a></p>
-      <?php endif; ?>
+  <section id="contact" class="inverted reveal">
+    <dl class="stats">
+      <div><dt><?= count($projects) ?></dt><dd><?= e(t('stat_projects', $lang)) ?></dd></div>
+      <div><dt><?= count($papers) ?></dt><dd><?= e(t('stat_papers', $lang)) ?></dd></div>
+      <div><dt><?= count($slides) ?></dt><dd><?= e(t('stat_presentations', $lang)) ?></dd></div>
+    </dl>
+    <div class="contact-grid">
+      <div>
+        <p class="label"><span>05</span><?= e(t('contact', $lang)) ?></p>
+        <h2><?= e(t('contact', $lang)) ?></h2>
+        <?php if (!empty($profile['email'])): ?><p><a href="mailto:<?= e($profile['email']) ?>"><?= e($profile['email']) ?></a></p><?php endif; ?>
+        <?php if (!empty($profile['phone'])): ?>
+          <p><span class="muted"><?= e(t('phone', $lang)) ?>:</span> <a href="tel:<?= e(preg_replace('/\s+/', '', $profile['phone'])) ?>"><?= e($profile['phone']) ?></a></p>
+        <?php endif; ?>
+      </div>
       <div class="links">
         <?php if (!empty($profile['linkedin'])): ?><a href="<?= e($profile['linkedin']) ?>" target="_blank" rel="noopener">LinkedIn</a><?php endif; ?>
         <?php if (!empty($profile['github'])): ?><a href="<?= e($profile['github']) ?>" target="_blank" rel="noopener">GitHub</a><?php endif; ?>
       </div>
     </div>
   </section>
-
-  <footer class="muted">© <?= date('Y') ?> <?= e($name) ?></footer>
 </main>
 
-<script src="assets/app.js" defer></script>
+<footer class="muted">
+  © <?= date('Y') ?> <?= e($name) ?> · <span class="build">build <?= $assetVersion ?></span>
+</footer>
+
+<script src="assets/app.js?v=<?= $assetVersion ?>" defer></script>
 </body>
 </html>
