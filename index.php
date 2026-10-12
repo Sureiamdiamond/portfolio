@@ -23,6 +23,8 @@ $education = array_values(array_filter($timeline, fn($t) => $t['kind'] === 'educ
 $experience = array_values(array_filter($timeline, fn($t) => $t['kind'] === 'experience'));
 
 $name = loc($profile, 'name', $lang) ?: t('default_name', $lang);
+// Hero photo uploaded in /admin (a transparent PNG or WebP); empty means the built-in cutout
+$heroPhoto = (string) ($profile['hero_photo'] ?? '');
 $headline = loc($profile, 'headline', $lang) ?: t('default_headline', $lang);
 $about = loc($profile, 'about', $lang);
 $switchLang = $lang === 'fa' ? 'en' : 'fa';
@@ -97,7 +99,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
       <span class="ring"></span>
       <div class="portrait">
         <span class="portrait-name"><?= e($name) ?></span>
-        <img class="portrait-img" src="assets/img/portrait.png?v=<?= $assetVersion ?>" alt="<?= e($name) ?>" width="380" height="541" decoding="async">
+        <img class="portrait-img" src="<?= e($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png?v=' . $assetVersion) ?>" alt="<?= e($name) ?>" width="380" height="541" decoding="async">
       </div>
       <span class="chip chip-a"><?= count($projects) ?> <?= e(t('stat_projects', $lang)) ?></span>
       <span class="chip chip-b"><?= count($papers) ?> <?= e(t('stat_papers', $lang)) ?></span>

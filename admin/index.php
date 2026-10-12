@@ -63,6 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     remove_upload($old ?: null);
                     $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('cv', ?)")->execute([$cv]);
                 }
+                if ($photo = save_file_upload('file_photo', ['png', 'webp'])) {
+                    $old = $pdo->query("SELECT v FROM profile WHERE k = 'hero_photo'")->fetchColumn();
+                    remove_upload($old ?: null);
+                    $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('hero_photo', ?)")->execute([$photo['path']]);
+                }
                 $notice = 'Profile saved.';
             }
 
@@ -325,6 +330,9 @@ if ($loggedIn) {
       <label for="cv">CV (PDF)</label>
       <input id="cv" type="file" name="file_cv" accept="application/pdf,.pdf">
       <p class="muted">Current CV: <?= !empty($profile['cv']) ? '<a href="../' . e($profile['cv']) . '" target="_blank">open</a>' : 'none' ?></p>
+      <label for="photo">Hero photo (PNG or WebP with a transparent background)</label>
+      <input id="photo" type="file" name="file_photo" accept="image/png,image/webp,.png,.webp">
+      <p class="muted">Current hero photo: <?= !empty($profile['hero_photo']) ? '<a href="../' . e($profile['hero_photo']) . '" target="_blank">open</a>' : 'built-in cutout' ?></p>
       <p><button type="submit">Save profile</button></p>
     </form>
   <?php elseif ($tab === 'files'): ?>
