@@ -287,3 +287,18 @@ function run_junior_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . JUNIOR_MIGRATION . "', '1')");
 }
+
+// One-time Persian name for the Persian pages: پارسا بنی‌طبا (with a half-space). Logged with the previous value.
+const NAME_FA_MIGRATION = 'migration_name_fa_v1';
+const NAME_FA_VALUE = "پارسا بنی\u{200C}طبا";
+
+function run_name_fa_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . NAME_FA_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT v FROM profile WHERE k = 'name_fa'")->fetchColumn();
+    migration_log('name_fa: previous value ' . json_encode((string) $previous, JSON_UNESCAPED_UNICODE));
+    $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v')
+        ->execute(['name_fa', NAME_FA_VALUE]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . NAME_FA_MIGRATION . "', '1')");
+}
