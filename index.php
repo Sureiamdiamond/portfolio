@@ -95,7 +95,10 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     </div>
     <div class="hero-art" aria-hidden="true">
       <span class="ring"></span>
-      <div class="hero-card"><span class="initials"><?= e($initials) ?></span></div>
+      <div class="portrait">
+        <span class="portrait-name"><?= e($name) ?></span>
+        <img class="portrait-img" src="assets/img/portrait.png?v=<?= $assetVersion ?>" alt="<?= e($name) ?>" width="380" height="541" decoding="async">
+      </div>
       <span class="chip chip-a"><?= count($projects) ?> <?= e(t('stat_projects', $lang)) ?></span>
       <span class="chip chip-b"><?= count($papers) ?> <?= e(t('stat_papers', $lang)) ?></span>
     </div>

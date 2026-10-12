@@ -121,11 +121,22 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
   position: absolute; width: min(360px, 90%); aspect-ratio: 1; border-radius: 50%;
   border: 1.5px dashed color-mix(in srgb, var(--accent) 35%, transparent); animation: spin 60s linear infinite;
 }
-.hero-card {
-  position: relative; width: min(300px, 80%); aspect-ratio: 4 / 5; border-radius: 24px; background: var(--surface);
-  display: grid; place-items: center; box-shadow: var(--shadow); animation: bob 7s var(--ease) infinite;
+.portrait {
+  position: relative; width: min(330px, 84%); aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden; isolation: isolate;
+  background:
+    radial-gradient(60% 55% at 50% 42%, #4D7CFF 0%, #0052FF 58%, #0A2A8C 100%);
+  box-shadow: var(--shadow); animation: bob 7s var(--ease) infinite;
 }
-.hero-card .initials { font-family: var(--display); font-size: clamp(3.5rem, 8vw, 5rem); background: var(--gradient); -webkit-background-clip: text; background-clip: text; color: transparent; }
+.portrait-name {
+  position: absolute; inset-inline: 0; top: 7%; z-index: 0; text-align: center; white-space: nowrap;
+  font: 800 clamp(2.1rem, 5.4vw, 3.3rem)/1 var(--display); letter-spacing: -.02em; text-transform: uppercase;
+  color: #fff; opacity: .34; pointer-events: none;
+}
+html[lang="fa"] .portrait-name { text-transform: none; letter-spacing: 0; font-family: Vazirmatn, system-ui, sans-serif; }
+.portrait-img {
+  position: absolute; inset-inline: 0; bottom: 0; z-index: 1; width: 100%; height: 94%; object-fit: contain; object-position: 50% 100%;
+  filter: grayscale(1) contrast(1.05);
+}
 .chip {
   position: absolute; padding: 8px 14px; border-radius: 12px; background: var(--surface); box-shadow: var(--shadow);
   font: 500 .82rem var(--mono); color: var(--fg); border: 1px solid var(--border);
@@ -227,7 +238,7 @@ footer .build { font: 400 .75rem var(--mono); }
 
 /* Persian: Vazirmatn for all text */
 html[lang="fa"] body, html[lang="fa"] h1, html[lang="fa"] h2, html[lang="fa"] h3, html[lang="fa"] .label,
-html[lang="fa"] .stats dt, html[lang="fa"] .hero-card .initials, html[lang="fa"] .tag, html[lang="fa"] .node .period,
+html[lang="fa"] .stats dt, html[lang="fa"] .tag, html[lang="fa"] .node .period,
 html[lang="fa"] .chip, html[lang="fa"] .tool, html[lang="fa"] .btn, html[lang="fa"] .filters button { font-family: Vazirmatn, system-ui, sans-serif; }
 html[lang="fa"] h1 { letter-spacing: 0; }
 html[lang="fa"] .chip, html[lang="fa"] .node .period, html[lang="fa"] .label { letter-spacing: 0; text-transform: none; }
