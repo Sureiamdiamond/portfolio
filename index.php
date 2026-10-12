@@ -31,11 +31,8 @@ $lastWord = count($words) > 1 ? array_pop($words) : '';
 $firstWords = implode(' ', $words);
 
 // Projects: the Project window tree and the viewer source for every file (rendered on the server)
-$projectTree = '';
 $projectSources = [];
-foreach ($projects as $project) {
-    $projectTree .= render_project_tree($project, $pdo, $lang, $projectSources);
-}
+$projectTree = $projects ? render_project_window($projects, $pdo, $lang, $projectSources) : '';
 
 // Content hash of the CSS and JS: changes whenever the files change, so caches can't serve an old build
 $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.css') . (string) file_get_contents(__DIR__ . '/assets/app.js')), 0, 8);

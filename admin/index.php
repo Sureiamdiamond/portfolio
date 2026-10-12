@@ -444,7 +444,7 @@ if ($loggedIn) {
           $stmt->execute([$pid]);
           $media = $stmt->fetchAll();
       }
-      $templatePaths = ['README.md', 'pubspec.yaml', 'lib/main.dart', 'analysis_options.yaml', '.gitignore', 'links.md'];
+      $templatePaths = ['README.md', 'pubspec.yaml', 'main.dart', 'analysis_options.yaml', '.gitignore', 'links.md'];
     ?>
     <h2>Project files</h2>
     <p class="muted">Each project shows a Flutter project tree. Its README, pubspec, links and placeholder code are generated from the project fields (title, summary, tags as tech stack, url). Paste real file contents here to replace a generated file or add one. Screenshots go into assets/images/.</p>
@@ -466,7 +466,7 @@ if ($loggedIn) {
       <input type="hidden" name="action" value="pf_save">
       <input type="hidden" name="project_id" value="<?= $pid ?>">
       <h3>Set file contents</h3>
-      <label for="pf-path">Path inside the project</label>
+      <label for="pf-path">Path inside the project (shown under lib/projects/&lt;name&gt;/)</label>
       <input id="pf-path" name="path" list="pf-paths" required maxlength="200" placeholder="lib/screens/home.dart">
       <datalist id="pf-paths"><?php foreach ($templatePaths as $tp): ?><option value="<?= e($tp) ?>"><?php endforeach; ?></datalist>
       <label for="pf-content">Contents (leave empty for an empty file)</label>

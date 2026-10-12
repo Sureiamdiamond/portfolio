@@ -151,7 +151,7 @@
     });
   }
 
-  // Projects filter: hide top-level projects that do not match
+  // Projects filter: hide project folders under lib/projects that do not match
   document.querySelectorAll('#projects .filters button').forEach((btn) => {
     btn.addEventListener('click', () => {
       const kind = btn.dataset.filter;
@@ -160,7 +160,7 @@
         b.classList.toggle('on', on);
         b.setAttribute('aria-pressed', String(on));
       });
-      tree.querySelectorAll(':scope > li.it-project').forEach((li) => {
+      tree.querySelectorAll('li.it-project').forEach((li) => {
         li.hidden = kind !== 'all' && li.dataset.kind !== kind;
       });
     });

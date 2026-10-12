@@ -1,8 +1,11 @@
 <?php
 declare(strict_types=1);
 
-// Default Flutter project layout shown for every project. Empty directories are part of the layout.
-const PROJECT_DIRS = ['android', 'ios', 'assets', 'assets/images', 'assets/fonts', 'lib', 'lib/models', 'lib/screens', 'lib/widgets', 'lib/services', 'lib/utils', 'test'];
+// One Flutter-style app holds every project: its folders are the layout, and projects live in lib/projects/.
+// Empty directories are part of the layout.
+const ROOT_NAME = 'portfolio';
+const ROOT_DIRS = ['android', 'ios', 'assets', 'assets/images', 'assets/fonts', 'lib', 'lib/projects', 'test'];
+const PROJECTS_DIR = 'lib/projects';
 
 const ICON_FOLDER = '<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 4.2a1 1 0 0 1 1-1h3.1l1.3 1.5h6.6a1 1 0 0 1 1 1v6.6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1z" fill="currentColor"/></svg>';
 
@@ -37,7 +40,7 @@ function project_generated_files(array $p, string $lang, string $slug): array {
     return [
         'README.md' => "# $title\n\n$summary\n$stack$links",
         'pubspec.yaml' => "# Generated overview from this project's stored data.\nname: $slug\ndescription: \"" . str_replace('"', "'", $title) . "\"\npublish_to: none\n\ndependencies:\n  flutter:\n    sdk: flutter\n$techComments",
-        'lib/main.dart' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n",
+        'main.dart' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n",
         'analysis_options.yaml' => "# Generated overview: standard Flutter lint setup.\ninclude: package:flutter_lints/flutter.yaml\n",
         '.gitignore' => "# Generated overview\n.dart_tool/\nbuild/\n.flutter-plugins\n.flutter-plugins-dependencies\n",
         'links.md' => "# Links\n\n" . (!empty($p['url']) ? "- {$p['url']}\n" : "No links yet.\n"),
@@ -48,7 +51,7 @@ function project_generated_files(array $p, string $lang, string $slug): array {
 function project_entries(PDO $pdo, array $p, string $lang, string $slug): array {
     $files = [];
     foreach (project_generated_files($p, $lang, $slug) as $path => $content) {
-        $files[$path] = ['kind' => 'text', 'lang' => lang_of($path), 'content' => $content, 'notice' => $path === 'lib/main.dart'];
+        $files[$path] = ['kind' => 'text', 'lang' => lang_of($path), 'content' => $content, 'notice' => $path === 'main.dart'];
     }
     $stmt = $pdo->prepare('SELECT path, content FROM project_files WHERE project_id = ? ORDER BY path');
     $stmt->execute([(int) $p['id']]);
@@ -109,11 +112,39 @@ function render_code(string $content, string $lang): string {
     return '<pre class="code">' . $out . '</pre>';
 }
 
-/** Renders the Project tree for one project. Writes each file's viewer source into $sources. */
-function render_project_tree(array $project, PDO $pdo, string $lang, array &$sources): string {
-    $slug = project_slug($project);
-    $files = project_entries($pdo, $project, $lang, $slug);
-    $dirs = array_fill_keys(PROJECT_DIRS, true);
+/** Root app files: a generated overview of the layout. Not real source code. */
+function root_entries(string $lang): array {
+    return [
+        'README.md' => ['kind' => 'text', 'content' => "# " . ROOT_NAME . "\n\nProjects live in lib/projects/, one folder each.\n", 'notice' => false],
+        'pubspec.yaml' => ['kind' => 'text', 'content' => "# Generated overview of the layout.\nname: " . ROOT_NAME . "\npublish_to: none\n", 'notice' => false],
+        'lib/main.dart' => ['kind' => 'text', 'content' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n", 'notice' => true],
+    ];
+}
+
+/**
+ * Renders the whole Projects window tree: one root app, each project as a folder under lib/projects/.
+ * Writes each file's viewer source into $sources.
+ */
+function render_project_window(array $projects, PDO $pdo, string $lang, array &$sources): string {
+    $files = [];
+    foreach (root_entries($lang) as $path => $entry) {
+        $files[$path] = $entry + ['lang' => lang_of($path)];
+    }
+    $projectKinds = [];
+    $used = [];
+    foreach ($projects as $project) {
+        $slug = project_slug($project);
+        if (isset($used[$slug])) {
+            $slug .= '_' . (int) $project['id'];
+        }
+        $used[$slug] = true;
+        $prefix = PROJECTS_DIR . '/' . $slug;
+        $projectKinds[$prefix] = (string) $project['kind'];
+        foreach (project_entries($pdo, $project, $lang, $slug) as $path => $entry) {
+            $files[$prefix . '/' . $path] = $entry;
+        }
+    }
+    $dirs = array_fill_keys(ROOT_DIRS, true) + array_fill_keys(array_keys($projectKinds), true);
     foreach (array_keys($files) as $path) {
         $dir = dirname($path);
         while ($dir !== '.' && $dir !== '') {
@@ -122,7 +153,7 @@ function render_project_tree(array $project, PDO $pdo, string $lang, array &$sou
         }
     }
     foreach ($files as $path => $entry) {
-        $id = 's' . substr(md5($project['id'] . ':' . $path), 0, 10);
+        $id = 's' . substr(md5($path), 0, 10);
         if ($entry['kind'] === 'image') {
             $sources[] = '<div class="pt-src" id="' . $id . '" hidden><figure class="pt-image"><img src="' . e($entry['src']) . '" alt="' . e(basename($path)) . '"></figure></div>';
         } else {
@@ -131,22 +162,22 @@ function render_project_tree(array $project, PDO $pdo, string $lang, array &$sou
         }
         $files[$path]['id'] = $id;
     }
-    $tree = '<li class="it-project" data-kind="' . e($project['kind']) . '"><details open><summary class="it dir"><span class="chev" aria-hidden="true"></span>'
-        . ICON_FOLDER . '<span class="nm">' . e($slug) . '</span></summary><ul class="kids">'
-        . render_dir_level(array_keys($dirs), $files, '.', $slug)
+    return '<li><details open><summary class="it dir"><span class="chev" aria-hidden="true"></span>'
+        . ICON_FOLDER . '<span class="nm">' . e(ROOT_NAME) . '</span></summary><ul class="kids">'
+        . render_dir_level(array_keys($dirs), $files, '.', $projectKinds)
         . '</ul></details></li>';
-    return $tree;
 }
 
 /** One directory level: folders first, then files, both alphabetical (as the IDE shows them). */
-function render_dir_level(array $dirs, array $files, string $parent, string $slug): string {
+function render_dir_level(array $dirs, array $files, string $parent, array $projectKinds): string {
     $html = '';
     $childDirs = array_values(array_filter($dirs, fn($d) => dirname($d) === $parent));
     usort($childDirs, 'strcasecmp');
     foreach ($childDirs as $dir) {
-        $html .= '<li><details open><summary class="it dir"><span class="chev" aria-hidden="true"></span>' . ICON_FOLDER
+        $isProject = isset($projectKinds[$dir]);
+        $html .= '<li' . ($isProject ? ' class="it-project" data-kind="' . e($projectKinds[$dir]) . '"' : '') . '><details open><summary class="it dir"><span class="chev" aria-hidden="true"></span>' . ICON_FOLDER
             . '<span class="nm">' . e(basename($dir)) . '</span></summary><ul class="kids">'
-            . render_dir_level($dirs, $files, $dir, $slug) . '</ul></details></li>';
+            . render_dir_level($dirs, $files, $dir, $projectKinds) . '</ul></details></li>';
     }
     $childFiles = array_keys(array_filter($files, fn($path) => dirname($path) === $parent, ARRAY_FILTER_USE_KEY));
     usort($childFiles, 'strcasecmp');
@@ -160,7 +191,7 @@ function render_dir_level(array $dirs, array $files, string $parent, string $slu
             default => ['T', 'ic-txt'],
         };
         $html .= '<li><a class="it file" href="#' . $entry['id'] . '" data-src="' . $entry['id'] . '"'
-            . ' data-path="' . e($slug . '/' . $path) . '" data-lang="' . e($entry['lang']) . '">'
+            . ' data-path="' . e(ROOT_NAME . '/' . $path) . '" data-lang="' . e($entry['lang']) . '">'
             . '<span class="chev-space" aria-hidden="true"></span><span class="ic ' . $badge[1] . '" aria-hidden="true">' . $badge[0] . '</span>'
             . '<span class="nm">' . e(basename($path)) . '</span></a></li>';
     }
