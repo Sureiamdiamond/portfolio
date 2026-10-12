@@ -96,6 +96,73 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
+            if ($action === 'folder_create') {
+                $name = clean_name((string) ($_POST['name'] ?? ''));
+                $parent = ($_POST['parent_id'] ?? '') === '' ? null : (int) $_POST['parent_id'];
+                if ($parent !== null && !$pdo->query("SELECT 1 FROM folders WHERE id = $parent")->fetchColumn()) {
+                    throw new RuntimeException('Parent folder not found.');
+                }
+                $pdo->prepare('INSERT INTO folders (parent_id, name, sort) VALUES (?, ?, 0)')->execute([$parent, $name]);
+                header('Location: index.php?t=files&saved=1');
+                exit;
+            }
+
+            if ($action === 'file_upload') {
+                $folder = ($_POST['folder_id'] ?? '') === '' ? null : (int) $_POST['folder_id'];
+                if ($folder !== null && !$pdo->query("SELECT 1 FROM folders WHERE id = $folder")->fetchColumn()) {
+                    throw new RuntimeException('Folder not found.');
+                }
+                $saved = save_file_upload('file_upload');
+                if ($saved === null) {
+                    throw new RuntimeException('Choose a file to upload.');
+                }
+                $preview = save_file_upload('file_preview', ['pdf']);
+                $pdo->prepare('INSERT INTO files (folder_id, name, path, ext, size, preview, sort) VALUES (?, ?, ?, ?, ?, ?, 0)')
+                    ->execute([$folder, $saved['name'], $saved['path'], $saved['ext'], $saved['size'], $preview['path'] ?? null]);
+                header('Location: index.php?t=files&saved=1');
+                exit;
+            }
+
+            if ($action === 'rename') {
+                $name = clean_name((string) ($_POST['name'] ?? ''));
+                $id = (int) ($_POST['id'] ?? 0);
+                $table = ($_POST['kind'] ?? '') === 'folder' ? 'folders' : (($_POST['kind'] ?? '') === 'file' ? 'files' : null);
+                if ($table === null) {
+                    throw new RuntimeException('Unknown item.');
+                }
+                $pdo->prepare("UPDATE $table SET name = ? WHERE id = ?")->execute([$name, $id]);
+                header('Location: index.php?t=files&saved=1');
+                exit;
+            }
+
+            if ($action === 'delete_file') {
+                $id = (int) ($_POST['id'] ?? 0);
+                $stmt = $pdo->prepare('SELECT path, preview FROM files WHERE id = ?');
+                $stmt->execute([$id]);
+                $row = $stmt->fetch();
+                if ($row) {
+                    $pdo->prepare('DELETE FROM files WHERE id = ?')->execute([$id]);
+                    foreach (['path', 'preview'] as $col) {
+                        if (!empty($row[$col]) && !upload_in_use($pdo, $row[$col])) {
+                            remove_upload($row[$col]);
+                        }
+                    }
+                }
+                header('Location: index.php?t=files');
+                exit;
+            }
+
+            if ($action === 'delete_folder') {
+                $id = (int) ($_POST['id'] ?? 0);
+                $hasChildren = $pdo->query("SELECT (SELECT COUNT(*) FROM folders WHERE parent_id = $id) + (SELECT COUNT(*) FROM files WHERE folder_id = $id)")->fetchColumn();
+                if ((int) $hasChildren > 0) {
+                    throw new RuntimeException('Folder is not empty. Delete or move its contents first.');
+                }
+                $pdo->prepare('DELETE FROM folders WHERE id = ?')->execute([$id]);
+                header('Location: index.php?t=files');
+                exit;
+            }
+
             if ($action === 'delete') {
                 $type = $_POST['type'] ?? '';
                 if (!isset(TYPES[$type])) {
@@ -170,6 +237,7 @@ if ($loggedIn) {
 <?php else: ?>
   <nav>
     <a href="index.php?t=profile" class="<?= $tab === 'profile' ? 'on' : '' ?>">Profile & CV</a>
+    <a href="index.php?t=files" class="<?= $tab === 'files' ? 'on' : '' ?>">Files</a>
     <?php foreach (TYPES as $key => $spec): ?>
       <a href="index.php?t=<?= $key ?>" class="<?= $tab === $key ? 'on' : '' ?>"><?= e($spec['label']) ?></a>
     <?php endforeach; ?>
@@ -200,6 +268,109 @@ if ($loggedIn) {
       <p class="muted">Current CV: <?= !empty($profile['cv']) ? '<a href="../' . e($profile['cv']) . '" target="_blank">open</a>' : 'none' ?></p>
       <p><button type="submit">Save profile</button></p>
     </form>
+  <?php elseif ($tab === 'files'): ?>
+    <?php
+      $folders = $pdo->query('SELECT * FROM folders ORDER BY sort, id')->fetchAll();
+      $files = $pdo->query('SELECT * FROM files ORDER BY folder_id, sort, id')->fetchAll();
+      // Full path of each folder, e.g. "Papers / 2025"
+      $paths = [];
+      $pathOf = function (?int $id) use (&$pathOf, &$paths, $folders): string {
+          if ($id === null) return '';
+          if (isset($paths[$id])) return $paths[$id];
+          foreach ($folders as $f) {
+              if ((int) $f['id'] === $id) {
+                  $parent = $f['parent_id'] === null ? null : (int) $f['parent_id'];
+                  $prefix = $parent === null ? '' : $pathOf($parent) . ' / ';
+                  return $paths[$id] = $prefix . $f['name'];
+              }
+          }
+          return '';
+      };
+      foreach ($folders as $f) { $pathOf((int) $f['id']); }
+    ?>
+    <h2>Files</h2>
+    <p class="muted">These appear as the Project file tree on the public site. Allowed: pdf, pptx, docx, zip, png, jpg, webp (100 MB max). A PDF preview can be attached to a PPTX or DOCX so visitors can read it in the browser.</p>
+
+    <form method="post">
+      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+      <input type="hidden" name="action" value="folder_create">
+      <h3>New folder</h3>
+      <label for="fc-name">Name</label>
+      <input id="fc-name" name="name" required maxlength="120">
+      <label for="fc-parent">Inside</label>
+      <select id="fc-parent" name="parent_id">
+        <option value="">Project root</option>
+        <?php foreach ($folders as $f): ?><option value="<?= (int) $f['id'] ?>"><?= e($paths[(int) $f['id']]) ?></option><?php endforeach; ?>
+      </select>
+      <p><button type="submit">Create folder</button></p>
+    </form>
+
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+      <input type="hidden" name="action" value="file_upload">
+      <h3>Upload file</h3>
+      <label for="fu-folder">Folder</label>
+      <select id="fu-folder" name="folder_id">
+        <option value="">Project root</option>
+        <?php foreach ($folders as $f): ?><option value="<?= (int) $f['id'] ?>"><?= e($paths[(int) $f['id']]) ?></option><?php endforeach; ?>
+      </select>
+      <label for="fu-file">File</label>
+      <input id="fu-file" type="file" name="file_upload" required>
+      <label for="fu-preview">Optional PDF preview (for PPTX or DOCX)</label>
+      <input id="fu-preview" type="file" name="file_preview" accept=".pdf">
+      <p><button type="submit">Upload</button></p>
+    </form>
+
+    <div class="card">
+      <h3>Folders</h3>
+      <?php foreach ($folders as $f): ?>
+        <div class="row">
+          <span><?= e($paths[(int) $f['id']]) ?>/</span>
+          <span>
+            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0">
+              <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+              <input type="hidden" name="action" value="rename"><input type="hidden" name="kind" value="folder"><input type="hidden" name="id" value="<?= (int) $f['id'] ?>">
+              <input name="name" value="<?= e($f['name']) ?>" maxlength="120" aria-label="Folder name" style="width:160px;display:inline-block">
+              <button type="submit">Rename</button>
+            </form>
+            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Delete this folder?')">
+              <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+              <input type="hidden" name="action" value="delete_folder"><input type="hidden" name="id" value="<?= (int) $f['id'] ?>">
+              <button class="danger" type="submit">Delete</button>
+            </form>
+          </span>
+        </div>
+      <?php endforeach; ?>
+      <?php if (!$folders): ?><p class="muted">No folders yet.</p><?php endif; ?>
+    </div>
+
+    <div class="card">
+      <h3>Files</h3>
+      <?php foreach ($files as $fl): ?>
+        <div class="row">
+          <span>
+            <?= e($fl['folder_id'] ? ($paths[(int) $fl['folder_id']] . ' / ') : '') ?><?= e($fl['name']) ?>
+            <span class="muted"><?= e(strtoupper($fl['ext'])) ?><?= $fl['preview'] ? ' + preview' : '' ?></span>
+          </span>
+          <span>
+            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0">
+              <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+              <input type="hidden" name="action" value="rename"><input type="hidden" name="kind" value="file"><input type="hidden" name="id" value="<?= (int) $fl['id'] ?>">
+              <input name="name" value="<?= e($fl['name']) ?>" maxlength="120" aria-label="File name" style="width:160px;display:inline-block">
+              <button type="submit">Rename</button>
+            </form>
+            <a href="../<?= e($fl['path']) ?>" target="_blank">open</a>
+            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Delete this file?')">
+              <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+              <input type="hidden" name="action" value="delete_file"><input type="hidden" name="id" value="<?= (int) $fl['id'] ?>">
+              <button class="danger" type="submit">Delete</button>
+            </form>
+          </span>
+        </div>
+      <?php endforeach; ?>
+      <?php if (!$files): ?><p class="muted">No files yet.</p><?php endif; ?>
+    </div>
+
   <?php else: ?>
     <?php $spec = TYPES[$tab]; ?>
     <?php

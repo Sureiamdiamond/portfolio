@@ -31,6 +31,55 @@ $firstWords = implode(' ', $words);
 
 // Content hash of the CSS and JS: changes whenever the files change, so caches can't serve an old build
 $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.css') . (string) file_get_contents(__DIR__ . '/assets/app.js')), 0, 8);
+
+// Files tree: folders and files from SQLite, rendered as nested <details> so it works without JavaScript
+$folderRows = $pdo->query('SELECT * FROM folders ORDER BY sort, id')->fetchAll();
+$fileRows = $pdo->query('SELECT * FROM files ORDER BY sort, id')->fetchAll();
+
+const ICON_FOLDER = '<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 4.2a1 1 0 0 1 1-1h3.1l1.3 1.5h6.6a1 1 0 0 1 1 1v6.6a1 1 0 0 1-1 1h-11a1 1 0 0 1-1-1z" fill="currentColor"/></svg>';
+const ICON_FILE = '<svg class="ico" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5h5l3.5 3.5v9.5h-8.5z" fill="none" stroke="currentColor" stroke-width="1.2"/></svg>';
+
+/** Renders one level of the tree. $parentId null = the root level. */
+function render_tree_level(array $folders, array $files, ?int $parentId, string $prefix): string {
+    $html = '';
+    foreach ($folders as $folder) {
+        $folderParent = $folder['parent_id'] === null ? null : (int) $folder['parent_id'];
+        if ($folderParent !== $parentId) {
+            continue;
+        }
+        $childPrefix = $prefix . $folder['name'] . ' / ';
+        $html .= '<li><details open><summary class="item folder">'
+            . '<span class="chev" aria-hidden="true"></span>' . ICON_FOLDER
+            . '<span class="name">' . e($folder['name']) . '</span></summary>'
+            . '<ul class="tree-children">' . render_tree_level($folders, $files, (int) $folder['id'], $childPrefix) . '</ul></details></li>';
+    }
+    foreach ($files as $file) {
+        if ((int) ($file['folder_id'] ?? 0) !== (int) ($parentId ?? 0)) {
+            continue;
+        }
+        $ext = strtolower((string) $file['ext']);
+        // Preview: a companion PDF (for pptx) or the file itself when it is a PDF or image
+        $previewPath = $file['preview'] ?: '';
+        $kind = 'none';
+        if ($previewPath !== '') {
+            $kind = 'pdf';
+        } elseif ($ext === 'pdf') {
+            $previewPath = $file['path'];
+            $kind = 'pdf';
+        } elseif (in_array($ext, ['png', 'jpg', 'jpeg', 'webp'], true)) {
+            $previewPath = $file['path'];
+            $kind = 'image';
+        }
+        $html .= '<li><a class="item file" href="' . e($file['path']) . '" target="_blank" rel="noopener"'
+            . ' data-name="' . e($prefix . $file['name']) . '"'
+            . ' data-kind="' . $kind . '" data-preview="' . e($previewPath) . '"'
+            . ' data-download="' . e($file['path']) . '">'
+            . '<span class="chev-space" aria-hidden="true"></span>' . ICON_FILE
+            . '<span class="name">' . e($file['name']) . '</span>'
+            . '<span class="badge">' . e(strtoupper($ext)) . '</span></a></li>';
+    }
+    return $html;
+}
 ?>
 <!doctype html>
 <html lang="<?= $lang ?>" dir="<?= $dir ?>">
@@ -164,6 +213,33 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     <?php if (!$slides): ?><p class="muted"><?= e(t('empty_slides', $lang)) ?></p><?php endif; ?>
   </section>
 
+  <section id="files" class="block reveal">
+    <p class="label"><span>05</span><?= e(t('files', $lang)) ?></p>
+    <h2><?= e(t('files', $lang)) ?></h2>
+    <div class="ide">
+      <div class="ide-head">
+        <span class="ide-title"><?= e(t('files_project', $lang)) ?></span>
+        <div class="ide-tools">
+          <button type="button" class="ide-btn" data-action="expand" aria-label="<?= e(t('expand_all', $lang)) ?>" title="<?= e(t('expand_all', $lang)) ?>">⊞</button>
+          <button type="button" class="ide-btn" data-action="collapse" aria-label="<?= e(t('collapse_all', $lang)) ?>" title="<?= e(t('collapse_all', $lang)) ?>">⊟</button>
+        </div>
+      </div>
+      <div class="ide-body">
+        <nav class="tree-wrap" aria-label="<?= e(t('files', $lang)) ?>">
+          <?php $tree = render_tree_level($folderRows, $fileRows, null, ''); ?>
+          <?php if ($tree !== ''): ?><ul class="tree" id="tree"><?= $tree ?></ul><?php else: ?><p class="muted ide-empty"><?= e(t('empty_projects', $lang)) ?></p><?php endif; ?>
+        </nav>
+        <div class="preview" id="preview" aria-live="polite">
+          <div class="pv-head">
+            <span class="pv-path" id="pv-path"></span>
+            <a class="btn btn-outline pv-download" id="pv-download" href="#" hidden><?= e(t('download', $lang)) ?></a>
+          </div>
+          <div class="pv-body" id="pv-body"><p class="muted"><?= e(t('select_file', $lang)) ?></p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="contact" class="inverted reveal">
     <dl class="stats">
       <div><dt><?= count($projects) ?></dt><dd><?= e(t('stat_projects', $lang)) ?></dd></div>
@@ -172,7 +248,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     </dl>
     <div class="contact-grid">
       <div>
-        <p class="label"><span>05</span><?= e(t('contact', $lang)) ?></p>
+        <p class="label"><span>06</span><?= e(t('contact', $lang)) ?></p>
         <h2><?= e(t('contact', $lang)) ?></h2>
         <?php if (!empty($profile['email'])): ?><p><a href="mailto:<?= e($profile['email']) ?>"><?= e($profile['email']) ?></a></p><?php endif; ?>
         <?php if (!empty($profile['phone'])): ?>

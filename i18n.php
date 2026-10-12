@@ -39,6 +39,13 @@ const STRINGS = [
         'stat_projects' => 'Projects',
         'stat_papers' => 'Papers',
         'stat_presentations' => 'Presentations',
+        'files' => 'Files',
+        'files_project' => 'Project',
+        'expand_all' => 'Expand all',
+        'collapse_all' => 'Collapse all',
+        'select_file' => 'Select a file to preview it here.',
+        'no_preview' => 'No preview for this file type. Use Download.',
+        'download' => 'Download',
     ],
     'fa' => [
         'nav_home' => 'خانه',
@@ -75,6 +82,13 @@ const STRINGS = [
         'stat_projects' => 'پروژه',
         'stat_papers' => 'مقاله',
         'stat_presentations' => 'ارائه',
+        'files' => 'فایل‌ها',
+        'files_project' => 'پروژه',
+        'expand_all' => 'باز کردن همه',
+        'collapse_all' => 'بستن همه',
+        'select_file' => 'یک فایل را انتخاب کنید تا اینجا نمایش داده شود.',
+        'no_preview' => 'پیش‌نمایشی برای این نوع فایل نیست. از دکمه‌ی دانلود استفاده کنید.',
+        'download' => 'دانلود',
     ],
 ];
 
