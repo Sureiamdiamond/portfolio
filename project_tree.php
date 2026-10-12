@@ -146,12 +146,25 @@ function highlight_line(string $line, string $lang): string {
     return $html;
 }
 
+/** Makes http(s) URLs in already-escaped, highlighted HTML clickable. Trailing punctuation stays outside the link. */
+function link_urls(string $html): string {
+    return preg_replace_callback('~https?://[^\s<"\'&]+(?:&amp;[^\s<"\'&]+)*~', function (array $m): string {
+        $url = $m[0];
+        $tail = '';
+        if (preg_match('~[.,;:!?)\]]+$~', $url, $t)) {
+            $tail = $t[0];
+            $url = substr($url, 0, -strlen($tail));
+        }
+        return '<a href="' . $url . '" target="_blank" rel="noopener">' . $url . '</a>' . $tail;
+    }, $html);
+}
+
 /** Renders the source of a text file as numbered lines. */
 function render_code(string $content, string $lang): string {
     $lines = explode("\n", rtrim($content, "\n"));
     $out = '';
     foreach ($lines as $line) {
-        $out .= '<span class="l">' . ($line === '' ? '&nbsp;' : highlight_line($line, $lang)) . '</span>' . "\n";
+        $out .= '<span class="l">' . ($line === '' ? '&nbsp;' : link_urls(highlight_line($line, $lang))) . '</span>' . "\n";
     }
     return '<pre class="code">' . $out . '</pre>';
 }

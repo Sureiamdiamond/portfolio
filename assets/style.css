@@ -364,6 +364,9 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
   text-align: end; color: var(--pt-ln); border-inline-end: 1px solid var(--pt-line); user-select: none;
 }
 .pt-notice { margin: 8px 0 16px; padding-inline-start: 58px; }
+.pt-window .pt-notice .btn { font-family: var(--mono); font-size: 13px; }
+.code a { color: var(--pt-accent); text-decoration: underline; text-underline-offset: 2px; }
+.code a:hover { text-decoration-thickness: 2px; }
 .code .kw { color: var(--c-kw); }
 .code .str { color: var(--c-str); }
 .code .com { color: var(--c-com); font-style: italic; }
