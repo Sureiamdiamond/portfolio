@@ -335,6 +335,7 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
   content: counter(line); display: inline-block; width: 44px; margin-inline-end: 14px; padding-inline-end: 8px;
   text-align: end; color: var(--pt-ln); border-inline-end: 1px solid var(--pt-line); user-select: none;
 }
+.pt-notice { margin: 8px 0 16px; padding-inline-start: 58px; }
 .code .kw { color: var(--c-kw); }
 .code .str { color: var(--c-str); }
 .code .com { color: var(--c-com); font-style: italic; }

@@ -46,6 +46,9 @@ const STRINGS = [
         'select_file' => 'Select a file to preview it here.',
         'no_preview' => 'No preview for this file type. Use Download.',
         'download' => 'Download',
+        'private_code' => 'Source code for this file is private.',
+        'private_code_more' => 'Contact me for a walkthrough.',
+        'contact_me' => 'Contact me',
     ],
     'fa' => [
         'nav_home' => 'خانه',
@@ -89,6 +92,9 @@ const STRINGS = [
         'select_file' => 'یک فایل را انتخاب کنید تا اینجا نمایش داده شود.',
         'no_preview' => 'پیش‌نمایشی برای این نوع فایل نیست. از دکمه‌ی دانلود استفاده کنید.',
         'download' => 'دانلود',
+        'private_code' => 'کد منبع این فایل خصوصی است.',
+        'private_code_more' => 'برای توضیح و نمایش عملی با من تماس بگیرید.',
+        'contact_me' => 'تماس با من',
     ],
 ];
 

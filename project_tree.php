@@ -36,11 +36,11 @@ function project_generated_files(array $p, string $lang, string $slug): array {
 
     return [
         'README.md' => "# $title\n\n$summary\n$stack$links",
-        'pubspec.yaml' => "# Generated overview from this project's stored data.\n# Replace it with the real file in /admin > Project files.\nname: $slug\ndescription: \"" . str_replace('"', "'", $title) . "\"\npublish_to: none\n\ndependencies:\n  flutter:\n    sdk: flutter\n$techComments",
-        'lib/main.dart' => "// Generated overview: placeholder, not the real source code.\n// Upload the real file in /admin > Project files.\nimport 'package:flutter/material.dart';\n\nvoid main() {\n  runApp(MaterialApp(home: Scaffold(body: Center(child: Text('$dartTitle')))));\n}\n",
+        'pubspec.yaml' => "# Generated overview from this project's stored data.\nname: $slug\ndescription: \"" . str_replace('"', "'", $title) . "\"\npublish_to: none\n\ndependencies:\n  flutter:\n    sdk: flutter\n$techComments",
+        'lib/main.dart' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n",
         'analysis_options.yaml' => "# Generated overview: standard Flutter lint setup.\ninclude: package:flutter_lints/flutter.yaml\n",
         '.gitignore' => "# Generated overview\n.dart_tool/\nbuild/\n.flutter-plugins\n.flutter-plugins-dependencies\n",
-        'links.md' => "# Links\n\n" . (!empty($p['url']) ? "- {$p['url']}\n" : "No links yet. Add them in /admin.\n"),
+        'links.md' => "# Links\n\n" . (!empty($p['url']) ? "- {$p['url']}\n" : "No links yet.\n"),
     ];
 }
 
@@ -48,7 +48,7 @@ function project_generated_files(array $p, string $lang, string $slug): array {
 function project_entries(PDO $pdo, array $p, string $lang, string $slug): array {
     $files = [];
     foreach (project_generated_files($p, $lang, $slug) as $path => $content) {
-        $files[$path] = ['kind' => 'text', 'lang' => lang_of($path), 'content' => $content];
+        $files[$path] = ['kind' => 'text', 'lang' => lang_of($path), 'content' => $content, 'notice' => $path === 'lib/main.dart'];
     }
     $stmt = $pdo->prepare('SELECT path, content FROM project_files WHERE project_id = ? ORDER BY path');
     $stmt->execute([(int) $p['id']]);
@@ -126,7 +126,8 @@ function render_project_tree(array $project, PDO $pdo, string $lang, array &$sou
         if ($entry['kind'] === 'image') {
             $sources[] = '<div class="pt-src" id="' . $id . '" hidden><figure class="pt-image"><img src="' . e($entry['src']) . '" alt="' . e(basename($path)) . '"></figure></div>';
         } else {
-            $sources[] = '<div class="pt-src" id="' . $id . '" data-lang="' . e($entry['lang']) . '" hidden>' . render_code($entry['content'], $entry['lang']) . '</div>';
+            $notice = !empty($entry['notice']) ? '<p class="pt-notice"><a class="btn btn-ghost" href="#contact">' . e(t('contact_me', $lang)) . '</a></p>' : '';
+            $sources[] = '<div class="pt-src" id="' . $id . '" data-lang="' . e($entry['lang']) . '" hidden>' . render_code($entry['content'], $entry['lang']) . $notice . '</div>';
         }
         $files[$path]['id'] = $id;
     }
