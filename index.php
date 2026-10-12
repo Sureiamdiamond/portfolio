@@ -25,6 +25,8 @@ $experience = array_values(array_filter($timeline, fn($t) => $t['kind'] === 'exp
 $name = loc($profile, 'name', $lang) ?: t('default_name', $lang);
 // Hero photo uploaded in /admin (a transparent PNG or WebP); empty means the built-in cutout
 $heroPhoto = (string) ($profile['hero_photo'] ?? '');
+// Name on two lines for the hero: first name, then the rest
+$nameLines = array_values(array_filter(preg_split('/\s+/u', trim($name), 2) ?: [], 'strlen'));
 $headline = loc($profile, 'headline', $lang) ?: t('default_headline', $lang);
 $about = loc($profile, 'about', $lang);
 $switchLang = $lang === 'fa' ? 'en' : 'fa';
@@ -98,7 +100,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     <div class="hero-art" aria-hidden="true">
       <span class="ring"></span>
       <div class="portrait">
-        <span class="portrait-name"><?= e($name) ?></span>
+        <span class="portrait-name"><?php foreach ($nameLines as $line): ?><span><?= e($line) ?></span><?php endforeach; ?></span>
         <img class="portrait-img" src="<?= e($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png?v=' . $assetVersion) ?>" alt="<?= e($name) ?>" width="380" height="541" decoding="async">
       </div>
       <span class="chip chip-a"><?= count($projects) ?> <?= e(t('stat_projects', $lang)) ?></span>
