@@ -43,7 +43,7 @@ function db(): PDO {
         SQL);
     // Backward-compatible migration: add Persian columns to existing databases.
     $persianColumns = [
-        'projects' => ['title_fa', 'summary_fa'],
+        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url'],
         'papers' => ['title_fa'],
         'presentations' => ['title_fa'],
         'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa'],

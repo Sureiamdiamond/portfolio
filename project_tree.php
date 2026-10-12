@@ -19,32 +19,76 @@ function project_slug(array $project): string {
 }
 
 function lang_of(string $path): string {
+    if (basename($path) === '.gitignore') {
+        return 'gitignore';
+    }
     return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
         'dart' => 'dart',
         'yaml', 'yml' => 'yaml',
         'md' => 'markdown',
+        'json' => 'json',
         default => 'text',
     };
 }
 
-/** Generated overview files, built only from the project's stored fields. Not the real source code. */
+/**
+ * Generated files of one project, built only from its stored fields.
+ * main.dart is a labeled stub, not the real source code; the real file replaces it when pasted in /admin.
+ */
 function project_generated_files(array $p, string $lang, string $slug): array {
     $title = loc($p, 'title', $lang);
-    $summary = loc($p, 'summary', $lang);
+    $summary = trim((string) $p['summary']);
+    $summaryFa = trim((string) ($p['summary_fa'] ?? ''));
+    $titleFa = trim((string) ($p['title_fa'] ?? ''));
     $tags = array_values(array_filter(array_map('trim', explode(',', (string) $p['tags']))));
-    $stack = $tags ? "\n## Tech stack\n" . implode("\n", array_map(fn($t) => "- $t", $tags)) . "\n" : '';
-    $links = !empty($p['url']) ? "\n## Links\n- {$p['url']}\n" : '';
-    $dartTitle = str_replace("'", "\\'", $title);
-    $techComments = $tags ? implode("\n", array_map(fn($t) => "  # tech: $t", $tags)) . "\n" : '';
+    $links = project_links($p);
+
+    $readme = "# $title\n\n";
+    $readme .= "Kind: {$p['kind']}\n\n";
+    $readme .= ($summary !== '' ? "$summary\n" : "No description yet.\n");
+    if ($titleFa !== '' || $summaryFa !== '') {
+        $readme .= "\n## Persian\n\n" . ($titleFa !== '' ? "**$titleFa**\n\n" : '') . ($summaryFa !== '' ? "$summaryFa\n" : '');
+    }
+    if ($tags) {
+        $readme .= "\n## Tech stack\n\n" . implode("\n", array_map(fn($t) => "- $t", $tags)) . "\n";
+    }
+    if ($links) {
+        $readme .= "\n## Links\n\n" . implode("\n", array_map(fn($l) => "- {$l[0]}: {$l[1]}", $links)) . "\n";
+    }
+
+    $linksFile = "# Links\n\n" . ($links
+        ? implode("\n", array_map(fn($l) => "- {$l[0]}: {$l[1]}", $links)) . "\n"
+        : "No links yet.\n");
+
+    $dartTitle = str_replace(['\\', "'"], ['\\\\', "\\'"], $title);
+    $main = "// Generated stub from this project's stored data. Not the real source code.\n"
+        . "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n"
+        . "import 'package:flutter/material.dart';\n\n"
+        . "void main() {\n"
+        . "  runApp(const MaterialApp(\n"
+        . "    title: '$dartTitle',\n"
+        . "    home: Scaffold(\n"
+        . "      body: Center(child: Text('$dartTitle')),\n"
+        . "    ),\n"
+        . "  ));\n"
+        . "}\n";
 
     return [
-        'README.md' => "# $title\n\n$summary\n$stack$links",
-        'pubspec.yaml' => "# Generated overview from this project's stored data.\nname: $slug\ndescription: \"" . str_replace('"', "'", $title) . "\"\npublish_to: none\n\ndependencies:\n  flutter:\n    sdk: flutter\n$techComments",
-        'main.dart' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n",
-        'analysis_options.yaml' => "# Generated overview: standard Flutter lint setup.\ninclude: package:flutter_lints/flutter.yaml\n",
-        '.gitignore' => "# Generated overview\n.dart_tool/\nbuild/\n.flutter-plugins\n.flutter-plugins-dependencies\n",
-        'links.md' => "# Links\n\n" . (!empty($p['url']) ? "- {$p['url']}\n" : "No links yet.\n"),
+        'README.md' => $readme,
+        'links.md' => $linksFile,
+        'main.dart' => $main,
     ];
+}
+
+/** Project links as [label, url] pairs, only for the ones that are set. */
+function project_links(array $p): array {
+    $pairs = [
+        ['GitHub', $p['github_url'] ?? ''],
+        ['App Store', $p['appstore_url'] ?? ''],
+        ['Google Play', $p['playstore_url'] ?? ''],
+        ['Website', $p['url'] ?? ''],
+    ];
+    return array_values(array_filter($pairs, fn($l) => trim((string) $l[1]) !== ''));
 }
 
 /** All entries of one project: text files (generated, overridden by admin content) and screenshots. */
@@ -188,7 +232,9 @@ function render_dir_level(array $dirs, array $files, string $parent, array $proj
             'yaml' => ['Y', 'ic-yaml'],
             'markdown' => ['M', 'ic-md'],
             'image' => ['IMG', 'ic-img'],
-            default => ['T', 'ic-txt'],
+            'gitignore' => ['⊘', 'ic-git'],
+            'json' => ['{}', 'ic-json'],
+            default => ['≡', 'ic-txt'],
         };
         $html .= '<li><a class="it file" href="#' . $entry['id'] . '" data-src="' . $entry['id'] . '"'
             . ' data-path="' . e(ROOT_NAME . '/' . $path) . '" data-lang="' . e($entry['lang']) . '">'

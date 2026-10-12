@@ -51,7 +51,7 @@ const STRINGS = [
         'contact_me' => 'Contact me',
         'view_label' => 'Projects view',
         'view_normal' => 'Normal',
-        'view_ide' => 'Android Studio',
+        'view_ide' => 'IDE',
     ],
     'fa' => [
         'nav_home' => 'خانه',
@@ -100,7 +100,7 @@ const STRINGS = [
         'contact_me' => 'تماس با من',
         'view_label' => 'نمایش پروژه‌ها',
         'view_normal' => 'عادی',
-        'view_ide' => 'Android Studio',
+        'view_ide' => 'IDE',
     ],
 ];
 

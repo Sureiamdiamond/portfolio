@@ -86,6 +86,8 @@
       btn.type = 'button';
       btn.setAttribute('role', 'tab');
       btn.textContent = name;
+      const icon = link.querySelector('.ic');
+      if (icon) btn.prepend(icon.cloneNode(true));
       btn.addEventListener('click', () => setActive(id));
       const x = document.createElement('button');
       x.type = 'button';
@@ -160,13 +162,14 @@
         b.classList.toggle('on', on);
         b.setAttribute('aria-pressed', String(on));
       });
-      document.querySelectorAll('#projects li.it-project, #projects .pcard').forEach((el) => {
+      // The filter applies to the Normal cards only; the IDE tree always shows every project
+      document.querySelectorAll('#projects .pcard').forEach((el) => {
         el.hidden = kind !== 'all' && el.dataset.kind !== kind;
       });
     });
   });
 
-  // Projects view switch: Normal cards or the Android Studio-style window. Remembers the choice.
+  // Projects view switch: Normal cards or the IDE window. Remembers the choice.
   const section = document.getElementById('projects');
   const switcher = document.getElementById('view-switch');
   if (section && switcher) {

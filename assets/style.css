@@ -165,6 +165,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 .pv-normal[hidden], .pt-window[hidden], .pcard[hidden] { display: none !important; }
 html[data-projects-view="ide"] #view-normal { display: none !important; }
 html[data-projects-view="normal"] .pt-window { display: none !important; }
+html[data-projects-view="ide"] #projects .filters { display: none !important; }
 .pv-normal { margin-top: 8px; }
 .pcard-shot { margin: 0 0 14px; }
 .pcard-shot img, .pcard-shots img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
@@ -261,7 +262,7 @@ html[lang="fa"] .timeline h3.sub, html[lang="fa"] .muted.mono, html[lang="fa"] .
   --pt-sel: #2675BF; --pt-hover: #E8ECF3; --pt-tab: #EBECF0; --pt-tab-on: #FFFFFF; --pt-accent: #3574F0;
   --pt-ln: #AFB1B3; --pt-status: #F2F3F5;
   --c-kw: #0033B3; --c-str: #067D17; --c-com: #8C8C8C; --c-num: #1750EB; --c-key: #871094; --c-hd: #0E6FAA;
-  --ic-dart: #40B6E0; --ic-yaml: #CB171E; --ic-md: #0E6FAA; --ic-img: #9876AA; --ic-txt: #6C707E;
+  --ic-dart: #40B6E0; --ic-yaml: #CB171E; --ic-md: #0E6FAA; --ic-img: #9876AA; --ic-txt: #6C707E; --ic-git: #7A7E85; --ic-json: #D9A343;
   direction: ltr; position: relative; border-radius: 14px; overflow: hidden; border: 1px solid var(--border);
   background: var(--pt-bg); color: var(--pt-text); box-shadow: var(--shadow); font: 13px/1.5 var(--sans); text-align: start;
   --tool-w: 280px;
@@ -336,6 +337,9 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
 .ic-md { background: var(--ic-md); }
 .ic-img { background: var(--ic-img); }
 .ic-txt { background: var(--ic-txt); }
+.ic-git { background: var(--ic-git); }
+.ic-json { background: var(--ic-json); }
+.pt-tab > button[role="tab"] { display: inline-flex; align-items: center; gap: 6px; }
 .it-project > details > summary.it { font-weight: 600; }
 .pt-empty-tree { padding: 12px; }
 
