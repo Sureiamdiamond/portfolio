@@ -160,11 +160,62 @@
         b.classList.toggle('on', on);
         b.setAttribute('aria-pressed', String(on));
       });
-      tree.querySelectorAll('li.it-project').forEach((li) => {
-        li.hidden = kind !== 'all' && li.dataset.kind !== kind;
+      document.querySelectorAll('#projects li.it-project, #projects .pcard').forEach((el) => {
+        el.hidden = kind !== 'all' && el.dataset.kind !== kind;
       });
     });
   });
+
+  // Projects view switch: Normal cards or the Android Studio-style window. Remembers the choice.
+  const section = document.getElementById('projects');
+  const switcher = document.getElementById('view-switch');
+  if (section && switcher) {
+    const views = {
+      normal: document.getElementById('view-normal'),
+      ide: section.querySelector('.pt-window'),
+    };
+    const buttons = Array.from(switcher.querySelectorAll('[role="radio"]'));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const show = (name, animate) => {
+      if (!views[name]) return;
+      section.dataset.view = name;
+      buttons.forEach((b) => {
+        const on = b.dataset.view === name;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-checked', String(on));
+        b.tabIndex = on ? 0 : -1;
+      });
+      Object.entries(views).forEach(([n, el]) => {
+        if (!el) return;
+        el.hidden = n !== name;
+        el.classList.remove('view-in');
+      });
+      const el = views[name];
+      if (animate && el && !reduceMotion.matches) {
+        void el.offsetWidth;
+        el.classList.add('view-in');
+        el.addEventListener('animationend', () => el.classList.remove('view-in'), { once: true });
+      }
+    };
+    let saved = 'normal';
+    try { saved = localStorage.getItem('projects-view') || 'normal'; } catch (err) { /* private mode: keep the default */ }
+    show(saved, false);
+
+    buttons.forEach((btn, i) => {
+      btn.addEventListener('click', () => {
+        show(btn.dataset.view, true);
+        try { localStorage.setItem('projects-view', btn.dataset.view); } catch (err) { /* ignore */ }
+      });
+      btn.addEventListener('keydown', (ev) => {
+        const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[ev.key];
+        if (!step) return;
+        ev.preventDefault();
+        const next = buttons[(i + step + buttons.length) % buttons.length];
+        next.focus();
+        next.click();
+      });
+    });
+  }
 
   // Resizable divider (desktop): drag, or use the arrow keys when focused
   const minW = 160;

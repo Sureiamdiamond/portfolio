@@ -12,6 +12,10 @@ foreach ($pdo->query('SELECT k, v FROM profile') as $row) {
     $profile[$row['k']] = $row['v'];
 }
 $projects = $pdo->query('SELECT * FROM projects ORDER BY sort, id DESC')->fetchAll();
+$projectShots = [];
+foreach ($pdo->query('SELECT project_id, path FROM project_media ORDER BY sort, id') as $shot) {
+    $projectShots[$shot['project_id']][] = $shot['path'];
+}
 $papers = $pdo->query('SELECT * FROM papers ORDER BY year DESC, sort, id DESC')->fetchAll();
 $slides = $pdo->query('SELECT * FROM presentations ORDER BY year DESC, sort, id DESC')->fetchAll();
 $timeline = $pdo->query('SELECT * FROM timeline ORDER BY sort, id DESC')->fetchAll();
@@ -113,13 +117,48 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
   <section id="projects" class="block reveal">
     <p class="label"><span>02</span><?= e(t('projects', $lang)) ?></p>
     <h2><?= e(t('projects', $lang)) ?></h2>
+    <div class="view-switch" id="view-switch" role="radiogroup" aria-label="<?= e(t('view_label', $lang)) ?>">
+      <button type="button" role="radio" class="on" data-view="normal" aria-checked="true" tabindex="0">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>
+        <span><?= e(t('view_normal', $lang)) ?></span>
+      </button>
+      <button type="button" role="radio" data-view="ide" aria-checked="false" tabindex="-1">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 2.5v11" stroke="currentColor" stroke-width="1.4"/></svg>
+        <span><?= e(t('view_ide', $lang)) ?></span>
+      </button>
+    </div>
+
     <div class="filters" role="group" aria-label="<?= e(t('projects', $lang)) ?>">
       <button type="button" class="on" data-filter="all" aria-pressed="true"><?= e(t('filter_all', $lang)) ?></button>
       <button type="button" data-filter="work" aria-pressed="false"><?= e(t('filter_work', $lang)) ?></button>
       <button type="button" data-filter="academic" aria-pressed="false"><?= e(t('filter_academic', $lang)) ?></button>
     </div>
 
-    <div class="pt-window" data-pt>
+    <div class="pv-normal" id="view-normal">
+      <div class="grid">
+        <?php foreach ($projects as $p): $shots = $projectShots[$p['id']] ?? []; ?>
+          <article class="card pcard" data-kind="<?= e($p['kind']) ?>">
+            <?php if ($shots): ?>
+              <figure class="pcard-shot"><img src="<?= e($shots[0]) ?>" alt="" loading="lazy"></figure>
+            <?php endif; ?>
+            <span class="tag"><?= e($p['kind']) ?></span>
+            <h3><?= e(loc($p, 'title', $lang)) ?></h3>
+            <p class="muted"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
+            <?php $tags = array_filter(array_map('trim', explode(',', (string) $p['tags']))); ?>
+            <?php if ($tags): ?>
+              <ul class="pcard-tags"><?php foreach ($tags as $tag): ?><li><?= e($tag) ?></li><?php endforeach; ?></ul>
+            <?php endif; ?>
+            <?php if (count($shots) > 1): ?>
+              <ul class="pcard-shots"><?php foreach (array_slice($shots, 1) as $more): ?><li><img src="<?= e($more) ?>" alt="" loading="lazy"></li><?php endforeach; ?></ul>
+            <?php endif; ?>
+            <?php if ($p['url']): ?><a href="<?= e($p['url']) ?>" target="_blank" rel="noopener"><?= e(t('view_project', $lang)) ?> →</a><?php endif; ?>
+          </article>
+        <?php endforeach; ?>
+      </div>
+      <?php if (!$projects): ?><p class="muted"><?= e(t('empty_projects', $lang)) ?></p><?php endif; ?>
+    </div>
+
+    <div class="pt-window" data-pt dir="ltr">
       <div class="pt-titlebar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="pt-title">ParsaBanitaba.ir — <?= e(t('projects', $lang)) ?></span></div>
       <div class="pt-main">
         <aside class="pt-tool" id="pt-tool">

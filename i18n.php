@@ -49,6 +49,9 @@ const STRINGS = [
         'private_code' => 'Source code for this file is private.',
         'private_code_more' => 'Contact me for a walkthrough.',
         'contact_me' => 'Contact me',
+        'view_label' => 'Projects view',
+        'view_normal' => 'Normal',
+        'view_ide' => 'Android Studio',
     ],
     'fa' => [
         'nav_home' => 'خانه',
@@ -95,6 +98,9 @@ const STRINGS = [
         'private_code' => 'کد منبع این فایل خصوصی است.',
         'private_code_more' => 'برای توضیح و نمایش عملی با من تماس بگیرید.',
         'contact_me' => 'تماس با من',
+        'view_label' => 'نمایش پروژه‌ها',
+        'view_normal' => 'عادی',
+        'view_ide' => 'Android Studio',
     ],
 ];
 
