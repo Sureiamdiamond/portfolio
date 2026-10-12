@@ -10,12 +10,20 @@ $config = require __DIR__ . '/../config.php';
 $pdo = db();
 
 const TYPES = [
-    'projects' => ['label' => 'Projects', 'fields' => ['title', 'kind', 'summary', 'tags', 'url', 'sort'], 'long' => ['summary'], 'files' => []],
-    'papers' => ['label' => 'Papers', 'fields' => ['title', 'venue', 'year', 'doi', 'sort'], 'long' => [], 'files' => ['pdf']],
-    'presentations' => ['label' => 'Presentations', 'fields' => ['title', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
-    'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'org', 'period', 'details', 'sort'], 'long' => ['details'], 'files' => []],
+    'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'sort'], 'long' => ['summary', 'summary_fa'], 'files' => []],
+    'papers' => ['label' => 'Papers', 'fields' => ['title', 'title_fa', 'venue', 'year', 'doi', 'sort'], 'long' => [], 'files' => ['pdf']],
+    'presentations' => ['label' => 'Presentations', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
+    'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'period', 'period_fa', 'details', 'details_fa', 'sort'], 'long' => ['details', 'details_fa'], 'files' => []],
 ];
-const PROFILE_FIELDS = ['name', 'headline', 'email', 'linkedin', 'github'];
+const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'email', 'phone', 'linkedin', 'github'];
+
+/** Human label for a field; Persian fields are marked so the admin knows where to type them. */
+function label(string $field): string {
+    if (str_ends_with($field, '_fa')) {
+        return ucfirst(substr($field, 0, -3)) . ' (Persian)';
+    }
+    return ucfirst($field);
+}
 
 $error = null;
 $notice = null;
@@ -179,7 +187,7 @@ if ($loggedIn) {
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="profile">
       <?php foreach (PROFILE_FIELDS as $field): ?>
-        <label for="p-<?= $field ?>"><?= ucfirst($field) ?></label>
+        <label for="p-<?= $field ?>"><?= e(label($field)) ?></label>
         <input id="p-<?= $field ?>" name="<?= $field ?>" value="<?= e($profile[$field] ?? '') ?>">
       <?php endforeach; ?>
       <label for="cv">CV (PDF)</label>
@@ -200,7 +208,7 @@ if ($loggedIn) {
       <input type="hidden" name="id" value="<?= (int) ($edit['id'] ?? 0) ?>">
       <h3><?= $edit ? 'Edit item' : 'Add item' ?></h3>
       <?php foreach ($spec['fields'] as $field): ?>
-        <label for="f-<?= $field ?>"><?= ucfirst($field) ?></label>
+        <label for="f-<?= $field ?>"><?= e(label($field)) ?></label>
         <?php if (in_array($field, $spec['long'], true)): ?>
           <textarea id="f-<?= $field ?>" name="<?= $field ?>"><?= e($edit[$field] ?? '') ?></textarea>
         <?php else: ?>

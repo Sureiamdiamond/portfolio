@@ -32,7 +32,28 @@ function db(): PDO {
             id INTEGER PRIMARY KEY AUTOINCREMENT, kind TEXT NOT NULL, title TEXT NOT NULL, org TEXT,
             period TEXT, details TEXT, sort INTEGER NOT NULL DEFAULT 0);
         SQL);
+    // Backward-compatible migration: add Persian columns to existing databases.
+    $persianColumns = [
+        'projects' => ['title_fa', 'summary_fa'],
+        'papers' => ['title_fa'],
+        'presentations' => ['title_fa'],
+        'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa'],
+    ];
+    foreach ($persianColumns as $table => $columns) {
+        $existing = array_column($pdo->query("PRAGMA table_info($table)")->fetchAll(), 'name');
+        foreach ($columns as $column) {
+            if (!in_array($column, $existing, true)) {
+                $pdo->exec("ALTER TABLE $table ADD COLUMN $column TEXT");
+            }
+        }
+    }
     return $pdo;
+}
+
+/** Returns the Persian value when the page is in Persian and one exists, otherwise the English value. */
+function loc(array $row, string $field, string $lang): string {
+    $fa = trim((string) ($row[$field . '_fa'] ?? ''));
+    return ($lang === 'fa' && $fa !== '') ? $fa : (string) ($row[$field] ?? '');
 }
 
 function e(?string $value): string {

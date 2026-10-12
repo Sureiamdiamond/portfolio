@@ -2,6 +2,19 @@
 document.documentElement.classList.add('js');
 
 (function () {
+  // Theme toggle: remembers the choice, otherwise follows the system preference
+  const root = document.documentElement;
+  const systemDark = window.matchMedia('(prefers-color-scheme: dark)');
+  const toggle = document.getElementById('theme-toggle');
+  const effectiveTheme = () => root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      try { localStorage.setItem('theme', next); } catch (e) { /* private mode: keep it for this page only */ }
+    });
+  }
+
   // Project filters
   const buttons = document.querySelectorAll('.filters button');
   buttons.forEach((btn) => {
@@ -39,11 +52,7 @@ document.documentElement.classList.add('js');
       return;
     }
     gsap.utils.toArray('.reveal').forEach((el) => {
-      gsap.to(el, {
-        opacity: 1, y: 0, duration: .8, ease: 'power3.out',
-        scrollTrigger: undefined,
-        delay: 0.05,
-      });
+      gsap.to(el, { opacity: 1, y: 0, duration: .8, ease: 'power3.out', delay: 0.05 });
     });
     gsap.from('.hero h1', { y: 30, opacity: 0, duration: 1, ease: 'power4.out' });
   };
