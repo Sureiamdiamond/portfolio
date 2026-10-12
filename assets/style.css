@@ -78,13 +78,7 @@ h3 { font-size: 1.12rem; font-weight: 600; }
   background: color-mix(in srgb, var(--bg) 82%, transparent); border-bottom: 1px solid var(--border);
 }
 .topbar-inner { max-width: 1120px; margin: 0 auto; padding: 0 20px; min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
-.brand { display: inline-flex; align-items: center; gap: 10px; color: var(--fg); font-weight: 600; min-height: 44px; }
-.brand:hover { text-decoration: none; }
-.brand-mark {
-  display: grid; place-items: center; width: 34px; height: 34px; border-radius: 10px; background: var(--gradient);
-  color: #fff; font: 600 .8rem/1 var(--sans);
-}
-.nav-links { display: flex; gap: 2px; }
+.nav-links { display: flex; gap: 2px; margin-inline: auto; }
 .nav-links a { color: var(--fg); font-size: .92rem; font-weight: 500; padding: 0 12px; min-height: 44px; display: inline-flex; align-items: center; border-radius: 10px; }
 .nav-links a:hover { color: var(--accent); background: color-mix(in srgb, var(--accent) 8%, transparent); text-decoration: none; }
 .nav-actions { display: flex; align-items: center; gap: 6px; }

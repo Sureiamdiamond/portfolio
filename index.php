@@ -31,9 +31,7 @@ $headline = loc($profile, 'headline', $lang) ?: t('default_headline', $lang);
 $about = loc($profile, 'about', $lang);
 $switchLang = $lang === 'fa' ? 'en' : 'fa';
 
-// Initials for the logo and hero card, e.g. "Parsa Banitaba" -> "PB"
 $words = preg_split('/\s+/u', trim($name)) ?: [];
-$initials = mb_strtoupper(implode('', array_map(fn($w) => mb_substr($w, 0, 1), array_slice($words, 0, 2))));
 // The last word of the name gets the gradient highlight
 $lastWord = count($words) > 1 ? array_pop($words) : '';
 $firstWords = implode(' ', $words);
@@ -71,7 +69,6 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
 
 <header class="topbar">
   <div class="topbar-inner">
-    <a class="brand" href="#top"><span class="brand-mark" aria-hidden="true"><?= e($initials) ?></span><span><?= e($name) ?></span></a>
     <nav class="nav-links" aria-label="<?= e(t('projects', $lang)) ?>">
       <a href="#journey"><?= e(t('journey', $lang)) ?></a>
       <a href="#projects"><?= e(t('projects', $lang)) ?></a>
@@ -81,7 +78,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     <div class="nav-actions">
       <a class="tool" href="?lang=<?= $switchLang ?>" hreflang="<?= $switchLang ?>"><?= e(t('lang_switch', $lang)) ?></a>
       <button type="button" class="tool" id="theme-toggle" aria-label="<?= e(t('toggle_theme', $lang)) ?>">◐</button>
-      <a class="btn btn-primary" href="#contact"><?= e(t('lets_chat', $lang)) ?></a>
+      <a class="btn btn-primary" href="#contact"><?= e(t('contact_me', $lang)) ?></a>
     </div>
   </div>
 </header>
