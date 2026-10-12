@@ -60,6 +60,7 @@ function db(): PDO {
     seed_files($pdo);
     seed_resume_projects($pdo);
     run_migrations($pdo);
+    run_content_migrations($pdo);
     return $pdo;
 }
 
