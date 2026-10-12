@@ -155,7 +155,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
             <?php endif; ?>
             <span class="tag"><?= e($p['kind']) ?></span>
             <h3><?= e(loc($p, 'title', $lang)) ?></h3>
-            <p class="muted"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
+            <p class="muted pcard-summary"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
             <?php $tags = array_filter(array_map('trim', explode(',', (string) $p['tags']))); ?>
             <?php if ($tags): ?>
               <ul class="pcard-tags"><?php foreach ($tags as $tag): ?><li><?= e($tag) ?></li><?php endforeach; ?></ul>
@@ -163,7 +163,11 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
             <?php if (count($shots) > 1): ?>
               <ul class="pcard-shots"><?php foreach (array_slice($shots, 1) as $more): ?><li><img src="<?= e($more) ?>" alt="" loading="lazy"></li><?php endforeach; ?></ul>
             <?php endif; ?>
-            <?php if ($p['url']): ?><a href="<?= e($p['url']) ?>" target="_blank" rel="noopener"><?= e(t('view_project', $lang)) ?> →</a><?php endif; ?>
+            <?php if ($p['url']): ?>
+              <a href="<?= e($p['url']) ?>" target="_blank" rel="noopener"><?= e(t('view_project', $lang)) ?> →</a>
+            <?php elseif (mb_strlen(loc($p, 'summary', $lang)) > 160): ?>
+              <a href="#projects-ide"><?= e(t('full_description', $lang)) ?> →</a>
+            <?php endif; ?>
           </article>
         <?php endforeach; ?>
       </div>

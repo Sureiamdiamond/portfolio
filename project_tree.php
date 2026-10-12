@@ -36,29 +36,32 @@ function lang_of(string $path): string {
  * main.dart is a labeled stub, not the real source code; the real file replaces it when pasted in /admin.
  */
 function project_generated_files(array $p, string $lang, string $slug): array {
+    // Headings and labels follow the page language; the description is the project's text in that language
+    $fa = $lang === 'fa';
+    $h = $fa
+        ? ['kind' => 'نوع', 'stack' => 'فناوری‌ها', 'links' => 'لینک‌ها', 'nolinks' => 'هنوز لینکی ثبت نشده است.', 'nodesc' => 'توضیحی ثبت نشده است.',
+            'work' => 'کاری', 'academic' => 'دانشگاهی']
+        : ['kind' => 'Kind', 'stack' => 'Tech stack', 'links' => 'Links', 'nolinks' => 'No links yet.', 'nodesc' => 'No description yet.',
+            'work' => 'Work', 'academic' => 'Academic'];
     $title = loc($p, 'title', $lang);
-    $summary = trim((string) $p['summary']);
-    $summaryFa = trim((string) ($p['summary_fa'] ?? ''));
-    $titleFa = trim((string) ($p['title_fa'] ?? ''));
+    $summary = trim(loc($p, 'summary', $lang));
     $tags = array_values(array_filter(array_map('trim', explode(',', (string) $p['tags']))));
     $links = project_links($p);
+    $kind = $h[$p['kind']] ?? $p['kind'];
 
     $readme = "# $title\n\n";
-    $readme .= "Kind: {$p['kind']}\n\n";
-    $readme .= ($summary !== '' ? "$summary\n" : "No description yet.\n");
-    if ($titleFa !== '' || $summaryFa !== '') {
-        $readme .= "\n## Persian\n\n" . ($titleFa !== '' ? "**$titleFa**\n\n" : '') . ($summaryFa !== '' ? "$summaryFa\n" : '');
-    }
+    $readme .= "{$h['kind']}: $kind\n\n";
+    $readme .= ($summary !== '' ? "$summary\n" : "{$h['nodesc']}\n");
     if ($tags) {
-        $readme .= "\n## Tech stack\n\n" . implode("\n", array_map(fn($t) => "- $t", $tags)) . "\n";
+        $readme .= "\n## {$h['stack']}\n\n" . implode("\n", array_map(fn($t) => "- $t", $tags)) . "\n";
     }
     if ($links) {
-        $readme .= "\n## Links\n\n" . implode("\n", array_map(fn($l) => "- {$l[0]}: {$l[1]}", $links)) . "\n";
+        $readme .= "\n## {$h['links']}\n\n" . implode("\n", array_map(fn($l) => "- {$l[0]}: {$l[1]}", $links)) . "\n";
     }
 
-    $linksFile = "# Links\n\n" . ($links
+    $linksFile = "# {$h['links']}\n\n" . ($links
         ? implode("\n", array_map(fn($l) => "- {$l[0]}: {$l[1]}", $links)) . "\n"
-        : "No links yet.\n");
+        : "{$h['nolinks']}\n");
 
     $dartTitle = str_replace(['\\', "'"], ['\\\\', "\\'"], $title);
     $main = "// Generated stub from this project's stored data. Not the real source code.\n"
@@ -173,7 +176,7 @@ function render_code(string $content, string $lang): string {
 /** Root app files: a generated overview of the layout. Not real source code. */
 function root_entries(string $lang): array {
     return [
-        'README.md' => ['kind' => 'text', 'content' => "# " . ROOT_NAME . "\n\nProjects live in lib/projects/, one folder each.\n", 'notice' => false],
+        'README.md' => ['kind' => 'text', 'content' => "# " . ROOT_NAME . "\n\n" . ($lang === 'fa' ? "پروژه‌ها در lib/projects/ قرار دارند، هر کدام در پوشه‌ی جدا.\n" : "Projects live in lib/projects/, one folder each.\n"), 'notice' => false],
         'pubspec.yaml' => ['kind' => 'text', 'content' => "# Generated overview of the layout.\nname: " . ROOT_NAME . "\npublish_to: none\n", 'notice' => false],
         'lib/main.dart' => ['kind' => 'text', 'content' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n", 'notice' => true],
     ];

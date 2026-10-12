@@ -179,6 +179,7 @@ html[data-projects-view="normal"] .pt-window { display: none !important; }
 html[data-projects-view="ide"] #projects .filters { display: none !important; }
 .pv-normal { margin-top: 8px; }
 .pcard-shot { margin: 0 0 14px; }
+.pcard-summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
 .pcard-shot img, .pcard-shots img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
 .pcard-shots { display: flex; gap: 8px; list-style: none; padding: 0; margin: 10px 0 0; }
 .pcard-shots li { width: 72px; }
