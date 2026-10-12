@@ -198,14 +198,19 @@
         el.addEventListener('animationend', () => el.classList.remove('view-in'), { once: true });
       }
     };
-    // #projects-ide is an explicit override: it is applied and saved like a click
+    // #projects-ide is an explicit override of the saved choice; it also scrolls to the section
+    const applyHash = (scroll) => {
+      if (window.location.hash !== '#projects-ide') return false;
+      show('ide', false);
+      try { localStorage.setItem('projects-view', 'ide'); } catch (err) { /* ignore */ }
+      if (scroll) section.scrollIntoView({ behavior: reduceMotion.matches ? 'auto' : 'smooth', block: 'start' });
+      return true;
+    };
     let initial = 'normal';
     try { initial = localStorage.getItem('projects-view') || 'normal'; } catch (err) { /* private mode: keep the default */ }
-    if (window.location.hash === '#projects-ide') {
-      initial = 'ide';
-      try { localStorage.setItem('projects-view', 'ide'); } catch (err) { /* ignore */ }
-    }
     show(initial === 'ide' ? 'ide' : 'normal', false);
+    applyHash(true);
+    window.addEventListener('hashchange', () => applyHash(true));
 
     buttons.forEach((btn, i) => {
       btn.addEventListener('click', () => {
