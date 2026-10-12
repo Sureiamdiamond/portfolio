@@ -256,14 +256,24 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
       <div>
         <p class="label"><span>06</span><?= e(t('contact', $lang)) ?></p>
         <h2><?= e(t('contact', $lang)) ?></h2>
-        <?php if (!empty($profile['email'])): ?><p><a href="mailto:<?= e($profile['email']) ?>"><?= e($profile['email']) ?></a></p><?php endif; ?>
-        <?php if (!empty($profile['phone'])): ?>
-          <p><span class="muted"><?= e(t('phone', $lang)) ?>:</span> <a href="tel:<?= e(preg_replace('/\s+/', '', $profile['phone'])) ?>"><?= e($profile['phone']) ?></a></p>
-        <?php endif; ?>
       </div>
-      <div class="links">
-        <?php if (!empty($profile['linkedin'])): ?><a href="<?= e($profile['linkedin']) ?>" target="_blank" rel="noopener">LinkedIn</a><?php endif; ?>
-        <?php if (!empty($profile['github'])): ?><a href="<?= e($profile['github']) ?>" target="_blank" rel="noopener">GitHub</a><?php endif; ?>
+      <div class="contact-cards">
+        <?php
+        // Each card: [href, label, shown value, svg viewBox, svg inner markup, opens in a new tab]
+        $cards = [];
+        if (!empty($profile['github'])) $cards[] = [$profile['github'], 'GitHub', preg_replace('#^https?://#', '', $profile['github']), '0 0 16 16', '<path fill="currentColor" stroke="none" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>', true];
+        if (!empty($profile['linkedin'])) $cards[] = [$profile['linkedin'], 'LinkedIn', preg_replace('#^https?://(www\.)?#', '', $profile['linkedin']), '0 0 24 24', '<rect x="2.5" y="2.5" width="19" height="19" rx="3"/><path d="M7 10v7M7 6.8v.2M11 17v-7M11 13c0-1.7 1.2-3 2.8-3s2.7 1.3 2.7 3v4"/>', true];
+        if (!empty($profile['email'])) $cards[] = ['mailto:' . $profile['email'], t('email', $lang), $profile['email'], '0 0 24 24', '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/>', false];
+        if (!empty($profile['phone'])) $cards[] = ['tel:' . preg_replace('/\s+/', '', $profile['phone']), t('phone', $lang), $profile['phone'], '0 0 24 24', '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>', false];
+        foreach ($cards as [$href, $label, $value, $viewBox, $icon, $external]): ?>
+          <a class="cc" href="<?= e($href) ?>"<?= $external ? ' target="_blank" rel="noopener"' : '' ?>>
+            <svg class="cc-ico" viewBox="<?= $viewBox ?>" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><?= $icon ?></svg>
+            <span class="cc-text">
+              <span class="cc-label"><?= e($label) ?></span>
+              <bdi class="cc-value" dir="ltr"><?= e($value) ?></bdi>
+            </span>
+          </a>
+        <?php endforeach; ?>
       </div>
     </div>
   </section>

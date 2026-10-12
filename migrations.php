@@ -231,3 +231,25 @@ function run_classyar_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_README_MIGRATION . "', '1')");
 }
+
+// One-time contact update: the phone number is replaced, and email and GitHub are filled only when empty. Logged with the previous values.
+const CONTACT_MIGRATION = 'migration_contact_v1';
+
+function run_contact_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CONTACT_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $current = $pdo->query("SELECT k, v FROM profile WHERE k IN ('phone', 'email', 'github')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $set = ['phone' => '+989120734729'];
+    foreach (['email' => 'banitabaparsa@gmail.com', 'github' => 'https://github.com/Sureiamdiamond'] as $k => $v) {
+        if (trim((string) ($current[$k] ?? '')) === '') {
+            $set[$k] = $v;
+        }
+    }
+    migration_log('contact: previous values ' . json_encode($current, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    foreach ($set as $k => $v) {
+        $stmt->execute([$k, $v]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CONTACT_MIGRATION . "', '1')");
+}
