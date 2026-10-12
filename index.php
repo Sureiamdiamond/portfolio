@@ -100,8 +100,15 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     <div class="hero-art" aria-hidden="true">
       <span class="ring"></span>
       <div class="portrait">
-        <span class="portrait-name"><?php foreach ($nameLines as $line): ?><span><?= e($line) ?></span><?php endforeach; ?></span>
         <img class="portrait-img" src="<?= e($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png?v=' . $assetVersion) ?>" alt="<?= e($name) ?>" width="380" height="541" decoding="async">
+        <svg class="dash" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <path class="dash-tail" d="M12 40 L3 33 L5 42 L1 47 L14 46 Z" fill="#029EFD"/>
+          <path class="dash-body" d="M10 42 C16 28 34 22 48 27 C55 29 58 34 56 38 C53 44 36 48 22 49 C16 50 11 47 10 42 Z" fill="#54C5F8"/>
+          <path class="dash-wing" d="M24 34 L38 12 L50 13 L40 32 Z" fill="#01579B"/>
+          <path class="dash-beak" d="M55 31 L63 35 L55 38 Z" fill="#FFB020"/>
+          <circle class="dash-eye" cx="45" cy="31" r="2.4" fill="#0B1222"/>
+          <path class="dash-legs" d="M30 47 L28 55 M36 47 L37 55" stroke="#01579B" stroke-width="2.4" stroke-linecap="round" fill="none"/>
+        </svg>
       </div>
       <span class="chip chip-a"><?= count($projects) ?> <?= e(t('stat_projects', $lang)) ?></span>
       <span class="chip chip-b"><?= count($papers) ?> <?= e(t('stat_papers', $lang)) ?></span>
