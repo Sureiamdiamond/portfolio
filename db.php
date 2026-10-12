@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 const DATA_DIR = __DIR__ . '/data';
+require_once __DIR__ . '/migrations.php';
 const UPLOAD_DIR = __DIR__ . '/uploads';
 const MAX_UPLOAD_BYTES = 100 * 1024 * 1024;
 
@@ -58,6 +59,7 @@ function db(): PDO {
     }
     seed_files($pdo);
     seed_resume_projects($pdo);
+    run_migrations($pdo);
     return $pdo;
 }
 
