@@ -253,3 +253,37 @@ function run_contact_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CONTACT_MIGRATION . "', '1')");
 }
+
+// One-time removal of the word "junior" (English and Persian) from the profile headline and about text, and from timeline titles. Logged with the previous values.
+const JUNIOR_MIGRATION = 'migration_junior_v1';
+
+function strip_junior(string $text): string {
+    $clean = preg_replace('/\s*(\bjunior\b|جونیور)\s*/iu', ' ', $text);
+    return trim(preg_replace('/\s{2,}/u', ' ', $clean));
+}
+
+function run_junior_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . JUNIOR_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $profile = $pdo->query("SELECT k, v FROM profile WHERE k IN ('headline', 'headline_fa', 'about', 'about_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $update = $pdo->prepare('UPDATE profile SET v = ? WHERE k = ?');
+    foreach ($profile as $k => $v) {
+        $clean = strip_junior((string) $v);
+        if ($clean !== (string) $v) {
+            migration_log("profile $k: previous value " . json_encode($v, JSON_UNESCAPED_UNICODE));
+            $update->execute([$clean, $k]);
+        }
+    }
+    $timeline = $pdo->query('SELECT * FROM timeline')->fetchAll();
+    $updateTimeline = $pdo->prepare('UPDATE timeline SET title = ?, title_fa = ? WHERE id = ?');
+    foreach ($timeline as $row) {
+        $title = strip_junior((string) $row['title']);
+        $titleFa = strip_junior((string) $row['title_fa']);
+        if ($title !== (string) $row['title'] || $titleFa !== (string) $row['title_fa']) {
+            migration_log("timeline {$row['id']}: previous title " . json_encode([$row['title'], $row['title_fa']], JSON_UNESCAPED_UNICODE));
+            $updateTimeline->execute([$title, $titleFa, $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . JUNIOR_MIGRATION . "', '1')");
+}

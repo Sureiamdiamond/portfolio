@@ -63,6 +63,7 @@ function db(): PDO {
     run_content_migrations($pdo);
     run_classyar_migration($pdo);
     run_contact_migration($pdo);
+    run_junior_migration($pdo);
     return $pdo;
 }
 

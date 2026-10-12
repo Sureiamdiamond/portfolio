@@ -269,3 +269,16 @@
     if (target) target.focus();
   });
 })();
+
+// Floating CV button: shown once the reader has scrolled past most of the hero
+(function () {
+  const fab = document.querySelector('.cv-fab');
+  if (!fab) return;
+  const hero = document.getElementById('top');
+  const update = () => {
+    const limit = hero ? hero.offsetHeight * 0.6 : 400;
+    fab.classList.toggle('show', window.scrollY > limit);
+  };
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+})();

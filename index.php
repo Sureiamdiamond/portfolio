@@ -113,13 +113,13 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
   </section>
 
   <section id="journey" class="block reveal">
-    <p class="label"><span>01</span><?= e(t('journey', $lang)) ?></p>
+    <p class="label"><?= e(t('journey', $lang)) ?></p>
     <h2><?= e(t('journey', $lang)) ?></h2>
     <div class="timeline">
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
         <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
         <?php foreach ($items as $item): ?>
-          <div class="node">
+          <div class="node node-<?= $label === 'education' ? 'edu' : 'exp' ?>">
             <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
             <strong><?= e(loc($item, 'title', $lang)) ?></strong>
             <?php if ($item['org'] || $item['org_fa']): ?><span class="muted"><?= e(loc($item, 'org', $lang)) ?></span><?php endif; ?>
@@ -131,7 +131,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
   </section>
 
   <section id="projects" class="block reveal">
-    <p class="label"><span>02</span><?= e(t('projects', $lang)) ?></p>
+    <p class="label"><?= e(t('projects', $lang)) ?></p>
     <h2><?= e(t('projects', $lang)) ?></h2>
     <div class="view-switch" id="view-switch" role="radiogroup" aria-label="<?= e(t('view_label', $lang)) ?>">
       <button type="button" role="radio" class="on" data-view="normal" aria-checked="true" tabindex="0">
@@ -208,7 +208,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
   </section>
 
   <section id="research" class="block reveal">
-    <p class="label"><span>03</span><?= e(t('papers', $lang)) ?></p>
+    <p class="label"><?= e(t('papers', $lang)) ?></p>
     <h2><?= e(t('papers', $lang)) ?></h2>
     <?php foreach ($papers as $paper): ?>
       <article class="row">
@@ -226,7 +226,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
   </section>
 
   <section id="slides" class="block reveal">
-    <p class="label"><span>04</span><?= e(t('presentations', $lang)) ?></p>
+    <p class="label"><?= e(t('presentations', $lang)) ?></p>
     <h2><?= e(t('presentations', $lang)) ?></h2>
     <?php foreach ($slides as $s): ?>
       <details class="slide">
@@ -254,7 +254,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     </dl>
     <div class="contact-grid">
       <div>
-        <p class="label"><span>06</span><?= e(t('contact', $lang)) ?></p>
+        <p class="label"><?= e(t('contact', $lang)) ?></p>
         <h2><?= e(t('contact', $lang)) ?></h2>
       </div>
       <div class="contact-cards">
@@ -278,6 +278,8 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     </div>
   </section>
 </main>
+
+<?php if (!empty($profile['cv'])): ?><a class="btn btn-primary cv-fab" href="<?= e($profile['cv']) ?>" download><?= e(t('download_cv', $lang)) ?></a><?php endif; ?>
 
 <footer class="muted">
   © <?= date('Y') ?> <?= e($name) ?> · <span class="build">build <?= $assetVersion ?></span>
