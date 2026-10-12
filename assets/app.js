@@ -153,22 +153,6 @@
     });
   }
 
-  // Projects filter: hide project folders under lib/projects that do not match
-  document.querySelectorAll('#projects .filters button').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const kind = btn.dataset.filter;
-      document.querySelectorAll('#projects .filters button').forEach((b) => {
-        const on = b === btn;
-        b.classList.toggle('on', on);
-        b.setAttribute('aria-pressed', String(on));
-      });
-      // The filter applies to the Normal cards only; the IDE tree always shows every project
-      document.querySelectorAll('#projects .pcard').forEach((el) => {
-        el.hidden = kind !== 'all' && el.dataset.kind !== kind;
-      });
-    });
-  });
-
   // Projects view switch: Normal cards or the IDE window. Remembers the choice.
   const section = document.getElementById('projects');
   const switcher = document.getElementById('view-switch');

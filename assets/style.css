@@ -157,12 +157,6 @@ html[lang="fa"] .portrait-name { text-transform: none; letter-spacing: 0; font-f
 .node .period { font: 500 .8rem var(--mono); color: var(--accent); }
 
 /* Filters and project cards */
-.filters { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-.filters button {
-  min-height: 44px; padding: 0 16px; border-radius: 999px; cursor: pointer; font: 500 .9rem var(--sans);
-  background: var(--surface); color: var(--fg); border: 1px solid var(--border);
-}
-.filters button.on { background: var(--fg); color: var(--bg); border-color: var(--fg); }
 .view-switch {
   display: inline-flex; gap: 4px; padding: 4px; margin-bottom: 16px; border: 1px solid var(--border); border-radius: 999px; background: var(--surface);
 }
@@ -176,8 +170,8 @@ html[lang="fa"] .portrait-name { text-transform: none; letter-spacing: 0; font-f
 .pv-normal[hidden], .pt-window[hidden], .pcard[hidden] { display: none !important; }
 html[data-projects-view="ide"] #view-normal { display: none !important; }
 html[data-projects-view="normal"] .pt-window { display: none !important; }
-html[data-projects-view="ide"] #projects .filters { display: none !important; }
 .pv-normal { margin-top: 8px; }
+.pv-normal .grid { gap: 36px; }
 .pcard-shot { margin: 0 0 14px; }
 .pcard-summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
 .pcard-shot img, .pcard-shots img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
@@ -240,7 +234,7 @@ footer .build { font: 400 .75rem var(--mono); }
 /* Persian: Vazirmatn for all text */
 html[lang="fa"] body, html[lang="fa"] h1, html[lang="fa"] h2, html[lang="fa"] h3, html[lang="fa"] .label,
 html[lang="fa"] .stats dt, html[lang="fa"] .tag, html[lang="fa"] .node .period,
-html[lang="fa"] .chip, html[lang="fa"] .tool, html[lang="fa"] .btn, html[lang="fa"] .filters button { font-family: Vazirmatn, system-ui, sans-serif; }
+html[lang="fa"] .chip, html[lang="fa"] .tool, html[lang="fa"] .btn { font-family: Vazirmatn, system-ui, sans-serif; }
 html[lang="fa"] h1 { letter-spacing: 0; }
 html[lang="fa"] .chip, html[lang="fa"] .node .period, html[lang="fa"] .label { letter-spacing: 0; text-transform: none; }
 

@@ -75,7 +75,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     <nav class="nav-links" aria-label="<?= e(t('projects', $lang)) ?>">
       <a href="#journey"><?= e(t('journey', $lang)) ?></a>
       <a href="#projects"><?= e(t('projects', $lang)) ?></a>
-      <a href="#papers"><?= e(t('papers', $lang)) ?></a>
+      <a href="#research"><?= e(t('papers', $lang)) ?></a>
       <a href="#slides"><?= e(t('presentations', $lang)) ?></a>
     </nav>
     <div class="nav-actions">
@@ -138,12 +138,6 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
         <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M5.5 2.5v11" stroke="currentColor" stroke-width="1.4"/></svg>
         <span><?= e(t('view_ide', $lang)) ?></span>
       </button>
-    </div>
-
-    <div class="filters" role="group" aria-label="<?= e(t('projects', $lang)) ?>">
-      <button type="button" class="on" data-filter="all" aria-pressed="true"><?= e(t('filter_all', $lang)) ?></button>
-      <button type="button" data-filter="work" aria-pressed="false"><?= e(t('filter_work', $lang)) ?></button>
-      <button type="button" data-filter="academic" aria-pressed="false"><?= e(t('filter_academic', $lang)) ?></button>
     </div>
 
     <div class="pv-normal" id="view-normal">
@@ -209,7 +203,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
     </div>
   </section>
 
-  <section id="papers" class="block reveal">
+  <section id="research" class="block reveal">
     <p class="label"><span>03</span><?= e(t('papers', $lang)) ?></p>
     <h2><?= e(t('papers', $lang)) ?></h2>
     <?php foreach ($papers as $paper): ?>
