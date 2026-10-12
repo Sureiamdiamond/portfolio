@@ -183,40 +183,36 @@ function run_content_migrations(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . WEATHER_README_MIGRATION . "', '1')");
 }
 
-// One-time description updates for other projects, matched by folder name and logged the same way.
-const CLASSYAR_README_MIGRATION = 'migration_classyar_readme_v1';
+// One-time description update for Classyar, matched by folder name and logged the same way.
+const CLASSYAR_README_MIGRATION = 'migration_classyar_readme_v2';
 const CLASSYAR_FOLDER = 'classyar_app';
 
 const CLASSYAR_SUMMARY_EN = <<<'EN'
-Flutter app for teacher attendance. Built for Azad Islamic University (Tehran West). Period: Mehr 1404.
+Flutter app for teachers to manage their classes. Teachers keep a list of students and record daily attendance with four statuses: present, absent, late and excused. Each student can have a note, and attendance can be recorded for any day.
 
 Features:
-- Manage students: add, edit and delete (name, student number, phone and parents' name).
-- Record daily attendance with four statuses: present, absent, late and excused.
+- Manage students: add, edit and delete.
+- Record daily attendance, and change the date to record any day.
 - Add a note for each student who is absent, late or excused.
-- Change the date and record attendance for any day.
-- Persian (Shamsi) calendar and right-to-left layout.
-- Data is stored on the device with shared_preferences.
+- Persian (Shamsi) calendar and right-to-left interface.
 
-Structure: lib/models (student and attendance record), lib/services (data service), lib/screens (home, add student and attendance screens), lib/main.dart.
+Built with Flutter and Dart. Data is handled through an API, with Firebase for data management. Published on Cafebazaar.
 
-Main packages: intl, shamsi_date, persian_datetime_picker, shared_preferences. Architecture: Clean Architecture with layers separated; state is managed with StatefulWidget. UI uses Material 3 with custom themes.
+Built for Azad Islamic University (Tehran West). Period: Mehr 1404.
 EN;
 
 const CLASSYAR_SUMMARY_FA = <<<'FA'
-اپلیکیشن Flutter برای مدیریت حضور و غیاب معلم، با پشتیبانی از تاریخ فارسی. ساخته‌شده برای دانشگاه آزاد اسلامی تهران غرب. بازه: مهر ۱۴۰۴.
+اپلیکیشن Flutter برای مدیریت کلاس‌ها توسط معلم. معلم فهرست دانش‌آموزان را نگه می‌دارد و حضور و غیاب روزانه را با چهار وضعیت ثبت می‌کند: حاضر، غایب، تأخیر و موجه. برای هر دانش‌آموز می‌توان یادداشت ثبت کرد و حضور و غیاب را برای هر روز ثبت کرد.
 
 امکانات:
-- مدیریت دانش‌آموزان: افزودن، ویرایش و حذف (نام، شماره دانش‌آموزی، شماره تلفن و نام والدین).
-- ثبت حضور و غیاب روزانه با چهار وضعیت: حاضر، غایب، تأخیر و موجه.
+- مدیریت دانش‌آموزان: افزودن، ویرایش و حذف.
+- ثبت حضور و غیاب روزانه و تغییر تاریخ برای ثبت هر روز.
 - افزودن یادداشت برای هر دانش‌آموز غایب، دیرآمده یا موجه.
-- تغییر تاریخ و ثبت حضور و غیاب برای هر روز.
-- تقویم شمسی و چیدمان راست‌به‌چپ.
-- ذخیره‌ی داده‌ها روی دستگاه با shared_preferences.
+- تقویم شمسی و رابط کاربری راست‌به‌چپ.
 
-ساختار: lib/models (مدل دانش‌آموز و رکورد حضور)، lib/services (سرویس داده)، lib/screens (صفحه‌ی اصلی، افزودن دانش‌آموز و حضور و غیاب)، lib/main.dart.
+ساخته‌شده با Flutter و Dart. داده‌ها از طریق API و با Firebase مدیریت می‌شوند. منتشر شده در کافه‌بازار.
 
-پکیج‌های اصلی: intl، shamsi_date، persian_datetime_picker، shared_preferences. معماری: Clean Architecture با جداسازی لایه‌ها؛ مدیریت وضعیت با StatefulWidget. رابط کاربری با Material 3 و تم سفارشی.
+ساخته‌شده برای دانشگاه آزاد اسلامی تهران غرب. بازه: مهر ۱۴۰۴.
 FA;
 
 function run_classyar_migration(PDO $pdo): void {
