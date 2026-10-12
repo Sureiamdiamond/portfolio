@@ -8,7 +8,7 @@
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   // Fail loudly in the console if controls this script depends on are missing
-  ['#theme-toggle', '.filters button', '#projects .card'].forEach((selector) => {
+  ['#theme-toggle', '[data-pt]'].forEach((selector) => {
     if (!document.querySelector(selector)) console.error('[portfolio] element not found:', selector);
   });
 
@@ -22,22 +22,6 @@
       try { localStorage.setItem('theme', next); } catch (e) { /* storage blocked: applies to this page only */ }
     });
   }
-
-  // Project filters
-  const buttons = document.querySelectorAll('.filters button');
-  buttons.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const kind = btn.dataset.filter;
-      buttons.forEach((b) => {
-        const active = b === btn;
-        b.classList.toggle('on', active);
-        b.setAttribute('aria-pressed', String(active));
-      });
-      document.querySelectorAll('#projects .card').forEach((card) => {
-        card.hidden = kind !== 'all' && card.dataset.kind !== kind;
-      });
-    });
-  });
 
   // Scroll entrance: each section fades up once when it first enters the viewport
   const sections = document.querySelectorAll('.reveal');
@@ -56,88 +40,178 @@
   }
 })();
 
-// Files panel: preview on click, expand/collapse all, and IDE-style arrow-key navigation.
-// Without this script the tree still works: folders are native <details>, files open in a new tab.
+// Project window: opens files in editor tabs, resizable tool window, keyboard navigation.
+// Without this script the tree still works: folders are native <details>, and each file is a link.
 (function () {
-  const tree = document.getElementById('tree');
-  if (!tree) return;
-  const preview = document.getElementById('preview');
-  const pvPath = document.getElementById('pv-path');
-  const pvBody = document.getElementById('pv-body');
-  const pvDownload = document.getElementById('pv-download');
-  const strings = document.documentElement.lang === 'fa'
-    ? { select: 'یک فایل را انتخاب کنید تا اینجا نمایش داده شود.', none: 'پیش‌نمایشی برای این نوع فایل نیست. از دکمه‌ی دانلود استفاده کنید.' }
-    : { select: 'Select a file to preview it here.', none: 'No preview for this file type. Use Download.' };
+  const win = document.querySelector('[data-pt]');
+  if (!win) return;
+  const tree = document.getElementById('pt-tree');
+  const tabsEl = document.getElementById('pt-tabs');
+  const view = document.getElementById('pt-view');
+  const statusPath = document.getElementById('pt-status-path');
+  const statusLang = document.getElementById('pt-status-lang');
+  const split = document.getElementById('pt-split');
+  const toggle = document.getElementById('pt-toggle');
+  const tabs = new Map(); // source id -> { tab, name }
+  let activeId = null;
 
-  // Build the preview with DOM methods (paths come from the database, never as raw HTML)
-  function show(link) {
+  const isNarrow = () => window.matchMedia('(max-width: 760px)').matches;
+  const langName = { dart: 'Dart', yaml: 'YAML', markdown: 'Markdown', image: 'Image', text: 'Plain text' };
+
+  function setActive(id) {
+    const src = document.getElementById(id);
+    if (!src) return;
+    activeId = id;
+    tabs.forEach((entry, key) => {
+      const on = key === id;
+      entry.tab.classList.toggle('is-active', on);
+      entry.tab.querySelector('[role="tab"]').setAttribute('aria-selected', String(on));
+    });
+    view.replaceChildren(...Array.from(src.childNodes, (n) => n.cloneNode(true)));
+    const link = tree.querySelector(`a[data-src="${id}"]`);
     tree.querySelectorAll('.is-selected').forEach((el) => el.classList.remove('is-selected'));
-    link.classList.add('is-selected');
-    pvPath.textContent = link.dataset.name;
-    pvDownload.href = link.dataset.download;
-    pvDownload.hidden = false;
-    pvBody.replaceChildren();
-    const kind = link.dataset.kind;
-    const src = link.dataset.preview;
-    if (kind === 'pdf' && src) {
-      const frame = document.createElement('iframe');
-      frame.src = src + '#view=FitH';
-      frame.title = link.dataset.name;
-      pvBody.appendChild(frame);
-    } else if (kind === 'image' && src) {
-      const img = document.createElement('img');
-      img.src = src;
-      img.alt = link.dataset.name;
-      pvBody.appendChild(img);
-    } else {
-      const p = document.createElement('p');
-      p.className = 'muted';
-      p.textContent = strings.none;
-      pvBody.appendChild(p);
+    if (link) link.classList.add('is-selected');
+    statusPath.textContent = link ? link.dataset.path : '';
+    statusLang.textContent = link ? (langName[link.dataset.lang] || 'Plain text') : '';
+    view.scrollTop = 0;
+  }
+
+  function openFile(link) {
+    const id = link.dataset.src;
+    if (!tabs.has(id)) {
+      const tab = document.createElement('div');
+      tab.className = 'pt-tab';
+      const name = link.querySelector('.nm').textContent;
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.setAttribute('role', 'tab');
+      btn.textContent = name;
+      btn.addEventListener('click', () => setActive(id));
+      const x = document.createElement('button');
+      x.type = 'button';
+      x.className = 'x';
+      x.setAttribute('aria-label', 'Close ' + name);
+      x.textContent = '×';
+      x.addEventListener('click', (ev) => { ev.stopPropagation(); closeTab(id); });
+      tab.append(btn, x);
+      tabs.set(id, { tab, name });
+      tabsEl.appendChild(tab);
     }
-    if (window.matchMedia('(max-width: 760px)').matches) {
-      preview.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    setActive(id);
+    if (isNarrow()) closeDrawer();
+  }
+
+  function closeTab(id) {
+    const entry = tabs.get(id);
+    if (!entry) return;
+    entry.tab.remove();
+    tabs.delete(id);
+    if (activeId === id) {
+      const last = Array.from(tabs.keys()).pop();
+      if (last) setActive(last);
+      else {
+        activeId = null;
+        view.replaceChildren();
+        const hint = document.createElement('p');
+        hint.className = 'pt-hint';
+        hint.textContent = document.documentElement.lang === 'fa' ? 'یک فایل را انتخاب کنید.' : 'Select a file in the Project panel.';
+        view.appendChild(hint);
+        statusPath.textContent = '';
+        statusLang.textContent = '';
+        tree.querySelectorAll('.is-selected').forEach((el) => el.classList.remove('is-selected'));
+      }
     }
   }
 
   tree.addEventListener('click', (ev) => {
-    const link = ev.target.closest('a.file');
+    const link = ev.target.closest('a.it.file');
     if (!link || ev.metaKey || ev.ctrlKey || ev.shiftKey) return;
     ev.preventDefault();
-    show(link);
+    openFile(link);
   });
 
-  // Expand all / collapse all
-  document.querySelectorAll('[data-action]').forEach((btn) => {
+  // Expand all / collapse all, and the mobile drawer
+  win.querySelectorAll('[data-act]').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const open = btn.dataset.action === 'expand';
+      const act = btn.dataset.act;
+      if (act === 'close-drawer') return closeDrawer();
+      const open = act === 'expand';
       tree.querySelectorAll('details').forEach((d) => { d.open = open; });
     });
   });
 
-  // Keyboard: Up/Down move through visible rows, Right opens or steps in, Left closes or steps out
-  const visibleRows = () => Array.from(tree.querySelectorAll('summary, a.file')).filter((el) => el.offsetParent !== null);
+  function closeDrawer() {
+    win.classList.remove('tool-open');
+    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+  }
+  if (toggle) {
+    toggle.addEventListener('click', () => {
+      const open = win.classList.toggle('tool-open');
+      toggle.setAttribute('aria-expanded', String(open));
+    });
+  }
+
+  // Projects filter: hide top-level projects that do not match
+  document.querySelectorAll('#projects .filters button').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const kind = btn.dataset.filter;
+      document.querySelectorAll('#projects .filters button').forEach((b) => {
+        const on = b === btn;
+        b.classList.toggle('on', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      tree.querySelectorAll(':scope > li.it-project').forEach((li) => {
+        li.hidden = kind !== 'all' && li.dataset.kind !== kind;
+      });
+    });
+  });
+
+  // Resizable divider (desktop): drag, or use the arrow keys when focused
+  const minW = 160;
+  const setWidth = (px) => {
+    const max = win.clientWidth * 0.7;
+    win.style.setProperty('--tool-w', Math.round(Math.min(max, Math.max(minW, px))) + 'px');
+  };
+  split.addEventListener('pointerdown', (ev) => {
+    split.setPointerCapture(ev.pointerId);
+    const left = win.querySelector('.pt-tool').getBoundingClientRect().left;
+    const move = (e) => setWidth(e.clientX - left);
+    const up = () => {
+      split.removeEventListener('pointermove', move);
+      split.removeEventListener('pointerup', up);
+    };
+    split.addEventListener('pointermove', move);
+    split.addEventListener('pointerup', up);
+  });
+  split.addEventListener('keydown', (ev) => {
+    const current = win.querySelector('.pt-tool').getBoundingClientRect().width;
+    if (ev.key === 'ArrowLeft') { setWidth(current - 16); ev.preventDefault(); }
+    if (ev.key === 'ArrowRight') { setWidth(current + 16); ev.preventDefault(); }
+  });
+
+  // Keyboard in the tree: Up/Down move through visible rows, Right opens or steps in, Left closes or steps out
+  const rows = () => Array.from(tree.querySelectorAll('summary.it, a.it.file')).filter((el) => el.offsetParent !== null);
   tree.addEventListener('keydown', (ev) => {
-    const rows = visibleRows();
-    const index = rows.indexOf(document.activeElement);
+    const list = rows();
+    const index = list.indexOf(document.activeElement);
     if (index === -1) return;
-    const row = rows[index];
-    const folderDetails = row.tagName === 'SUMMARY' ? row.parentElement : null;
+    const row = list[index];
+    const folder = row.tagName === 'SUMMARY' ? row.parentElement : null;
     let target = null;
     switch (ev.key) {
-      case 'ArrowDown': target = rows[index + 1]; break;
-      case 'ArrowUp': target = rows[index - 1]; break;
-      case 'Home': target = rows[0]; break;
-      case 'End': target = rows[rows.length - 1]; break;
+      case 'ArrowDown': target = list[index + 1]; break;
+      case 'ArrowUp': target = list[index - 1]; break;
+      case 'Home': target = list[0]; break;
+      case 'End': target = list[list.length - 1]; break;
       case 'ArrowRight':
-        if (folderDetails && !folderDetails.open) { folderDetails.open = true; }
-        else { target = rows[index + 1]; }
+        if (folder && !folder.open) folder.open = true;
+        else target = list[index + 1];
         break;
       case 'ArrowLeft':
-        if (folderDetails && folderDetails.open) { folderDetails.open = false; }
+        if (folder && folder.open) folder.open = false;
         else {
-          const parentDetails = folderDetails ? folderDetails.parentElement.closest('details') : row.closest('details');
-          target = parentDetails?.querySelector(':scope > summary');
+          const parent = folder ? folder.parentElement.closest('details') : row.closest('details');
+          target = parent && parent.querySelector(':scope > summary');
         }
         break;
       default: return;

@@ -36,6 +36,10 @@ function db(): PDO {
         CREATE TABLE IF NOT EXISTS files (
             id INTEGER PRIMARY KEY AUTOINCREMENT, folder_id INTEGER, name TEXT NOT NULL, path TEXT NOT NULL,
             ext TEXT NOT NULL, size INTEGER NOT NULL DEFAULT 0, preview TEXT, sort INTEGER NOT NULL DEFAULT 0);
+        CREATE TABLE IF NOT EXISTS project_files (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, project_id INTEGER NOT NULL, path TEXT NOT NULL, content TEXT);
+        CREATE TABLE IF NOT EXISTS project_media (
+            id INTEGER PRIMARY KEY AUTOINCREMENT, project_id INTEGER NOT NULL, path TEXT NOT NULL, sort INTEGER NOT NULL DEFAULT 0);
         SQL);
     // Backward-compatible migration: add Persian columns to existing databases.
     $persianColumns = [
@@ -122,6 +126,7 @@ function upload_in_use(PDO $pdo, string $path): bool {
     $sql = "SELECT 1 FROM files WHERE path = :p OR preview = :p
         UNION ALL SELECT 1 FROM presentations WHERE pdf = :p OR pptx = :p
         UNION ALL SELECT 1 FROM papers WHERE pdf = :p
+        UNION ALL SELECT 1 FROM project_media WHERE path = :p
         UNION ALL SELECT 1 FROM profile WHERE v = :p";
     $stmt = $pdo->prepare($sql);
     $stmt->execute([':p' => $path]);

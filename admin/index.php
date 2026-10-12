@@ -152,6 +152,64 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
+            if ($action === 'pf_save') {
+                $project = (int) ($_POST['project_id'] ?? 0);
+                $path = trim((string) ($_POST['path'] ?? ''));
+                $content = str_replace("\r\n", "\n", (string) ($_POST['content'] ?? ''));
+                if (!$pdo->query("SELECT 1 FROM projects WHERE id = $project")->fetchColumn()) {
+                    throw new RuntimeException('Project not found.');
+                }
+                if (!valid_project_path($path)) {
+                    throw new RuntimeException('Invalid path. Use letters, numbers, dots, dashes, underscores and slashes.');
+                }
+                if (strlen($content) > 512 * 1024) {
+                    throw new RuntimeException('Content is larger than 512 KB.');
+                }
+                $pdo->prepare('DELETE FROM project_files WHERE project_id = ? AND path = ?')->execute([$project, $path]);
+                $pdo->prepare('INSERT INTO project_files (project_id, path, content) VALUES (?, ?, ?)')->execute([$project, $path, $content]);
+                header('Location: index.php?t=pfiles&project=' . $project . '&saved=1');
+                exit;
+            }
+
+            if ($action === 'pf_delete') {
+                $id = (int) ($_POST['id'] ?? 0);
+                $project = (int) $pdo->query("SELECT project_id FROM project_files WHERE id = $id")->fetchColumn();
+                $pdo->prepare('DELETE FROM project_files WHERE id = ?')->execute([$id]);
+                header('Location: index.php?t=pfiles&project=' . $project);
+                exit;
+            }
+
+            if ($action === 'media_upload') {
+                $project = (int) ($_POST['project_id'] ?? 0);
+                if (!$pdo->query("SELECT 1 FROM projects WHERE id = $project")->fetchColumn()) {
+                    throw new RuntimeException('Project not found.');
+                }
+                $saved = save_file_upload('file_image', ['png', 'jpg', 'jpeg', 'webp']);
+                if ($saved === null) {
+                    throw new RuntimeException('Choose an image to upload.');
+                }
+                $pdo->prepare('INSERT INTO project_media (project_id, path, sort) VALUES (?, ?, 0)')->execute([$project, $saved['path']]);
+                header('Location: index.php?t=pfiles&project=' . $project . '&saved=1');
+                exit;
+            }
+
+            if ($action === 'media_delete') {
+                $id = (int) ($_POST['id'] ?? 0);
+                $stmt = $pdo->prepare('SELECT project_id, path FROM project_media WHERE id = ?');
+                $stmt->execute([$id]);
+                $row = $stmt->fetch();
+                if ($row) {
+                    $pdo->prepare('DELETE FROM project_media WHERE id = ?')->execute([$id]);
+                    if (!upload_in_use($pdo, $row['path'])) {
+                        remove_upload($row['path']);
+                    }
+                    header('Location: index.php?t=pfiles&project=' . (int) $row['project_id']);
+                    exit;
+                }
+                header('Location: index.php?t=pfiles');
+                exit;
+            }
+
             if ($action === 'delete_folder') {
                 $id = (int) ($_POST['id'] ?? 0);
                 $hasChildren = $pdo->query("SELECT (SELECT COUNT(*) FROM folders WHERE parent_id = $id) + (SELECT COUNT(*) FROM files WHERE folder_id = $id)")->fetchColumn();
@@ -238,6 +296,7 @@ if ($loggedIn) {
   <nav>
     <a href="index.php?t=profile" class="<?= $tab === 'profile' ? 'on' : '' ?>">Profile & CV</a>
     <a href="index.php?t=files" class="<?= $tab === 'files' ? 'on' : '' ?>">Files</a>
+    <a href="index.php?t=pfiles" class="<?= $tab === 'pfiles' ? 'on' : '' ?>">Project files</a>
     <?php foreach (TYPES as $key => $spec): ?>
       <a href="index.php?t=<?= $key ?>" class="<?= $tab === $key ? 'on' : '' ?>"><?= e($spec['label']) ?></a>
     <?php endforeach; ?>
@@ -370,6 +429,91 @@ if ($loggedIn) {
       <?php endforeach; ?>
       <?php if (!$files): ?><p class="muted">No files yet.</p><?php endif; ?>
     </div>
+
+  <?php elseif ($tab === 'pfiles'): ?>
+    <?php
+      $projectList = $pdo->query('SELECT id, title FROM projects ORDER BY sort, id')->fetchAll();
+      $pid = (int) ($_GET['project'] ?? ($projectList[0]['id'] ?? 0));
+      $overrides = [];
+      $media = [];
+      if ($pid > 0) {
+          $stmt = $pdo->prepare('SELECT id, path, length(content) AS size FROM project_files WHERE project_id = ? ORDER BY path');
+          $stmt->execute([$pid]);
+          $overrides = $stmt->fetchAll();
+          $stmt = $pdo->prepare('SELECT id, path FROM project_media WHERE project_id = ? ORDER BY sort, id');
+          $stmt->execute([$pid]);
+          $media = $stmt->fetchAll();
+      }
+      $templatePaths = ['README.md', 'pubspec.yaml', 'lib/main.dart', 'analysis_options.yaml', '.gitignore', 'links.md'];
+    ?>
+    <h2>Project files</h2>
+    <p class="muted">Each project shows a Flutter project tree. Its README, pubspec, links and placeholder code are generated from the project fields (title, summary, tags as tech stack, url). Paste real file contents here to replace a generated file or add one. Screenshots go into assets/images/.</p>
+
+    <form method="get">
+      <input type="hidden" name="t" value="pfiles">
+      <label for="pf-project">Project</label>
+      <select id="pf-project" name="project">
+        <?php foreach ($projectList as $pr): ?>
+          <option value="<?= (int) $pr['id'] ?>" <?= (int) $pr['id'] === $pid ? 'selected' : '' ?>><?= e($pr['title']) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <p><button type="submit">Show</button></p>
+    </form>
+
+    <?php if ($pid > 0): ?>
+    <form method="post">
+      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+      <input type="hidden" name="action" value="pf_save">
+      <input type="hidden" name="project_id" value="<?= $pid ?>">
+      <h3>Set file contents</h3>
+      <label for="pf-path">Path inside the project</label>
+      <input id="pf-path" name="path" list="pf-paths" required maxlength="200" placeholder="lib/screens/home.dart">
+      <datalist id="pf-paths"><?php foreach ($templatePaths as $tp): ?><option value="<?= e($tp) ?>"><?php endforeach; ?></datalist>
+      <label for="pf-content">Contents (leave empty for an empty file)</label>
+      <textarea id="pf-content" name="content" rows="14" style="font-family:ui-monospace,Menlo,monospace"></textarea>
+      <p><button type="submit">Save file</button></p>
+    </form>
+
+    <div class="card">
+      <h3>Saved file contents</h3>
+      <?php foreach ($overrides as $ov): ?>
+        <div class="row">
+          <span><?= e($ov['path']) ?> <span class="muted"><?= (int) $ov['size'] ?> bytes</span></span>
+          <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Remove this saved file? The generated version will show again.')">
+            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+            <input type="hidden" name="action" value="pf_delete"><input type="hidden" name="id" value="<?= (int) $ov['id'] ?>">
+            <button class="danger" type="submit">Remove</button>
+          </form>
+        </div>
+      <?php endforeach; ?>
+      <?php if (!$overrides): ?><p class="muted">No saved contents. The generated overview is shown.</p><?php endif; ?>
+    </div>
+
+    <form method="post" enctype="multipart/form-data">
+      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+      <input type="hidden" name="action" value="media_upload">
+      <input type="hidden" name="project_id" value="<?= $pid ?>">
+      <h3>Add a screenshot</h3>
+      <label for="pm-file">Image (png, jpg, webp)</label>
+      <input id="pm-file" type="file" name="file_image" accept=".png,.jpg,.jpeg,.webp" required>
+      <p><button type="submit">Upload screenshot</button></p>
+    </form>
+
+    <div class="card">
+      <h3>Screenshots</h3>
+      <?php foreach ($media as $m): ?>
+        <div class="row">
+          <span>assets/images/<?= e(basename($m['path'])) ?></span>
+          <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Delete this screenshot?')">
+            <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+            <input type="hidden" name="action" value="media_delete"><input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
+            <button class="danger" type="submit">Delete</button>
+          </form>
+        </div>
+      <?php endforeach; ?>
+      <?php if (!$media): ?><p class="muted">No screenshots yet.</p><?php endif; ?>
+    </div>
+    <?php endif; ?>
 
   <?php else: ?>
     <?php $spec = TYPES[$tab]; ?>
