@@ -344,6 +344,10 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
 .ic-img { background: var(--ic-img); }
 .ic-txt { background: var(--ic-txt); }
 .ic-git { background: var(--ic-git); }
+.ic-gradle { background: #2F8F5B; }
+.ic-xml { background: #E37933; }
+.ic-plist { background: #8A9BB0; }
+.ic-ruby { background: #B31C1C; }
 .ic-json { background: var(--ic-json); }
 .pt-tab > button[role="tab"] { display: inline-flex; align-items: center; gap: 6px; }
 .it-project > details > summary.it { font-weight: 600; }

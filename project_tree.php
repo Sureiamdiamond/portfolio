@@ -22,11 +22,18 @@ function lang_of(string $path): string {
     if (basename($path) === '.gitignore') {
         return 'gitignore';
     }
+    if (basename($path) === 'Podfile') {
+        return 'ruby';
+    }
     return match (strtolower(pathinfo($path, PATHINFO_EXTENSION))) {
         'dart' => 'dart',
         'yaml', 'yml' => 'yaml',
         'md' => 'markdown',
         'json' => 'json',
+        'gradle' => 'gradle',
+        'xml' => 'xml',
+        'plist' => 'plist',
+        'properties' => 'properties',
         default => 'text',
     };
 }
@@ -173,12 +180,27 @@ function render_code(string $content, string $lang): string {
     return '<pre class="code">' . $out . '</pre>';
 }
 
+// Platform files shown in the IDE's android/ and ios/ folders. Labeled as display-only; they are not the real build configuration.
+const PLATFORM_NOTE = "Generated for display on this portfolio. Not the real build configuration.";
+const PLATFORM_FILES = [
+    'android/app/build.gradle' => "// " . PLATFORM_NOTE . "\nplugins {\n    id \"com.android.application\"\n    id \"kotlin-android\"\n    id \"dev.flutter.flutter-gradle-plugin\"\n}\n\nandroid {\n    namespace \"com.parsabanitaba.portfolio\"\n    compileSdk 35\n\n    defaultConfig {\n        applicationId \"com.parsabanitaba.portfolio\"\n        minSdk 21\n        targetSdk 35\n        versionCode 1\n        versionName \"1.0.0\"\n    }\n}\n",
+    'android/app/src/main/AndroidManifest.xml' => "<!-- " . PLATFORM_NOTE . " -->\n<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\">\n    <uses-permission android:name=\"android.permission.INTERNET\" />\n    <application\n        android:label=\"Parsa Banitaba\"\n        android:icon=\"@mipmap/ic_launcher\" />\n</manifest>\n",
+    'android/gradle.properties' => "# " . PLATFORM_NOTE . "\norg.gradle.jvmargs=-Xmx4G\nandroid.useAndroidX=true\nandroid.enableJetifier=true\n",
+    'ios/Runner/Info.plist' => "<!-- " . PLATFORM_NOTE . " -->\n<plist version=\"1.0\">\n<dict>\n    <key>CFBundleDisplayName</key>\n    <string>Parsa Banitaba</string>\n    <key>CFBundleIdentifier</key>\n    <string>com.parsabanitaba.portfolio</string>\n    <key>CFBundleShortVersionString</key>\n    <string>1.0.0</string>\n    <key>CFBundleVersion</key>\n    <string>1</string>\n</dict>\n</plist>\n",
+    'ios/Podfile' => "# " . PLATFORM_NOTE . "\nplatform :ios, '13.0'\ntarget 'Runner' do\n  use_frameworks!\n  use_modular_headers!\n  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))\nend\n",
+];
+
 /** Root app files: a generated overview of the layout. Not real source code. */
 function root_entries(string $lang): array {
     return [
         'README.md' => ['kind' => 'text', 'content' => "# " . ROOT_NAME . "\n\n" . ($lang === 'fa' ? "پروژه‌ها در lib/projects/ قرار دارند، هر کدام در پوشه‌ی جدا.\n" : "Projects live in lib/projects/, one folder each.\n"), 'notice' => false],
         'pubspec.yaml' => ['kind' => 'text', 'content' => "# Generated overview of the layout.\nname: " . ROOT_NAME . "\npublish_to: none\n", 'notice' => false],
         'lib/main.dart' => ['kind' => 'text', 'content' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n", 'notice' => true],
+        'android/app/build.gradle' => ['kind' => 'text', 'content' => PLATFORM_FILES['android/app/build.gradle'], 'notice' => false],
+        'android/app/src/main/AndroidManifest.xml' => ['kind' => 'text', 'content' => PLATFORM_FILES['android/app/src/main/AndroidManifest.xml'], 'notice' => false],
+        'android/gradle.properties' => ['kind' => 'text', 'content' => PLATFORM_FILES['android/gradle.properties'], 'notice' => false],
+        'ios/Runner/Info.plist' => ['kind' => 'text', 'content' => PLATFORM_FILES['ios/Runner/Info.plist'], 'notice' => false],
+        'ios/Podfile' => ['kind' => 'text', 'content' => PLATFORM_FILES['ios/Podfile'], 'notice' => false],
     ];
 }
 
@@ -250,6 +272,11 @@ function render_dir_level(array $dirs, array $files, string $parent, array $proj
             'markdown' => ['M', 'ic-md'],
             'image' => ['IMG', 'ic-img'],
             'gitignore' => ['⊘', 'ic-git'],
+            'gradle' => ['G', 'ic-gradle'],
+            'xml' => ['X', 'ic-xml'],
+            'plist' => ['P', 'ic-plist'],
+            'properties' => ['≡', 'ic-txt'],
+            'ruby' => ['R', 'ic-ruby'],
             'json' => ['{}', 'ic-json'],
             default => ['≡', 'ic-txt'],
         };
