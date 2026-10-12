@@ -107,8 +107,8 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
           <path class="dash-legs" d="M30 47 L28 55 M36 47 L37 55" stroke="#01579B" stroke-width="2.4" stroke-linecap="round" fill="none"/>
         </svg>
       </div>
-      <span class="chip chip-a"><?= count($projects) ?> <?= e(t('stat_projects', $lang)) ?></span>
-      <span class="chip chip-b"><?= count($papers) ?> <?= e(t('stat_papers', $lang)) ?></span>
+      <span class="chip chip-icon chip-a" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></span>
+      <span class="chip chip-icon chip-b" aria-hidden="true"><svg viewBox="0 0 64 64" width="26" height="26"><polygon points="36,4 60,28 44,44 20,20" fill="#54C5F8"/><polygon points="20,20 44,44 36,52 12,28" fill="#029EFD"/><polygon points="36,52 44,44 60,44 44,60" fill="#01579B"/></svg></span>
     </div>
   </section>
 
