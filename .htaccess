@@ -1,0 +1,13 @@
+Options -Indexes
+RewriteEngine On
+
+# Never serve the database, the config file or the data folder
+RedirectMatch 403 ^/data/
+RedirectMatch 403 ^/config\.php$
+RedirectMatch 403 ^/\.github/
+<FilesMatch "\.(db|sqlite|bak|md)$">
+  Require all denied
+</FilesMatch>
+
+# Never run PHP that was uploaded
+RewriteRule ^uploads/.*\.(php[0-9]?|phtml|phar)$ - [F,L]
