@@ -86,6 +86,7 @@ function project_links(array $p): array {
         ['GitHub', $p['github_url'] ?? ''],
         ['App Store', $p['appstore_url'] ?? ''],
         ['Google Play', $p['playstore_url'] ?? ''],
+        ['Cafebazaar', $p['bazaar_url'] ?? ''],
         ['Website', $p['url'] ?? ''],
     ];
     return array_values(array_filter($pairs, fn($l) => trim((string) $l[1]) !== ''));

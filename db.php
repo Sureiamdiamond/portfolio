@@ -43,7 +43,7 @@ function db(): PDO {
         SQL);
     // Backward-compatible migration: add Persian columns to existing databases.
     $persianColumns = [
-        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url'],
+        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url'],
         'papers' => ['title_fa'],
         'presentations' => ['title_fa'],
         'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa'],
@@ -57,6 +57,7 @@ function db(): PDO {
         }
     }
     seed_files($pdo);
+    seed_resume_projects($pdo);
     return $pdo;
 }
 
@@ -73,6 +74,49 @@ function seed_files(PDO $pdo): void {
         $stmt->execute([$cv, filesize(__DIR__ . '/' . $cv)]);
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('files_seeded', '1')");
+    $pdo->commit();
+}
+
+/** Projects listed in the CV. Seeded once; a project with the same English title is never overwritten or duplicated. */
+const RESUME_PROJECTS = [
+    ['title' => 'Tobank', 'title_fa' => 'اپلیکیشن توبانک (شعبه مجازی بانک گردشگری)', 'kind' => 'work',
+        'summary' => "Flutter mobile app for Tobank, the virtual branch of Tourism Bank (Bank Gardeshgari). Banking domain. Period: Farvardin 1403.",
+        'summary_fa' => "اپلیکیشن موبایل توبانک، شعبه مجازی بانک گردشگری، با فلاتر. حوزه بانکی. بازه: فروردین ۱۴۰۳.",
+        'tags' => 'flutter, dart', 'url' => 'https://tobank.ir', 'github_url' => '', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 1],
+    ['title' => 'Weather App', 'title_fa' => 'اپلیکیشن آب و هوا', 'kind' => 'academic',
+        'summary' => "Weather app built with Bloc and Clean Architecture. University project. Period: Farvardin 1404.",
+        'summary_fa' => "اپلیکیشن آب و هوا با Bloc و Clean Architecture. پروژه دانشگاه. بازه: فروردین ۱۴۰۴.",
+        'tags' => 'flutter, dart, bloc, clean architecture', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/weather_app', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 2],
+    ['title' => 'TechBlog', 'title_fa' => 'تک بلاگ', 'kind' => 'academic',
+        'summary' => "Group project for Prof. Safari, built with Flutter. Period: Tir 1401.",
+        'summary_fa' => "پروژه گروهی استاد صفری با فلاتر. بازه: تیر ۱۴۰۱.",
+        'tags' => 'flutter, dart', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/TechBlog', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 3],
+    ['title' => 'Classyar App', 'title_fa' => 'اپلیکیشن کلاسیار', 'kind' => 'work',
+        'summary' => "Flutter app for Classyar, built for Azad Islamic University (Tehran West). Dynamic UI, state management with GetX and Bloc, data from an API and Firebase, published on Cafebazaar. Period: Mehr 1404.",
+        'summary_fa' => "اپلیکیشن کلاسیار با فلاتر برای دانشگاه آزاد اسلامی تهران غرب: صفحات پویا، مدیریت وضعیت با GetX و Bloc، داده از API و Firebase، منتشر شده در کافه‌بازار. بازه: مهر ۱۴۰۴.",
+        'tags' => 'flutter, dart, getx, bloc, firebase', 'url' => '', 'github_url' => '', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => 'https://cafebazaar.ir/app/com.classyar.app', 'sort' => 4],
+    ['title' => 'Tobank SDUI', 'title_fa' => 'توبانک SDUI', 'kind' => 'work',
+        'summary' => "Server-driven UI for the Tobank app: pages are rendered from JSON received from the server, using the Stac framework. Period: Farvardin 1405.",
+        'summary_fa' => "رندر صفحات اپلیکیشن توبانک از روی JSON دریافتی از سرور با معماری Server-Driven UI و فریم‌ورک Stac. بازه: فروردین ۱۴۰۵.",
+        'tags' => 'flutter, dart, stac, server-driven ui, json', 'url' => '', 'github_url' => '', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 5],
+];
+
+/** One-time seed of the CV projects. Existing rows are left alone. */
+function seed_resume_projects(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = 'resume_projects_seeded'")->fetchColumn()) {
+        return;
+    }
+    $pdo->beginTransaction();
+    $find = $pdo->prepare('SELECT 1 FROM projects WHERE title = ?');
+    $insert = $pdo->prepare('INSERT INTO projects (title, title_fa, kind, summary, summary_fa, tags, url, github_url, appstore_url, playstore_url, bazaar_url, sort)
+        VALUES (:title, :title_fa, :kind, :summary, :summary_fa, :tags, :url, :github_url, :appstore_url, :playstore_url, :bazaar_url, :sort)');
+    foreach (RESUME_PROJECTS as $project) {
+        $find->execute([$project['title']]);
+        if (!$find->fetchColumn()) {
+            $insert->execute($project);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('resume_projects_seeded', '1')");
     $pdo->commit();
 }
 
