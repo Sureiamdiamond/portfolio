@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/db.php';
 require __DIR__ . '/i18n.php';
-require __DIR__ . '/project_tree.php';
+require_once __DIR__ . '/project_tree.php';
 
 $lang = current_lang();
 $dir = $lang === 'fa' ? 'rtl' : 'ltr';
