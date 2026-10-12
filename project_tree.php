@@ -34,6 +34,8 @@ function lang_of(string $path): string {
         'xml' => 'xml',
         'plist' => 'plist',
         'properties' => 'properties',
+        'svg', 'png', 'jpg', 'jpeg', 'webp' => 'image',
+        'woff2', 'woff', 'ttf', 'otf' => 'font',
         default => 'text',
     };
 }
@@ -191,10 +193,22 @@ const PLATFORM_FILES = [
 ];
 
 /** Root app files: a generated overview of the layout. Not real source code. */
+/** The fonts shown in the IDE's assets folder, as they appear in the pubspec overview. */
+const ROOT_FONTS_YAML = "    - family: Calistoga\n      fonts:\n        - asset: assets/fonts/calistoga-latin-400-normal.woff2\n"
+    . "    - family: Inter\n      fonts:\n        - asset: assets/fonts/inter-latin-600-normal.woff2\n          weight: 600\n"
+    . "    - family: JetBrains Mono\n      fonts:\n        - asset: assets/fonts/jetbrains-mono-latin-500-normal.woff2\n          weight: 500\n"
+    . "    - family: Vazirmatn\n      fonts:\n        - asset: assets/fonts/vazirmatn-arabic-400-normal.woff2\n";
+
 function root_entries(string $lang): array {
     return [
         'README.md' => ['kind' => 'text', 'content' => "# " . ROOT_NAME . "\n\n" . ($lang === 'fa' ? "پروژه‌ها در lib/projects/ قرار دارند، هر کدام در پوشه‌ی جدا.\n" : "Projects live in lib/projects/, one folder each.\n"), 'notice' => false],
-        'pubspec.yaml' => ['kind' => 'text', 'content' => "# Generated overview of the layout.\nname: " . ROOT_NAME . "\npublish_to: none\n", 'notice' => false],
+        'pubspec.yaml' => ['kind' => 'text', 'content' => "# Generated overview of the layout.\nname: " . ROOT_NAME . "\npublish_to: none\n\nflutter:\n  assets:\n    - assets/images/\n  fonts:\n" . ROOT_FONTS_YAML, 'notice' => false],
+        'assets/images/flutter_logo.svg' => ['kind' => 'image', 'lang' => 'image', 'src' => 'assets/img/ide/flutter_logo.svg'],
+        'assets/images/dash.svg' => ['kind' => 'image', 'lang' => 'image', 'src' => 'assets/img/ide/dash.svg'],
+        'assets/fonts/calistoga-latin-400-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/calistoga-latin-400-normal.woff2'],
+        'assets/fonts/inter-latin-600-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/inter-latin-600-normal.woff2'],
+        'assets/fonts/jetbrains-mono-latin-500-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/jetbrains-mono-latin-500-normal.woff2'],
+        'assets/fonts/vazirmatn-arabic-400-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/vazirmatn-arabic-400-normal.woff2'],
         'lib/main.dart' => ['kind' => 'text', 'content' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n", 'notice' => true],
         'android/app/build.gradle' => ['kind' => 'text', 'content' => PLATFORM_FILES['android/app/build.gradle'], 'notice' => false],
         'android/app/src/main/AndroidManifest.xml' => ['kind' => 'text', 'content' => PLATFORM_FILES['android/app/src/main/AndroidManifest.xml'], 'notice' => false],
@@ -239,6 +253,8 @@ function render_project_window(array $projects, PDO $pdo, string $lang, array &$
         $id = 's' . substr(md5($path), 0, 10);
         if ($entry['kind'] === 'image') {
             $sources[] = '<div class="pt-src" id="' . $id . '" hidden><figure class="pt-image"><img src="' . e($entry['src']) . '" alt="' . e(basename($path)) . '"></figure></div>';
+        } elseif ($entry['kind'] === 'binary') {
+            $sources[] = '<div class="pt-src" id="' . $id . '" hidden><p class="pt-hint">' . e($lang === 'fa' ? 'این فایل باینری است و در این نما نمایش داده نمی‌شود.' : 'Binary file. The preview is not shown here.') . '</p><p><a href="' . e($entry['src']) . '" download>' . e(basename($path)) . '</a></p></div>';
         } else {
             $notice = !empty($entry['notice']) ? '<p class="pt-notice"><a class="btn btn-ghost" href="#contact">' . e(t('contact_me', $lang)) . '</a></p>' : '';
             $sources[] = '<div class="pt-src" id="' . $id . '" data-lang="' . e($entry['lang']) . '" hidden>' . render_code($entry['content'], $entry['lang']) . $notice . '</div>';
@@ -278,6 +294,7 @@ function render_dir_level(array $dirs, array $files, string $parent, array $proj
             'properties' => ['≡', 'ic-txt'],
             'ruby' => ['R', 'ic-ruby'],
             'json' => ['{}', 'ic-json'],
+            'font' => ['Aa', 'ic-txt'],
             default => ['≡', 'ic-txt'],
         };
         $html .= '<li><a class="it file" href="#' . $entry['id'] . '" data-src="' . $entry['id'] . '"'
