@@ -203,7 +203,7 @@ function root_entries(string $lang): array {
     return [
         'README.md' => ['kind' => 'text', 'content' => "# " . ROOT_NAME . "\n\n" . ($lang === 'fa' ? "پروژه‌ها در lib/projects/ قرار دارند، هر کدام در پوشه‌ی جدا.\n" : "Projects live in lib/projects/, one folder each.\n"), 'notice' => false],
         'pubspec.yaml' => ['kind' => 'text', 'content' => "# Generated overview of the layout.\nname: " . ROOT_NAME . "\npublish_to: none\n\nflutter:\n  assets:\n    - assets/images/\n  fonts:\n" . ROOT_FONTS_YAML, 'notice' => false],
-        'assets/images/flutter_logo.svg' => ['kind' => 'image', 'lang' => 'image', 'src' => 'assets/img/ide/flutter_logo.svg'],
+        'assets/images/flutter_logo.svg' => ['kind' => 'image', 'lang' => 'image', 'src' => 'assets/img/ide/flutter_logo.png'],
         'assets/images/dash.svg' => ['kind' => 'image', 'lang' => 'image', 'src' => 'assets/img/ide/dash.svg'],
         'assets/fonts/calistoga-latin-400-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/calistoga-latin-400-normal.woff2'],
         'assets/fonts/inter-latin-600-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/inter-latin-600-normal.woff2'],
