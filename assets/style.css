@@ -163,6 +163,8 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 .view-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .view-switch svg { width: 16px; height: 16px; flex: none; }
 .pv-normal[hidden], .pt-window[hidden], .pcard[hidden] { display: none !important; }
+html[data-projects-view="ide"] #view-normal { display: none !important; }
+html[data-projects-view="normal"] .pt-window { display: none !important; }
 .pv-normal { margin-top: 8px; }
 .pcard-shot { margin: 0 0 14px; }
 .pcard-shot img, .pcard-shots img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }

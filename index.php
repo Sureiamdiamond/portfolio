@@ -53,6 +53,11 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
 <script>
   // Apply the saved theme before first paint to avoid a flash.
   try { var s = localStorage.getItem('theme'); if (s) document.documentElement.dataset.theme = s; } catch (e) {}
+  // Projects view before first paint: #projects-ide wins, then the saved choice, then Normal.
+  try {
+    var pv = location.hash === '#projects-ide' ? 'ide' : localStorage.getItem('projects-view');
+    document.documentElement.dataset.projectsView = pv === 'ide' ? 'ide' : 'normal';
+  } catch (e) { document.documentElement.dataset.projectsView = 'normal'; }
 </script>
 <link rel="stylesheet" href="assets/style.css?v=<?= $assetVersion ?>">
 </head>

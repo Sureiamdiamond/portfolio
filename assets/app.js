@@ -179,6 +179,7 @@
     const show = (name, animate) => {
       if (!views[name]) return;
       section.dataset.view = name;
+      document.documentElement.dataset.projectsView = name;
       buttons.forEach((b) => {
         const on = b.dataset.view === name;
         b.classList.toggle('on', on);
@@ -197,9 +198,14 @@
         el.addEventListener('animationend', () => el.classList.remove('view-in'), { once: true });
       }
     };
-    let saved = 'normal';
-    try { saved = localStorage.getItem('projects-view') || 'normal'; } catch (err) { /* private mode: keep the default */ }
-    show(saved, false);
+    // #projects-ide is an explicit override: it is applied and saved like a click
+    let initial = 'normal';
+    try { initial = localStorage.getItem('projects-view') || 'normal'; } catch (err) { /* private mode: keep the default */ }
+    if (window.location.hash === '#projects-ide') {
+      initial = 'ide';
+      try { localStorage.setItem('projects-view', 'ide'); } catch (err) { /* ignore */ }
+    }
+    show(initial === 'ide' ? 'ide' : 'normal', false);
 
     buttons.forEach((btn, i) => {
       btn.addEventListener('click', () => {
