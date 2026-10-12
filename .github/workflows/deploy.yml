@@ -23,8 +23,6 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./
           server-dir: ./
-          # A new sync-state name per run means no file is skipped as "already uploaded"
-          state-name: .ftp-deploy-sync-${{ github.run_id }}.json
           exclude: |
             **/.git*
             **/.git*/**
