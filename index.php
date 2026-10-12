@@ -50,8 +50,49 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title><?= e($name) ?> · <?= e(t('default_title', $lang)) ?></title>
-<meta name="description" content="<?= e($headline) ?>">
+<?php
+// Search and sharing metadata. The site lives at the domain; each language has its own address.
+$siteUrl = 'https://parsabanitaba.ir';
+$pageUrl = $lang === 'fa' ? $siteUrl . '/?lang=fa' : $siteUrl . '/';
+$summary = trim(preg_replace('/\s+/u', ' ', strip_tags($about)));
+$description = mb_substr(trim($name . ' · ' . $headline . ($summary !== '' ? ' — ' . $summary : '')), 0, 160);
+$shareImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png');
+$personData = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Person',
+    'name' => 'Parsa Banitaba',
+    'alternateName' => 'پارسا بنی‌طبا',
+    'jobTitle' => 'Flutter Developer',
+    'description' => $summary !== '' ? mb_substr($summary, 0, 300) : null,
+    'url' => $siteUrl . '/',
+    'image' => $shareImage,
+    'email' => !empty($profile['email']) ? 'mailto:' . $profile['email'] : null,
+    'knowsAbout' => ['Flutter', 'Dart'],
+    'sameAs' => array_values(array_filter([$profile['github'] ?? '', $profile['linkedin'] ?? ''])),
+];
+$personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
+?>
+<title><?= e($name) ?> · <?= e($headline !== '' ? $headline : t('default_title', $lang)) ?></title>
+<meta name="description" content="<?= e($description) ?>">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="<?= e($pageUrl) ?>">
+<link rel="alternate" hreflang="en" href="<?= e($siteUrl . '/') ?>">
+<link rel="alternate" hreflang="fa" href="<?= e($siteUrl . '/?lang=fa') ?>">
+<link rel="alternate" hreflang="x-default" href="<?= e($siteUrl . '/') ?>">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="<?= e($name) ?>">
+<meta property="og:title" content="<?= e($name) ?> · <?= e($headline) ?>">
+<meta property="og:description" content="<?= e($description) ?>">
+<meta property="og:url" content="<?= e($pageUrl) ?>">
+<meta property="og:image" content="<?= e($shareImage) ?>">
+<meta property="og:locale" content="<?= $lang === 'fa' ? 'fa_IR' : 'en_US' ?>">
+<meta property="og:locale:alternate" content="<?= $lang === 'fa' ? 'en_US' : 'fa_IR' ?>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?= e($name) ?> · <?= e($headline) ?>">
+<meta name="twitter:description" content="<?= e($description) ?>">
+<meta name="twitter:image" content="<?= e($shareImage) ?>">
+<link rel="icon" href="assets/img/favicon.svg?v=<?= $assetVersion ?>" type="image/svg+xml">
+<script type="application/ld+json"><?= json_encode($personData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <script>
   // Apply the saved theme before first paint to avoid a flash.
   try { var s = localStorage.getItem('theme'); if (s) document.documentElement.dataset.theme = s; } catch (e) {}

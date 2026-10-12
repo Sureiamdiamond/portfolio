@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /data/
+
+Sitemap: https://parsabanitaba.ir/sitemap.xml
