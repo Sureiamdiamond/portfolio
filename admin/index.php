@@ -15,7 +15,8 @@ const TYPES = [
     'presentations' => ['label' => 'Presentations', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
     'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'period', 'period_fa', 'details', 'details_fa', 'sort'], 'long' => ['details', 'details_fa'], 'files' => []],
 ];
-const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'email', 'phone', 'linkedin', 'github'];
+const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'linkedin', 'github'];
+const PROFILE_LONG = ['about', 'about_fa'];
 
 /** Human label for a field; Persian fields are marked so the admin knows where to type them. */
 function label(string $field): string {
@@ -188,7 +189,11 @@ if ($loggedIn) {
       <input type="hidden" name="action" value="profile">
       <?php foreach (PROFILE_FIELDS as $field): ?>
         <label for="p-<?= $field ?>"><?= e(label($field)) ?></label>
-        <input id="p-<?= $field ?>" name="<?= $field ?>" value="<?= e($profile[$field] ?? '') ?>">
+        <?php if (in_array($field, PROFILE_LONG, true)): ?>
+          <textarea id="p-<?= $field ?>" name="<?= $field ?>"><?= e($profile[$field] ?? '') ?></textarea>
+        <?php else: ?>
+          <input id="p-<?= $field ?>" name="<?= $field ?>" value="<?= e($profile[$field] ?? '') ?>">
+        <?php endif; ?>
       <?php endforeach; ?>
       <label for="cv">CV (PDF)</label>
       <input id="cv" type="file" name="file_cv" accept="application/pdf,.pdf">

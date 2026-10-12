@@ -35,6 +35,10 @@ const STRINGS = [
         'default_headline' => 'Software engineer',
         'default_title' => 'Portfolio',
         'lang_switch' => 'فارسی',
+        'lets_chat' => "Let's Chat",
+        'stat_projects' => 'Projects',
+        'stat_papers' => 'Papers',
+        'stat_presentations' => 'Presentations',
     ],
     'fa' => [
         'nav_home' => 'خانه',
@@ -67,6 +71,10 @@ const STRINGS = [
         'default_headline' => 'مهندس نرم‌افزار',
         'default_title' => 'پورتفولیو',
         'lang_switch' => 'English',
+        'lets_chat' => 'گفتگو',
+        'stat_projects' => 'پروژه',
+        'stat_papers' => 'مقاله',
+        'stat_presentations' => 'ارائه',
     ],
 ];
 
