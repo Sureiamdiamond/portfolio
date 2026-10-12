@@ -1,6 +1,12 @@
 Options -Indexes
 RewriteEngine On
 
+# Send the domain to one HTTPS address: http -> https and www -> apex. Other hosts (the temporary IP path) are not redirected.
+RewriteCond %{HTTP_HOST} ^(www\.)?parsabanitaba\.ir$ [NC]
+RewriteCond %{HTTPS} off [OR]
+RewriteCond %{HTTP_HOST} ^www\. [NC]
+RewriteRule ^(.*)$ https://parsabanitaba.ir/$1 [R=301,L,QSA]
+
 # Never serve the database, the config file or the data folder
 RedirectMatch 403 ^/data/
 RedirectMatch 403 ^/config\.php$
