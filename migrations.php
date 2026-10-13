@@ -334,6 +334,22 @@ function cv_timeline_rows(): array {
     ];
 }
 
+// One-time removal of the duty points from workplace entries: only organisation, position and years are shown.
+// The removed text is logged in full first, so nothing is lost silently.
+const EXPERIENCE_BULLETS_MIGRATION = 'migration_exp_bullets_v1';
+
+function run_experience_bullets_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . EXPERIENCE_BULLETS_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $rows = $pdo->query("SELECT id, title, org, bullets, bullets_fa FROM timeline WHERE kind = 'experience' AND (TRIM(bullets) <> '' OR TRIM(bullets_fa) <> '')")->fetchAll(PDO::FETCH_ASSOC);
+    if ($rows) {
+        migration_log('exp-bullets: removed ' . json_encode($rows, JSON_UNESCAPED_UNICODE));
+        $pdo->exec("UPDATE timeline SET bullets = '', bullets_fa = '' WHERE kind = 'experience'");
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . EXPERIENCE_BULLETS_MIGRATION . "', '1')");
+}
+
 // One-time removal of the word "junior" (English and Persian) from the profile headline and about text, and from timeline titles. Logged with the previous values.
 const JUNIOR_MIGRATION = 'migration_junior_v1';
 

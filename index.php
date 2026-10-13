@@ -187,14 +187,17 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
                     <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
                     <?php if (trim(loc($item, 'city', $lang)) !== ''): ?><span class="tl-city"><?= e(loc($item, 'city', $lang)) ?></span><?php endif; ?>
                   </p>
-                  <?php $bullets = timeline_bullets($item, $lang); ?>
-                  <?php if ($bullets): ?>
-                    <ul class="tl-bullets">
-                      <?php foreach ($bullets as $b): ?><li><?= e($b) ?></li><?php endforeach; ?>
-                    </ul>
-                  <?php elseif (trim(loc($item, 'details', $lang)) !== ''): ?>
-                    <p class="tl-details"><?= nl2br(e(loc($item, 'details', $lang))) ?></p>
-                  <?php endif; ?>
+                  <?php // Workplaces show only organisation, position and years; education can also show its major and points
+                    if ($label === 'education'):
+                      $bullets = timeline_bullets($item, $lang);
+                      if ($bullets): ?>
+                        <ul class="tl-bullets">
+                          <?php foreach ($bullets as $b): ?><li><?= e($b) ?></li><?php endforeach; ?>
+                        </ul>
+                      <?php elseif (trim(loc($item, 'details', $lang)) !== ''): ?>
+                        <p class="tl-details"><?= nl2br(e(loc($item, 'details', $lang))) ?></p>
+                      <?php endif;
+                    endif; ?>
                   <?= timeline_site($item, $lang) ?>
                 </div>
               </article>

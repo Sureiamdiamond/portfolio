@@ -66,6 +66,7 @@ function db(): PDO {
     run_junior_migration($pdo);
     run_name_fa_migration($pdo);
     run_cv_migration($pdo);
+    run_experience_bullets_migration($pdo);
     return $pdo;
 }
 
