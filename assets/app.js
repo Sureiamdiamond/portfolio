@@ -273,11 +273,12 @@
 // Floating CV button: shown once the reader has scrolled past most of the hero
 (function () {
   const fab = document.querySelector('.cv-fab');
-  if (!fab) return;
   const hero = document.getElementById('top');
+  const toTop = document.querySelector('.to-top');
   const update = () => {
     const limit = hero ? hero.offsetHeight * 0.6 : 400;
-    fab.classList.toggle('show', window.scrollY > limit);
+    if (fab) fab.classList.toggle('show', window.scrollY > limit);
+    if (toTop) toTop.classList.toggle('show', window.scrollY > 600);
   };
   window.addEventListener('scroll', update, { passive: true });
   update();

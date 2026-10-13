@@ -228,6 +228,7 @@ function render_project_window(array $projects, PDO $pdo, string $lang, array &$
         $files[$path] = $entry + ['lang' => lang_of($path)];
     }
     $projectKinds = [];
+    $projectTiles = [];
     $used = [];
     foreach ($projects as $project) {
         $slug = project_slug($project);
@@ -237,6 +238,7 @@ function render_project_window(array $projects, PDO $pdo, string $lang, array &$
         $used[$slug] = true;
         $prefix = PROJECTS_DIR . '/' . $slug;
         $projectKinds[$prefix] = (string) $project['kind'];
+        $projectTiles[$prefix] = project_tile($project, 'sm');
         foreach (project_entries($pdo, $project, $lang, $slug) as $path => $entry) {
             $files[$prefix . '/' . $path] = $entry;
         }
@@ -263,20 +265,36 @@ function render_project_window(array $projects, PDO $pdo, string $lang, array &$
     }
     return '<li><details open><summary class="it dir"><span class="chev" aria-hidden="true"></span>'
         . ICON_FOLDER . '<span class="nm">' . e(ROOT_NAME) . '</span></summary><ul class="kids">'
-        . render_dir_level(array_keys($dirs), $files, '.', $projectKinds)
+        . render_dir_level(array_keys($dirs), $files, '.', $projectKinds, $projectTiles)
         . '</ul></details></li>';
 }
 
 /** One directory level: folders first, then files, both alphabetical (as the IDE shows them). */
-function render_dir_level(array $dirs, array $files, string $parent, array $projectKinds): string {
+/**
+ * The project's icon: the uploaded icon when one is set, otherwise a generated tile with its initials.
+ * Each project gets its own hue, so the tiles differ from one another without any brand logo.
+ */
+function project_tile(array $p, string $size = ''): string {
+    $cls = 'ptile' . ($size !== '' ? ' ' . $size : '');
+    $icon = trim((string) ($p['icon'] ?? ''));
+    if ($icon !== '') {
+        return '<img class="' . $cls . ' ptile-img" src="' . e($icon) . '" alt="" width="44" height="44" loading="lazy">';
+    }
+    $title = trim((string) ($p['title'] ?? ''));
+    $words = array_values(array_filter(preg_split('/\s+/u', $title) ?: [], 'strlen'));
+    $initials = mb_strtoupper(implode('', array_map(fn($w) => mb_substr($w, 0, 1), array_slice($words, 0, 2))));
+    return '<span class="' . $cls . '" style="--hue:' . (crc32($title) % 360) . '" aria-hidden="true">' . e($initials !== '' ? $initials : '•') . '</span>';
+}
+
+function render_dir_level(array $dirs, array $files, string $parent, array $projectKinds, array $projectTiles = []): string {
     $html = '';
     $childDirs = array_values(array_filter($dirs, fn($d) => dirname($d) === $parent));
     usort($childDirs, 'strcasecmp');
     foreach ($childDirs as $dir) {
         $isProject = isset($projectKinds[$dir]);
-        $html .= '<li' . ($isProject ? ' class="it-project" data-kind="' . e($projectKinds[$dir]) . '"' : '') . '><details open><summary class="it dir"><span class="chev" aria-hidden="true"></span>' . ICON_FOLDER
+        $html .= '<li' . ($isProject ? ' class="it-project" data-kind="' . e($projectKinds[$dir]) . '"' : '') . '><details open><summary class="it dir"><span class="chev" aria-hidden="true"></span>' . ($isProject && isset($projectTiles[$dir]) ? $projectTiles[$dir] : ICON_FOLDER)
             . '<span class="nm">' . e(basename($dir)) . '</span></summary><ul class="kids">'
-            . render_dir_level($dirs, $files, $dir, $projectKinds) . '</ul></details></li>';
+            . render_dir_level($dirs, $files, $dir, $projectKinds, $projectTiles) . '</ul></details></li>';
     }
     $childFiles = array_keys(array_filter($files, fn($path) => dirname($path) === $parent, ARRAY_FILTER_USE_KEY));
     usort($childFiles, 'strcasecmp');

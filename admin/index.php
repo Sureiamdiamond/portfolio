@@ -12,7 +12,7 @@ $pdo = db();
 const TYPES = [
     'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'sort'], 'long' => ['summary', 'summary_fa'], 'files' => []],
     'papers' => ['label' => 'Research', 'fields' => ['title', 'title_fa', 'venue', 'year', 'doi', 'sort'], 'long' => [], 'files' => ['pdf']],
-    'presentations' => ['label' => 'Presentations', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
+    'presentations' => ['label' => 'Slides', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
     'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'period', 'period_fa', 'details', 'details_fa', 'sort'], 'long' => ['details', 'details_fa'], 'files' => []],
 ];
 const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'linkedin', 'github'];
@@ -86,6 +86,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($path = save_upload('file_' . $ext, $ext)) {
                         $data[$ext] = $path;
                     }
+                }
+                // Projects can have their own icon; without one the site shows a generated tile
+                if ($type === 'projects' && ($icon = save_file_upload('file_icon', ['png', 'webp', 'jpg', 'jpeg']))) {
+                    if ($id > 0) {
+                        $old = $pdo->prepare('SELECT icon FROM projects WHERE id = ?');
+                        $old->execute([$id]);
+                        remove_upload($old->fetchColumn() ?: null);
+                    }
+                    $data['icon'] = $icon['path'];
                 }
                 if ($id > 0) {
                     $sets = implode(', ', array_map(fn($k) => "$k = ?", array_keys($data)));
@@ -234,6 +243,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $id = (int) ($_POST['id'] ?? 0);
                 foreach (TYPES[$type]['files'] as $ext) {
                     $stmt = $pdo->prepare("SELECT $ext FROM $type WHERE id = ?");
+                    $stmt->execute([$id]);
+                    remove_upload($stmt->fetchColumn() ?: null);
+                }
+                if ($type === 'projects') {
+                    $stmt = $pdo->prepare('SELECT icon FROM projects WHERE id = ?');
                     $stmt->execute([$id]);
                     remove_upload($stmt->fetchColumn() ?: null);
                 }
@@ -548,6 +562,11 @@ if ($loggedIn) {
         <input id="f-<?= $ext ?>" type="file" name="file_<?= $ext ?>" accept=".<?= $ext ?>">
         <p class="muted">Current: <?= !empty($edit[$ext]) ? e($edit[$ext]) : 'none' ?></p>
       <?php endforeach; ?>
+      <?php if ($tab === 'projects'): ?>
+        <label for="f-icon">Icon (PNG, WebP or JPG, optional)</label>
+        <input id="f-icon" type="file" name="file_icon" accept=".png,.webp,.jpg,.jpeg">
+        <p class="muted">Current: <?= !empty($edit['icon']) ? e($edit['icon']) : 'generated tile' ?></p>
+      <?php endif; ?>
       <p><button type="submit">Save</button>
         <?php if ($edit): ?><a href="index.php?t=<?= $tab ?>">Cancel</a><?php endif; ?></p>
     </form>

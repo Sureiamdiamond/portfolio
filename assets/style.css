@@ -476,3 +476,42 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
   .nav-links::-webkit-scrollbar { display: none; }
   .nav-links a { flex: none; white-space: nowrap; }
 }
+
+/* Back to top: bottom-left, away from the CV button */
+.to-top {
+  position: fixed; left: max(24px, env(safe-area-inset-left)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 20;
+  width: 48px; height: 48px; display: grid; place-items: center; border-radius: 999px; color: var(--fg);
+  background: color-mix(in srgb, var(--surface) 82%, transparent); border: 1px solid var(--border); box-shadow: var(--shadow);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); transition: opacity .25s var(--ease), transform .25s var(--ease);
+}
+.js .to-top { opacity: 0; transform: translateY(12px); pointer-events: none; }
+.js .to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+@media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+@media (prefers-reduced-motion: reduce) { .to-top { transition: none; } }
+@media (max-width: 760px) { .to-top { left: max(16px, env(safe-area-inset-left)); bottom: max(16px, env(safe-area-inset-bottom)); } }
+
+/* Arrows point in the reading direction: left in Persian */
+html[dir="rtl"] .arr { display: inline-block; transform: scaleX(-1); }
+
+/* Space between the headline pill and the name */
+.hero-text h1 { margin-top: 22px; }
+
+/* Email and other contact values stay on one line */
+.contact-cards .cc-value { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.contact-cards .cc-text { min-width: 0; flex: 1; }
+
+/* Phone-safe page: no text size adjust on rotation or zoom, and no sideways overflow */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body { overflow-x: clip; }
+
+/* Project icons: the uploaded icon, or a generated tile with the project's initials */
+.ptile {
+  display: inline-grid; place-items: center; width: 44px; height: 44px; flex: none; border-radius: 12px;
+  color: #fff; font: 700 .85rem/1 var(--sans); letter-spacing: .02em;
+  background: linear-gradient(135deg, hsl(var(--hue) 88% 60%), hsl(calc(var(--hue) + 28) 82% 42%));
+  box-shadow: 0 8px 18px -10px hsl(var(--hue) 85% 45% / .9);
+}
+.ptile-img { object-fit: cover; background: var(--surface); }
+.pcard > .ptile { margin-bottom: 12px; }
+.ptile.sm { width: 18px; height: 18px; border-radius: 5px; font-size: 8px; box-shadow: none; vertical-align: middle; }
+.it .ptile.sm { margin-inline-end: 4px; }

@@ -192,6 +192,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
             <?php if ($shots): ?>
               <figure class="pcard-shot"><img src="<?= e($shots[0]) ?>" alt="" loading="lazy"></figure>
             <?php endif; ?>
+            <?= project_tile($p) ?>
             <span class="tag"><?= e($p['kind']) ?></span>
             <h3><?= e(loc($p, 'title', $lang)) ?></h3>
             <p class="muted pcard-summary"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
@@ -203,9 +204,9 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
               <ul class="pcard-shots"><?php foreach (array_slice($shots, 1) as $more): ?><li><img src="<?= e($more) ?>" alt="" loading="lazy"></li><?php endforeach; ?></ul>
             <?php endif; ?>
             <?php if ($p['url']): ?>
-              <a href="<?= e($p['url']) ?>" target="_blank" rel="noopener"><?= e(t('view_project', $lang)) ?> →</a>
+              <a href="<?= e($p['url']) ?>" target="_blank" rel="noopener"><?= e(t('view_project', $lang)) ?> <span class="arr" aria-hidden="true">→</span></a>
             <?php elseif (mb_strlen(loc($p, 'summary', $lang)) > 160): ?>
-              <a href="#projects-ide"><?= e(t('full_description', $lang)) ?> →</a>
+              <a href="#projects-ide"><?= e(t('full_description', $lang)) ?> <span class="arr" aria-hidden="true">→</span></a>
             <?php endif; ?>
           </article>
         <?php endforeach; ?>
@@ -325,10 +326,12 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 </main>
 
 <?php if (!empty($profile['cv'])): ?><a class="btn btn-primary cv-fab" href="<?= e($profile['cv']) ?>" download><?= e(t('download_cv', $lang)) ?></a><?php endif; ?>
+<a class="to-top" href="#top" aria-label="<?= e(t('back_to_top', $lang)) ?>" title="<?= e(t('back_to_top', $lang)) ?>"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 14l6-6 6 6"/></svg></a>
 
 <footer class="muted">
-  © <?= date('Y') ?> <?= e($name) ?> · <span class="build">build <?= $assetVersion ?></span>
+  © <?= date('Y') ?> <?= e($name) ?>
 </footer>
+<!-- build <?= $assetVersion ?> -->
 
 <script src="assets/app.js?v=<?= $assetVersion ?>" defer></script>
 </body>
