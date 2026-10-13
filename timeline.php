@@ -5,12 +5,12 @@ declare(strict_types=1);
 function org_tile(array $item, string $lang): string {
     $logo = trim((string) ($item['logo'] ?? ''));
     if ($logo !== '') {
-        return '<img class="tl-logo" src="' . e($logo) . '" alt="" loading="lazy">';
+        return '<span class="tl-slot"><img class="tl-logo" src="' . e($logo) . '" alt="" loading="lazy"></span>';
     }
     $name = trim(loc($item, 'org', $lang)) !== '' ? loc($item, 'org', $lang) : loc($item, 'title', $lang);
     $words = array_values(array_filter(preg_split('/\s+/u', trim($name)) ?: [], 'strlen'));
     $initials = mb_strtoupper(implode('', array_map(fn($w) => mb_substr($w, 0, 1), array_slice($words, 0, 2))));
-    return '<span class="tl-logo tl-initials" style="--hue:' . (crc32($name) % 360) . '" aria-hidden="true">' . e($initials !== '' ? $initials : '•') . '</span>';
+    return '<span class="tl-slot"><span class="tl-logo tl-initials" style="--hue:' . (crc32($name) % 360) . '" aria-hidden="true">' . e($initials !== '' ? $initials : '•') . '</span></span>';
 }
 
 /** Bullet points, one per line; falls back to the description paragraph when there are none. */
