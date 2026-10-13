@@ -350,6 +350,34 @@ function run_experience_bullets_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . EXPERIENCE_BULLETS_MIGRATION . "', '1')");
 }
 
+// Skills grouped under Flutter, with the less important ones behind the More button. Replaces the list left by the CV migration.
+const SKILLS_MIGRATION = 'migration_skills_v1';
+const SKILLS_LIST = "Dart | dart
+Flutter | flutter
+GetX | getx | parent:Flutter
+Bloc | bloc | parent:Flutter
+SDUI | | parent:Flutter
+Stac | | parent:Flutter
+Python | python
+Git | git
+Http / Dio | | more
+GitHub | github | more
+GitLab | gitlab | more
+Figma | figma | more
+Jira | jira | more
+Firebase | firebase | more";
+
+function run_skills_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT v FROM profile WHERE k = 'skills'")->fetchColumn();
+    migration_log('skills: previous value ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['skills', SKILLS_LIST]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_MIGRATION . "', '1')");
+}
+
 // One-time removal of the word "junior" (English and Persian) from the profile headline and about text, and from timeline titles. Logged with the previous values.
 const JUNIOR_MIGRATION = 'migration_junior_v1';
 

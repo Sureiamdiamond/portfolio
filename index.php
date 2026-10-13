@@ -208,6 +208,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     </div>
     <?php
       $skills = skill_items((string) ($profile['skills'] ?? ''));
+      $skillGroups = skill_groups($skills);
       $languages = language_items((string) ($profile['languages'] ?? ''));
     ?>
     <?php if ($skills || $languages): ?>
@@ -215,14 +216,19 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
         <h3 class="sub"><?= e(t('skills_languages', $lang)) ?></h3>
         <?php if ($skills): ?>
           <p class="skills-label"><?= e(t('skills', $lang)) ?></p>
-          <ul class="skill-grid">
-            <?php foreach ($skills as $skill): $svg = skill_icon_svg($skill['icon']); ?>
-              <li class="skill">
-                <?php if ($svg !== null): ?><span class="skill-icon"><?= $svg ?></span><?php else: ?><span class="skill-icon skill-initials" aria-hidden="true"><?= e(mb_strtoupper(mb_substr($skill['name'], 0, 2))) ?></span><?php endif; ?>
-                <span><?= e($skill['name']) ?></span>
-              </li>
-            <?php endforeach; ?>
-          </ul>
+          <?php if ($skillGroups['visible']): ?>
+            <ul class="skill-grid">
+              <?php foreach ($skillGroups['visible'] as $group): ?><?= skill_card_html($group) ?><?php endforeach; ?>
+            </ul>
+          <?php endif; ?>
+          <?php if ($skillGroups['more']): ?>
+            <details class="skills-more">
+              <summary><span class="when-closed"><?= e(t('skills_more', $lang)) ?></span><span class="when-open"><?= e(t('skills_less', $lang)) ?></span></summary>
+              <ul class="skill-grid">
+                <?php foreach ($skillGroups['more'] as $group): ?><?= skill_card_html($group) ?><?php endforeach; ?>
+              </ul>
+            </details>
+          <?php endif; ?>
         <?php endif; ?>
         <?php if ($languages): ?>
           <p class="skills-label"><?= e(t('languages', $lang)) ?></p>
