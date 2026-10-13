@@ -356,7 +356,7 @@ const SKILLS_LIST = "Dart | dart
 Flutter | flutter
 GetX | getx | parent:Flutter
 Bloc | bloc | parent:Flutter
-SDUI | | parent:Flutter
+SDUI | sdui | parent:Flutter
 Stac | | parent:Flutter
 Riverpod | | parent:Flutter
 AI | ai
@@ -376,7 +376,7 @@ const SKILLS_FA_LIST = "Dart | dart
 Flutter | flutter
 GetX | getx | parent:Flutter
 Bloc | bloc | parent:Flutter
-SDUI | | parent:Flutter
+SDUI | sdui | parent:Flutter
 Stac | | parent:Flutter
 Riverpod | | parent:Flutter
 هوش مصنوعی | ai
@@ -487,6 +487,21 @@ function run_skills_v5_migration(PDO $pdo): void {
     $stmt->execute(['skills', SKILLS_LIST]);
     $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_HTTP_MIGRATION . "', '1')");
+}
+
+// Icons for GetX and SDUI in the Flutter panel. Rewrites both skills lists; the previous values are logged.
+const SKILLS_ICONS_FLUTTER_MIGRATION = 'migration_skills_v6';
+
+function run_skills_v6_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_ICONS_FLUTTER_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('skills', 'skills_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('skills v6: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['skills', SKILLS_LIST]);
+    $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_ICONS_FLUTTER_MIGRATION . "', '1')");
 }
 
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
