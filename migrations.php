@@ -298,7 +298,7 @@ function cv_timeline_rows(): array {
         "زبان‌ها و فریم‌ورک‌ها: Dart، Flutter\nمدیریت وضعیت: BLoC، GetX؛ استفاده از Freezed برای مدل‌سازی داده و مدیریت ایونت‌ها و استیت‌ها\nمعماری نرم‌افزار: MVP، Clean Architecture، MVVM\nپروژه SDUI\nارتباط با سرور: کار با Dio و HTTP برای API Integration\nتم و ظاهر اپلیکیشن: پیاده‌سازی تم‌های پویا و سفارشی‌سازی کامل UI\nرابط کاربری: تبدیل طراحی‌های Figma به UI واکنش‌گرا\nچندزبانه‌سازی اپلیکیشن: تجربه در پیاده‌سازی Localization\nابزارهای تیمی و مدیریتی: Jira، Git (GitHub/GitLab)\nتوسعه تیمی: آشنایی با متدولوژی Agile و کار گروهی",
         "Languages and frameworks: Dart, Flutter\nState management: BLoC and GetX, with Freezed for data models and events and states\nSoftware architecture: MVP, Clean Architecture, MVVM\nSDUI project\nServer communication: Dio and HTTP for API integration\nApp theming: dynamic themes and full UI customisation\nUI: turning Figma designs into responsive UI\nLocalisation: experience implementing multi-language apps\nTeam tools: Jira, Git (GitHub and GitLab)\nTeamwork: familiar with Agile and group work",
     ];
-    $ipam = ['org' => 'شرکت دانش‌بنیان ایده‌پرداز دانش نوین آرشام (ایپام)', 'org_en' => 'Ideh Pardaz Danesh Novin Arsham (IPAM)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
+    $ipam = ['org' => 'شرکت دانش‌بنیان ایده‌پرداز دانش نوین آرشام (ایپاام)', 'org_en' => 'Ideh Pardaz Danesh Novin Arsham (IPAAM)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
     $azad = ['website_w' => 'https://wtb.iau.ir/', 'website_c' => 'https://ctb.iau.ir/'];
     return [
         [
@@ -517,6 +517,34 @@ function run_skills_v7_migration(PDO $pdo): void {
     $stmt->execute(['skills', SKILLS_LIST]);
     $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_ORDER_MIGRATION . "', '1')");
+}
+
+// Workplace name spelled IPAAM (was IPAM / ایپام) in the stored timeline and profile text. Changed rows are logged with their previous values.
+const IPAAM_MIGRATION = 'migration_ipaam_v1';
+
+function ipaam_fix(string $text): string {
+    return str_replace(['IPAM', 'ایپام'], ['IPAAM', 'ایپاام'], $text);
+}
+
+function run_ipaam_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . IPAAM_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare('UPDATE timeline SET org = ?, org_fa = ?, title = ?, title_fa = ?, details = ?, details_fa = ?, bullets = ?, bullets_fa = ? WHERE id = ?');
+    foreach ($pdo->query('SELECT * FROM timeline')->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $fields = ['org', 'org_fa', 'title', 'title_fa', 'details', 'details_fa', 'bullets', 'bullets_fa'];
+        $new = array_map(fn($f) => ipaam_fix((string) ($row[$f] ?? '')), $fields);
+        if ($new !== array_map(fn($f) => (string) ($row[$f] ?? ''), $fields)) {
+            migration_log("ipaam: timeline {$row['id']} previous row " . json_encode($row, JSON_UNESCAPED_UNICODE));
+            $update->execute([...$new, $row['id']]);
+        }
+    }
+    $stmt = $pdo->prepare('UPDATE profile SET v = ? WHERE k = ?');
+    foreach ($pdo->query("SELECT k, v FROM profile WHERE v LIKE '%IPAM%' OR v LIKE '%ایپام%'")->fetchAll(PDO::FETCH_KEY_PAIR) as $k => $v) {
+        migration_log("ipaam: profile $k previous value " . json_encode($v, JSON_UNESCAPED_UNICODE));
+        $stmt->execute([ipaam_fix((string) $v), $k]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_MIGRATION . "', '1')");
 }
 
 // English becomes a panel with CAE and TTC as sub-items. Rewrites both language fields; the previous values are logged.
