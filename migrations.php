@@ -607,6 +607,21 @@ function run_ipam_fa_spelling_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAM_FA_SPELLING_MIGRATION . "', '1')");
 }
 
+// The TechBlog project's GitHub link moves to the fork. Only the exact old link is changed; the project README in the IDE reads the same field.
+const TECHBLOG_GITHUB_MIGRATION = 'migration_techblog_github_v1';
+function run_techblog_github_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TECHBLOG_GITHUB_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $old = 'https://github.com/Sureiamdiamond/TechBlog';
+    $new = 'https://github.com/Sureiamdiamond/Techblog-Fork';
+    foreach ($pdo->query('SELECT id, github_url FROM projects WHERE github_url = ' . $pdo->quote($old))->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        migration_log("techblog github: project {$row['id']} previous github_url " . json_encode($row['github_url'], JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE projects SET github_url = ? WHERE id = ?')->execute([$new, $row['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_GITHUB_MIGRATION . "', '1')");
+}
+
 // Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.
 const TIMELINE_LOGOS_MIGRATION = 'migration_timeline_logos_v2';
 const TIMELINE_LOGOS = [

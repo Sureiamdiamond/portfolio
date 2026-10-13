@@ -84,6 +84,7 @@ function db(): PDO {
     run_timeline_logos_migration($pdo);
     run_codeyad_period_migration($pdo);
     run_ipam_fa_spelling_migration($pdo);
+    run_techblog_github_migration($pdo);
     return $pdo;
 }
 
@@ -116,7 +117,7 @@ const RESUME_PROJECTS = [
     ['title' => 'TechBlog', 'title_fa' => 'تک بلاگ', 'kind' => 'academic',
         'summary' => "Group project for Prof. Safari, built with Flutter. Period: Tir 1401.",
         'summary_fa' => "پروژه گروهی استاد صفری با فلاتر. بازه: تیر ۱۴۰۱.",
-        'tags' => 'flutter, dart', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/TechBlog', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 3],
+        'tags' => 'flutter, dart', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/Techblog-Fork', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 3],
     ['title' => 'Classyar App', 'title_fa' => 'اپلیکیشن کلاسیار', 'kind' => 'work',
         'summary' => "Flutter app for Classyar, built for Azad Islamic University (Tehran West). Dynamic UI, state management with GetX and Bloc, data from an API and Firebase, published on Cafebazaar. Period: Mehr 1404.",
         'summary_fa' => "اپلیکیشن کلاسیار با فلاتر برای دانشگاه آزاد اسلامی تهران غرب: صفحات پویا، مدیریت وضعیت با GetX و Bloc، داده از API و Firebase، منتشر شده در کافه‌بازار. بازه: مهر ۱۴۰۴.",
