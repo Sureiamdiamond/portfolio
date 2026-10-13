@@ -602,7 +602,7 @@ html[data-theme="dark"] .tl-initials { background: hsl(var(--hue) 45% 22%); colo
 .skills-langs { margin-top: 36px; }
 .skills-label { margin: 16px 0 8px; font: 500 .8rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 html[lang="fa"] .skills-label { font-family: Vazirmatn, system-ui, sans-serif; letter-spacing: 0; text-transform: none; font-size: .9rem; }
-.skill-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; }
+.skill-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; align-items: start; }
 .skill { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); font-weight: 500; }
 .skill-icon { width: 30px; height: 30px; flex: none; display: grid; place-items: center; color: var(--fg); }
 .skill-svg { width: 24px; height: 24px; }

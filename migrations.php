@@ -358,6 +358,7 @@ GetX | getx | parent:Flutter
 Bloc | bloc | parent:Flutter
 SDUI | | parent:Flutter
 Stac | | parent:Flutter
+Riverpod | | parent:Flutter
 Python | python
 Git | git
 Http / Dio | | more
@@ -376,6 +377,20 @@ function run_skills_migration(PDO $pdo): void {
     $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
     $stmt->execute(['skills', SKILLS_LIST]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_MIGRATION . "', '1')");
+}
+
+// Riverpod added under Flutter. Rewrites the skills list with the current SKILLS_LIST; the previous value is logged.
+const SKILLS_V2_MIGRATION = 'migration_skills_v2';
+
+function run_skills_v2_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_V2_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT v FROM profile WHERE k = 'skills'")->fetchColumn();
+    migration_log('skills v2: previous value ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['skills', SKILLS_LIST]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_V2_MIGRATION . "', '1')");
 }
 
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
