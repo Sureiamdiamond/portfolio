@@ -167,6 +167,13 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
           <path class="dash-legs" d="M30 47 L28 55 M36 47 L37 55" stroke="#01579B" stroke-width="2.4" stroke-linecap="round" fill="none"/>
         </svg>
       </div>
+      <svg class="splash" viewBox="0 0 400 500" aria-hidden="true" focusable="false">
+        <g class="sp sp-1"><path d="M30 150C40 90 110 70 150 40C175 22 205 30 190 52C170 85 120 110 80 175C60 205 25 190 30 150Z"/><path class="hl" d="M70 140l30-28M95 160l16-14"/></g>
+        <g class="sp sp-2"><path d="M225 60C260 20 330 10 365 22C380 28 372 48 355 52C320 62 270 80 240 95C222 104 208 80 225 60Z"/><path class="hl" d="M250 60l60-18M300 50l30-8"/><path d="M150 20C170 0 215 0 210 18C205 36 170 40 150 20Z"/></g>
+        <g class="sp sp-3"><path d="M330 210C355 190 385 215 378 260C372 300 350 330 340 360C332 380 318 368 322 340C326 300 318 250 330 210Z"/><path class="hl" d="M352 240l-4 60"/></g>
+        <g class="sp sp-4"><path d="M10 300C20 280 60 282 80 300C98 316 84 345 62 350C38 356 12 330 10 300Z"/><path class="hl" d="M30 310l20-4"/></g>
+        <g class="sp sp-5"><path d="M290 410C320 385 380 395 390 430C398 460 360 480 330 470C300 462 270 440 290 410Z"/><path class="hl" d="M320 425l40-4M330 445l28-2"/></g>
+      </svg>
       <span class="chip chip-icon chip-a" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></span>
       <span class="chip chip-icon chip-b" aria-hidden="true"><img src="assets/img/ide/flutter_logo.png?v=<?= $assetVersion ?>" alt="" width="27" height="32" decoding="async"></span>
     </div>
