@@ -83,8 +83,8 @@ const TYPES = [
     'presentations' => ['label' => 'Slides', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
     'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'city', 'city_fa', 'period', 'period_fa', 'website', 'bullets', 'bullets_fa', 'details', 'details_fa', 'sort'], 'long' => ['bullets', 'bullets_fa', 'details', 'details_fa'], 'files' => []],
 ];
-const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'linkedin', 'github', 'skills', 'languages', 'meta_description', 'footer_text'];
-const PROFILE_LONG = ['about', 'about_fa', 'skills', 'languages', 'meta_description'];
+const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'location', 'location_fa', 'linkedin', 'github', 'skills', 'languages', 'languages_fa', 'meta_description', 'footer_text'];
+const PROFILE_LONG = ['about', 'about_fa', 'skills', 'languages', 'languages_fa', 'meta_description'];
 // Sections of the public page that can be hidden; stored as '1' (shown) or '0' (hidden)
 const SECTION_SWITCHES = [
     'show_journey' => 'Education & experience',

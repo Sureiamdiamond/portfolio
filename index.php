@@ -82,6 +82,7 @@ $personData = [
     'image' => $shareImage,
     'email' => !empty($profile['email']) ? 'mailto:' . $profile['email'] : null,
     'knowsAbout' => ['Flutter', 'Dart'],
+    'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Tehran', 'addressCountry' => 'IR'],
     'sameAs' => array_values(array_filter([$profile['github'] ?? '', $profile['linkedin'] ?? ''])),
 ];
 $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
@@ -149,6 +150,9 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
         <?php if (!empty($profile['cv'])): ?><a class="btn btn-primary" href="<?= e($profile['cv']) ?>" download><?= e(t('download_cv', $lang)) ?></a><?php endif; ?>
         <?php if (!empty($profile['email'])): ?><a class="btn btn-outline" href="mailto:<?= e($profile['email']) ?>"><?= e(t('email_me', $lang)) ?></a><?php endif; ?>
       </div>
+      <?php $heroLocation = loc($profile, 'location', $lang); if ($heroLocation !== ''): ?>
+        <p class="loc"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span><?= e($heroLocation) ?></span></p>
+      <?php endif; ?>
     </div>
     <div class="hero-art" aria-hidden="true">
       <span class="ring"></span>
@@ -209,7 +213,8 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     <?php
       $skills = skill_items((string) ($profile['skills'] ?? ''));
       $skillGroups = skill_groups($skills);
-      $languages = language_items((string) ($profile['languages'] ?? ''));
+      $languages = language_items(loc($profile, 'languages', $lang));
+      $location = loc($profile, 'location', $lang);
     ?>
     <?php if ($skills || $languages): ?>
       <div class="skills-langs">
@@ -384,6 +389,8 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
         if (!empty($profile['linkedin'])) $cards[] = [$profile['linkedin'], 'LinkedIn', null, '0 0 24 24', '<rect x="2.5" y="2.5" width="19" height="19" rx="3"/><path d="M7 10v7M7 6.8v.2M11 17v-7M11 13c0-1.7 1.2-3 2.8-3s2.7 1.3 2.7 3v4"/>', true];
         if (!empty($profile['email'])) $cards[] = ['mailto:' . $profile['email'], t('email', $lang), $profile['email'], '0 0 24 24', '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/>', false];
         if (!empty($profile['phone'])) $cards[] = ['tel:' . preg_replace('/\s+/', '', $profile['phone']), t('phone', $lang), $profile['phone'], '0 0 24 24', '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>', false];
+        // The location card opens Tehran on OpenStreetMap only when clicked; no map is embedded.
+        if ($location !== '') $cards[] = ['https://www.openstreetmap.org/search?query=' . rawurlencode($location), t('location', $lang), $location, '0 0 24 24', '<path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>', true];
         foreach ($cards as [$href, $label, $value, $viewBox, $icon, $external]): ?>
           <a class="cc" href="<?= e($href) ?>"<?= $external ? ' target="_blank" rel="noopener"' : '' ?>>
             <svg class="cc-ico" viewBox="<?= $viewBox ?>" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><?= $icon ?></svg>

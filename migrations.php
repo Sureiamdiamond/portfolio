@@ -378,6 +378,28 @@ function run_skills_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_MIGRATION . "', '1')");
 }
 
+// English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
+const LOCATION_LANGUAGES_MIGRATION = 'migration_location_langs_v1';
+
+function run_location_languages_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . LOCATION_LANGUAGES_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $current = $pdo->query("SELECT k, v FROM profile WHERE k IN ('languages', 'languages_fa', 'location', 'location_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('location/languages: previous values ' . json_encode($current, JSON_UNESCAPED_UNICODE));
+    $set = [
+        'languages' => "English | Advanced (C1) · CAE · TTC",
+        'languages_fa' => "انگلیسی | پیشرفته (C1) · CAE · TTC",
+        'location' => 'Iran, Tehran',
+        'location_fa' => 'ایران، تهران',
+    ];
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    foreach ($set as $k => $v) {
+        $stmt->execute([$k, $v]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LOCATION_LANGUAGES_MIGRATION . "', '1')");
+}
+
 // One-time removal of the word "junior" (English and Persian) from the profile headline and about text, and from timeline titles. Logged with the previous values.
 const JUNIOR_MIGRATION = 'migration_junior_v1';
 
