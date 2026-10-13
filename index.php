@@ -188,11 +188,8 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
               <article class="tl-card">
                 <?= org_tile($item, $lang) ?>
                 <div class="tl-body">
-                  <p class="tl-org"><?= e(loc($item, 'org', $lang)) ?></p>
-                  <div class="tl-head">
-                    <h4 class="tl-role"><?= e(loc($item, 'title', $lang)) ?></h4>
-                    <?= timeline_site($item, $lang) ?>
-                  </div>
+                  <p class="tl-org"><span><?= e(loc($item, 'org', $lang)) ?></span><?= timeline_site($item, $lang) ?></p>
+                  <h4 class="tl-role"><?= e(loc($item, 'title', $lang)) ?></h4>
                   <p class="tl-meta">
                     <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
                     <?php if ($duration !== ''): ?><span class="tl-dur"><?= e($duration) ?></span><?php endif; ?>
