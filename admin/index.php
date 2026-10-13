@@ -9,6 +9,54 @@ if (!is_file(__DIR__ . '/../config.php')) {
 $config = require __DIR__ . '/../config.php';
 $pdo = db();
 
+/** The admin password hash: the one changed from this panel if it exists, otherwise config.php. */
+function admin_hash(array $config): string {
+    $file = DATA_DIR . '/admin_hash.php';
+    if (is_file($file)) {
+        $saved = require $file;
+        if (is_array($saved) && !empty($saved['admin_hash'])) {
+            return (string) $saved['admin_hash'];
+        }
+    }
+    return (string) $config['admin_hash'];
+}
+
+/** Stores a new hash in data/, which deploys never overwrite and the web cannot read. */
+function save_admin_hash(string $hash): void {
+    $file = DATA_DIR . '/admin_hash.php';
+    $tmp = $file . '.tmp';
+    $body = "<?php\n// Written by the admin panel. Do not share this file.\nreturn ['admin_hash' => " . var_export($hash, true) . "];\n";
+    if (file_put_contents($tmp, $body, LOCK_EX) === false || !rename($tmp, $file)) {
+        throw new RuntimeException('The new password could not be saved. Check that the data folder is writable.');
+    }
+    @chmod($file, 0600);
+}
+
+/** Failed logins per IP: five wrong passwords block that IP for 15 minutes. */
+const LOGIN_LIMIT_FILE = DATA_DIR . '/login_limit.json';
+
+function login_limits(): array {
+    return is_file(LOGIN_LIMIT_FILE) ? (json_decode((string) file_get_contents(LOGIN_LIMIT_FILE), true) ?: []) : [];
+}
+
+function login_blocked(string $ip): bool {
+    $entry = login_limits()[$ip] ?? null;
+    return $entry !== null && ($entry['until'] ?? 0) > time();
+}
+
+function login_failed(string $ip): void {
+    $all = login_limits();
+    $fails = (int) ($all[$ip]['fails'] ?? 0) + 1;
+    $all[$ip] = $fails >= 5 ? ['fails' => 0, 'until' => time() + 900] : ['fails' => $fails, 'until' => 0];
+    @file_put_contents(LOGIN_LIMIT_FILE, json_encode($all), LOCK_EX);
+}
+
+function login_succeeded(string $ip): void {
+    $all = login_limits();
+    unset($all[$ip]);
+    @file_put_contents(LOGIN_LIMIT_FILE, json_encode($all), LOCK_EX);
+}
+
 const TYPES = [
     'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'sort'], 'long' => ['summary', 'summary_fa'], 'files' => []],
     'papers' => ['label' => 'Research', 'fields' => ['title', 'title_fa', 'venue', 'year', 'doi', 'sort'], 'long' => [], 'files' => ['pdf']],
@@ -32,13 +80,20 @@ $notice = null;
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
         if (($_POST['action'] ?? '') === 'login') {
+            csrf_check();
+            $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+            if (login_blocked($ip)) {
+                throw new RuntimeException('Too many wrong passwords. Try again in 15 minutes.');
+            }
             usleep(500000); // slows down password guessing
-            if (password_verify($_POST['password'] ?? '', $config['admin_hash'])) {
+            if (password_verify($_POST['password'] ?? '', admin_hash($config))) {
+                login_succeeded($ip);
                 session_regenerate_id(true);
                 $_SESSION['auth'] = true;
                 header('Location: index.php');
                 exit;
             }
+            login_failed($ip);
             $error = 'Wrong password.';
         } elseif (empty($_SESSION['auth'])) {
             http_response_code(403);
@@ -50,6 +105,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'logout') {
                 session_destroy();
                 header('Location: index.php');
+                exit;
+            }
+
+            if ($action === 'password') {
+                $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+                if (login_blocked($ip)) {
+                    throw new RuntimeException('Too many wrong passwords. Try again in 15 minutes.');
+                }
+                $new = (string) ($_POST['new'] ?? '');
+                if (!password_verify((string) ($_POST['current'] ?? ''), admin_hash($config))) {
+                    login_failed($ip);
+                    throw new RuntimeException('The current password is wrong.');
+                }
+                if (strlen($new) < 12) {
+                    throw new RuntimeException('The new password must be at least 12 characters.');
+                }
+                if (!hash_equals($new, (string) ($_POST['repeat'] ?? ''))) {
+                    throw new RuntimeException('The two new passwords do not match.');
+                }
+                save_admin_hash(password_hash($new, PASSWORD_DEFAULT));
+                login_succeeded($ip);
+                session_regenerate_id(true);
+                header('Location: index.php?t=password&changed=1');
                 exit;
             }
 
@@ -306,6 +384,7 @@ if ($loggedIn) {
   <h1>Admin login</h1>
   <?php if ($error): ?><div class="msg err"><?= e($error) ?></div><?php endif; ?>
   <form method="post">
+    <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
     <input type="hidden" name="action" value="login">
     <label for="pw">Password</label>
     <input id="pw" type="password" name="password" required autofocus>
@@ -319,6 +398,7 @@ if ($loggedIn) {
     <?php foreach (TYPES as $key => $spec): ?>
       <a href="index.php?t=<?= $key ?>" class="<?= $tab === $key ? 'on' : '' ?>"><?= e($spec['label']) ?></a>
     <?php endforeach; ?>
+    <a href="index.php?t=password" class="<?= $tab === 'password' ? 'on' : '' ?>">Password</a>
     <a href="../index.php" target="_blank">View site</a>
     <form method="post" style="margin:0;padding:0;background:none;box-shadow:none;margin-left:auto">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
@@ -329,7 +409,21 @@ if ($loggedIn) {
   <?php if ($error): ?><div class="msg err"><?= e($error) ?></div><?php endif; ?>
   <?php if ($notice || isset($_GET['saved'])): ?><div class="msg">Saved.</div><?php endif; ?>
 
-  <?php if ($tab === 'profile'): ?>
+  <?php if ($tab === 'password'): ?>
+    <?php if (isset($_GET['changed'])): ?><div class="msg">Password changed. Use the new password next time you log in.</div><?php endif; ?>
+    <form method="post" autocomplete="off">
+      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+      <input type="hidden" name="action" value="password">
+      <h2>Change password</h2>
+      <label for="pw-current">Current password</label>
+      <input id="pw-current" type="password" name="current" autocomplete="current-password" required>
+      <label for="pw-new">New password (at least 12 characters)</label>
+      <input id="pw-new" type="password" name="new" autocomplete="new-password" minlength="12" required>
+      <label for="pw-repeat">Repeat the new password</label>
+      <input id="pw-repeat" type="password" name="repeat" autocomplete="new-password" minlength="12" required>
+      <p><button type="submit">Change password</button></p>
+    </form>
+  <?php elseif ($tab === 'profile'): ?>
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="profile">
