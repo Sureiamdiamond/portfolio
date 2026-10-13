@@ -254,6 +254,86 @@ function run_contact_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CONTACT_MIGRATION . "', '1')");
 }
 
+// One-time replacement of the old education and experience seed rows with the entries from the CV, plus skills, languages and LinkedIn.
+// The previous rows are logged in full before they are removed, so they can be restored from data/migration.log.
+const CV_MIGRATION = 'migration_cv_v2';
+
+function run_cv_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CV_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $old = $pdo->query('SELECT * FROM timeline ORDER BY id')->fetchAll(PDO::FETCH_ASSOC);
+    migration_log('cv: replacing timeline rows ' . json_encode($old, JSON_UNESCAPED_UNICODE));
+    $pdo->exec('DELETE FROM timeline');
+    $ins = $pdo->prepare('INSERT INTO timeline (kind, title, title_fa, org, org_fa, city, city_fa, period, period_fa, website, details, details_fa, bullets, bullets_fa, sort)
+        VALUES (:kind, :title, :title_fa, :org, :org_fa, :city, :city_fa, :period, :period_fa, :website, :details, :details_fa, :bullets, :bullets_fa, :sort)');
+    foreach (cv_timeline_rows() as $row) {
+        $ins->execute($row);
+    }
+    $current = $pdo->query("SELECT k, v FROM profile WHERE k IN ('skills', 'languages', 'linkedin')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('cv: previous profile values ' . json_encode($current, JSON_UNESCAPED_UNICODE));
+    $set = [
+        'skills' => "Dart | dart\nFlutter | flutter\nSDUI\nBloc\nGetX\nHttp / Dio\nPython | python\nGit | git\nGitHub | github\nGitLab | gitlab\nFigma | figma\nJira | jira\nFirebase | firebase",
+        'languages' => "English | C1 · TTC, CAE\nفارسی | مادری",
+        'linkedin' => 'https://www.linkedin.com/in/parsabanitaba/',
+    ];
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    foreach ($set as $k => $v) {
+        $stmt->execute([$k, $v]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CV_MIGRATION . "', '1')");
+}
+
+/** The five CV entries, newest first within each group. Dates and wording follow the CV; bullets are its duty lists. */
+function cv_timeline_rows(): array {
+    $bullets = [
+        "همکاری در توسعه و نگه‌داری اپلیکیشن تحت نظارت توسعه‌دهندگان ارشد\nمشارکت در طراحی و پیاده‌سازی قابلیت‌های جدید در پروژه‌های واقعی\nحضور در جلسات بازبینی کد و رفع باگ‌های گزارش‌شده\nتحقیق و یادگیری مستمر درباره ابزارها و تکنولوژی‌های مرتبط\nهمکاری تیمی مؤثر و دریافت بازخورد جهت رشد حرفه‌ای\nانجام تست‌های کارایی و عیب‌یابی نرم‌افزار",
+        "Helped develop and maintain an app under the supervision of senior developers\nContributed to designing and building new features in real projects\nTook part in code reviews and fixed reported bugs\nResearched and kept learning related tools and technologies\nWorked effectively in a team and took feedback to grow professionally\nRan performance tests and debugged software",
+    ];
+    $trainee = [
+        "یادگیری اصول پایه‌ای توسعه فلاتر شامل Dart و Flutter\nکمک در توسعه و نگه‌داری اپلیکیشن‌های فلاتر در پروژه‌های واقعی\nهمکاری تیمی با توسعه‌دهندگان ارشد برای طراحی و پیاده‌سازی اپلیکیشن‌های مقیاس‌پذیر و کاربرپسند\nنوشتن کد با کیفیت و مستندسازی کامل\nمشارکت در جلسات بررسی کد و برطرف کردن باگ‌ها\nاطمینان از کیفیت نرم‌افزار از طریق تست‌های جامع و رفع اشکال\nپیاده‌سازی ویژگی‌های جدید و افزودن قابلیت‌های نوین به اپلیکیشن‌ها\nدنبال کردن آخرین تکنولوژی‌ها و روندهای توسعه فلاتر\nکمک به افزایش سرعت و بهبود عملکرد اپلیکیشن‌ها\nارائه کمک و راهنمایی به اعضای تیم در مواقع نیاز",
+        "Learned the basics of Flutter development, including Dart and Flutter\nHelped develop and maintain Flutter apps in real projects\nWorked with senior developers to design and build scalable, user-friendly apps\nWrote high-quality, well-documented code\nTook part in code reviews and fixed bugs\nEnsured software quality through thorough tests and bug fixes\nBuilt new features and added new capabilities to apps\nKept up with the latest Flutter technologies and trends\nHelped improve app speed and performance\nProvided support and guidance to team members when needed",
+    ];
+    $flutter = [
+        "زبان‌ها و فریم‌ورک‌ها: Dart، Flutter\nمدیریت وضعیت: BLoC، GetX؛ استفاده از Freezed برای مدل‌سازی داده و مدیریت ایونت‌ها و استیت‌ها\nمعماری نرم‌افزار: MVP، Clean Architecture، MVVM\nپروژه SDUI\nارتباط با سرور: کار با Dio و HTTP برای API Integration\nتم و ظاهر اپلیکیشن: پیاده‌سازی تم‌های پویا و سفارشی‌سازی کامل UI\nرابط کاربری: تبدیل طراحی‌های Figma به UI واکنش‌گرا\nچندزبانه‌سازی اپلیکیشن: تجربه در پیاده‌سازی Localization\nابزارهای تیمی و مدیریتی: Jira، Git (GitHub/GitLab)\nتوسعه تیمی: آشنایی با متدولوژی Agile و کار گروهی",
+        "Languages and frameworks: Dart, Flutter\nState management: BLoC and GetX, with Freezed for data models and events and states\nSoftware architecture: MVP, Clean Architecture, MVVM\nSDUI project\nServer communication: Dio and HTTP for API integration\nApp theming: dynamic themes and full UI customisation\nUI: turning Figma designs into responsive UI\nLocalisation: experience implementing multi-language apps\nTeam tools: Jira, Git (GitHub and GitLab)\nTeamwork: familiar with Agile and group work",
+    ];
+    $ipam = ['org' => 'شرکت دانش‌بنیان ایده‌پرداز دانش نوین آرشام (ایپام)', 'org_en' => 'Ideh Pardaz Danesh Novin Arsham (IPAM)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
+    $azad = ['website_w' => 'https://wtb.iau.ir/', 'website_c' => 'https://ctb.iau.ir/'];
+    return [
+        [
+            'kind' => 'education', 'title' => 'Master of Science in Computer Engineering (software)', 'title_fa' => 'کارشناسی ارشد مهندسی کامپیوتر (گرایش نرم‌افزار)',
+            'org' => 'Islamic Azad University, Central Tehran Branch', 'org_fa' => 'دانشگاه آزاد اسلامی واحد تهران مرکز',
+            'city' => 'Tehran', 'city_fa' => 'تهران', 'period' => 'Oct 2025 – now', 'period_fa' => 'مهر ۱۴۰۴ – اکنون',
+            'website' => $azad['website_c'], 'details' => 'Major: Software', 'details_fa' => 'گرایش: نرم‌افزار', 'bullets' => '', 'bullets_fa' => '', 'sort' => 1,
+        ],
+        [
+            'kind' => 'education', 'title' => 'Bachelor of Science in Computer Engineering (software)', 'title_fa' => 'کارشناسی مهندسی کامپیوتر (گرایش نرم‌افزار)',
+            'org' => 'Islamic Azad University, West Tehran Branch', 'org_fa' => 'دانشگاه آزاد اسلامی واحد تهران غرب',
+            'city' => 'Tehran', 'city_fa' => 'تهران', 'period' => 'Oct 2021 – Oct 2025', 'period_fa' => 'مهر ۱۴۰۰ – مهر ۱۴۰۴',
+            'website' => $azad['website_w'], 'details' => 'Major: Software', 'details_fa' => 'گرایش: نرم‌افزار', 'bullets' => '', 'bullets_fa' => '', 'sort' => 2,
+        ],
+        [
+            'kind' => 'experience', 'title' => 'Flutter developer', 'title_fa' => 'برنامه‌نویس فلاتر',
+            'org' => $ipam['org_en'], 'org_fa' => $ipam['org'], 'city' => $ipam['city_en'], 'city_fa' => $ipam['city'],
+            'period' => 'Mar 2024 – now', 'period_fa' => 'فروردین ۱۴۰۳ – اکنون',
+            'website' => $ipam['website'], 'details' => '', 'details_fa' => '', 'bullets' => $flutter[1], 'bullets_fa' => $flutter[0], 'sort' => 1,
+        ],
+        [
+            'kind' => 'experience', 'title' => 'Programming trainee', 'title_fa' => 'کارآموز برنامه‌نویسی',
+            'org' => $ipam['org_en'], 'org_fa' => $ipam['org'], 'city' => $ipam['city_en'], 'city_fa' => $ipam['city'],
+            'period' => 'Nov 2023 – Mar 2024', 'period_fa' => 'آبان ۱۴۰۲ – فروردین ۱۴۰۳',
+            'website' => $ipam['website'], 'details' => '', 'details_fa' => '', 'bullets' => $trainee[1], 'bullets_fa' => $trainee[0], 'sort' => 2,
+        ],
+        [
+            'kind' => 'experience', 'title' => 'Intern (Codeyad project-based course)', 'title_fa' => 'کاراموز (دوره پروژه‌محور کدیاد)',
+            'org' => 'Codeyad', 'org_fa' => 'کدیاد', 'city' => 'Tehran', 'city_fa' => 'تهران',
+            'period' => 'Apr 2023 – Nov 2023', 'period_fa' => 'اردیبهشت ۱۴۰۲ – آبان ۱۴۰۲',
+            'website' => 'https://codeyad.com/', 'details' => '', 'details_fa' => '', 'bullets' => $bullets[1], 'bullets_fa' => $bullets[0], 'sort' => 3,
+        ],
+    ];
+}
+
 // One-time removal of the word "junior" (English and Persian) from the profile headline and about text, and from timeline titles. Logged with the previous values.
 const JUNIOR_MIGRATION = 'migration_junior_v1';
 
