@@ -579,10 +579,14 @@ html[data-motion="off"][data-glass="on"] .btn:hover, html[data-motion="off"][dat
    Logical properties keep the spacing right in Persian (RTL) as well as English. */
 .timeline ol.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .tl-card {
-  display: grid; grid-template-columns: 56px minmax(0, 1fr); gap: 16px; align-items: start;
+  display: grid; grid-template-columns: 150px minmax(0, 1fr); gap: 16px; align-items: start;
   padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);
 }
-.tl-logo { width: 56px; height: 56px; border-radius: 14px; object-fit: contain; background: #fff; border: 1px solid var(--border); padding: 6px; box-sizing: border-box; }
+/* Logos are bare images, sized by height and kept at their own proportions. */
+img.tl-logo { display: block; height: 72px; width: auto; max-width: 150px; object-fit: contain; }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.tl-logo { filter: drop-shadow(0 0 0.6px rgba(255, 255, 255, .85)) drop-shadow(0 0 3px rgba(255, 255, 255, .35)); } }
+html[data-theme="dark"] img.tl-logo { filter: drop-shadow(0 0 0.6px rgba(255, 255, 255, .85)) drop-shadow(0 0 3px rgba(255, 255, 255, .35)); }
+.tl-logo.tl-initials { width: 56px; height: 56px; border-radius: 14px; border: 1px solid var(--border); box-sizing: border-box; }
 .tl-initials {
   display: grid; place-items: center; padding: 0; background: hsl(var(--hue) 70% 92%); color: hsl(var(--hue) 60% 28%);
   border-color: transparent; font: 700 1rem var(--sans); letter-spacing: .02em;
@@ -604,7 +608,7 @@ html[data-theme="dark"] .tl-initials { background: hsl(var(--hue) 45% 22%); colo
 .tl-site:hover { color: var(--accent); border-color: var(--accent); text-decoration: none; }
 .tl-site:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
-@media (max-width: 520px) { .tl-card { grid-template-columns: 44px minmax(0, 1fr); gap: 12px; padding: 14px; } .tl-logo { width: 44px; height: 44px; border-radius: 12px; } }
+@media (max-width: 520px) { .tl-card { grid-template-columns: 110px minmax(0, 1fr); gap: 12px; padding: 14px; } img.tl-logo { height: 52px; max-width: 110px; } .tl-logo.tl-initials { width: 44px; height: 44px; border-radius: 12px; } }
 
 /* Skills and languages */
 .skills-langs { margin-top: 36px; }

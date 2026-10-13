@@ -5,7 +5,7 @@ declare(strict_types=1);
 function org_tile(array $item, string $lang): string {
     $logo = trim((string) ($item['logo'] ?? ''));
     if ($logo !== '') {
-        return '<img class="tl-logo" src="' . e($logo) . '" alt="" width="56" height="56" loading="lazy">';
+        return '<img class="tl-logo" src="' . e($logo) . '" alt="" loading="lazy">';
     }
     $name = trim(loc($item, 'org', $lang)) !== '' ? loc($item, 'org', $lang) : loc($item, 'title', $lang);
     $words = array_values(array_filter(preg_split('/\s+/u', trim($name)) ?: [], 'strlen'));
