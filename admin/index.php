@@ -5,9 +5,19 @@ session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => !empty($_
 session_start();
 require __DIR__ . '/../db.php';
 require __DIR__ . '/../theme.php';
+require __DIR__ . '/lang.php';
+
+// Language switch: remembered in this browser for a year, then back to the same page without the parameter
+if (isset($_GET['lang']) && in_array($_GET['lang'], ADMIN_LANGS, true)) {
+    setcookie(ADMIN_LANG_COOKIE, (string) $_GET['lang'], ['expires' => time() + 31536000, 'path' => '/admin/', 'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', 'httponly' => false, 'samesite' => 'Lax']);
+    $query = $_GET;
+    unset($query['lang']);
+    header('Location: index.php' . ($query ? '?' . http_build_query($query) : ''));
+    exit;
+}
 
 if (!is_file(__DIR__ . '/../config.php')) {
-    exit('Create config.php from config.sample.php on the server first.');
+    exit(t('login.no_config'));
 }
 $config = require __DIR__ . '/../config.php';
 $pdo = db();
@@ -37,7 +47,7 @@ function save_admin_account(string $username, string $hash): void {
     $body = "<?php\n// Written by the admin panel. Do not share this file.\nreturn ['username' => " . var_export($username, true)
         . ", 'admin_hash' => " . var_export($hash, true) . "];\n";
     if (file_put_contents($tmp, $body, LOCK_EX) === false || !rename($tmp, $file)) {
-        throw new RuntimeException('The change could not be saved. Check that the data folder is writable.');
+        throw new RuntimeException(t('err.save_failed'));
     }
     @chmod($file, 0600);
 }
@@ -85,10 +95,24 @@ const SECTION_SWITCHES = [
 
 /** Human label for a field; Persian fields are marked so the admin knows where to type them. */
 function label(string $field): string {
-    if (str_ends_with($field, '_fa')) {
-        return ucfirst(str_replace('_', ' ', substr($field, 0, -3))) . ' (Persian)';
+    $key = 'field.' . $field;
+    return isset(ADMIN_STRINGS['en'][$key]) ? t($key) : ucfirst(str_replace('_', ' ', $field));
+}
+
+/** Fields that hold addresses, codes or English-only values are typed left to right. */
+function ltr_attr(string $field): string {
+    return preg_match('/(url|doi|email|phone|linkedin|github|path)$/', $field) ? ' dir="ltr"' : '';
+}
+
+/** Links that switch the admin language, keeping the current page. */
+function admin_lang_links(): string {
+    $links = [];
+    foreach (ADMIN_LANGS as $code) {
+        $on = $code === admin_lang();
+        $href = 'index.php?' . http_build_query(array_merge($_GET, ['lang' => $code]));
+        $links[] = '<a href="' . e($href) . '" lang="' . $code . '"' . ($on ? ' class="on" aria-current="true"' : '') . '>' . e(t('lang.' . $code)) . '</a>';
     }
-    return ucfirst(str_replace('_', ' ', $field));
+    return implode(' ', $links);
 }
 
 $error = null;
@@ -100,7 +124,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             csrf_check();
             $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
             if (login_blocked($ip)) {
-                throw new RuntimeException('Too many wrong passwords. Try again in 15 minutes.');
+                throw new RuntimeException(t('err.locked'));
             }
             usleep(500000); // slows down password guessing
             $account = admin_account($config);
@@ -113,10 +137,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
             login_failed($ip);
-            $error = 'Wrong username or password.';
+            $error = t('login.wrong');
         } elseif (empty($_SESSION['auth'])) {
             http_response_code(403);
-            exit('Not logged in.');
+            exit(t('login.not_logged_in'));
         } else {
             csrf_check();
             $action = $_POST['action'] ?? '';
@@ -130,19 +154,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'password') {
                 $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
                 if (login_blocked($ip)) {
-                    throw new RuntimeException('Too many wrong passwords. Try again in 15 minutes.');
+                    throw new RuntimeException(t('err.locked'));
                 }
                 $new = (string) ($_POST['new'] ?? '');
                 $account = admin_account($config);
                 if (!password_verify((string) ($_POST['current'] ?? ''), $account['admin_hash'])) {
                     login_failed($ip);
-                    throw new RuntimeException('The current password is wrong.');
+                    throw new RuntimeException(t('err.wrong_current'));
                 }
                 if (strlen($new) < 12) {
-                    throw new RuntimeException('The new password must be at least 12 characters.');
+                    throw new RuntimeException(t('err.pw_short'));
                 }
                 if (!hash_equals($new, (string) ($_POST['repeat'] ?? ''))) {
-                    throw new RuntimeException('The two new passwords do not match.');
+                    throw new RuntimeException(t('err.pw_mismatch'));
                 }
                 save_admin_account($account['username'], password_hash($new, PASSWORD_DEFAULT));
                 login_succeeded($ip);
@@ -169,7 +193,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $token = bin2hex(random_bytes(16));
                     $body = json_encode(['token' => $token, 'created' => time(), 'settings' => $settings], JSON_UNESCAPED_UNICODE);
                     if (file_put_contents(THEME_DRAFT_FILE . '.tmp', $body, LOCK_EX) === false || !rename(THEME_DRAFT_FILE . '.tmp', THEME_DRAFT_FILE)) {
-                        throw new RuntimeException('The draft could not be saved. Check that the data folder is writable.');
+                        throw new RuntimeException(t('err.draft_failed'));
                     }
                     header('Content-Type: application/json; charset=utf-8');
                     echo json_encode([
@@ -203,16 +227,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'username') {
                 $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
                 if (login_blocked($ip)) {
-                    throw new RuntimeException('Too many wrong passwords. Try again in 15 minutes.');
+                    throw new RuntimeException(t('err.locked'));
                 }
                 $account = admin_account($config);
                 if (!password_verify((string) ($_POST['current'] ?? ''), $account['admin_hash'])) {
                     login_failed($ip);
-                    throw new RuntimeException('The current password is wrong.');
+                    throw new RuntimeException(t('err.wrong_current'));
                 }
                 $username = strtolower(trim((string) ($_POST['username'] ?? '')));
                 if (!preg_match('/^[a-z0-9._-]{3,40}$/', $username)) {
-                    throw new RuntimeException('The username must be 3 to 40 characters: letters, digits, dot, dash or underscore.');
+                    throw new RuntimeException(t('err.username_format'));
                 }
                 save_admin_account($username, $account['admin_hash']);
                 header('Location: index.php?t=password&renamed=1');
@@ -237,13 +261,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     remove_upload($old ?: null);
                     $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('hero_photo', ?)")->execute([$photo['path']]);
                 }
-                $notice = 'Profile saved.';
+                $notice = t('profile.saved');
             }
 
             if ($action === 'save') {
                 $type = $_POST['type'] ?? '';
                 if (!isset(TYPES[$type])) {
-                    throw new RuntimeException('Unknown section.');
+                    throw new RuntimeException(t('err.unknown_section'));
                 }
                 $spec = TYPES[$type];
                 $id = (int) ($_POST['id'] ?? 0);
@@ -274,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $marks = implode(', ', array_fill(0, count($data), '?'));
                     $pdo->prepare("INSERT INTO $type ($cols) VALUES ($marks)")->execute(array_values($data));
                 }
-                $notice = 'Saved.';
+                $notice = t('common.saved');
                 header('Location: index.php?t=' . $type . '&saved=1');
                 exit;
             }
@@ -283,7 +307,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $name = clean_name((string) ($_POST['name'] ?? ''));
                 $parent = ($_POST['parent_id'] ?? '') === '' ? null : (int) $_POST['parent_id'];
                 if ($parent !== null && !$pdo->query("SELECT 1 FROM folders WHERE id = $parent")->fetchColumn()) {
-                    throw new RuntimeException('Parent folder not found.');
+                    throw new RuntimeException(t('err.parent_missing'));
                 }
                 $pdo->prepare('INSERT INTO folders (parent_id, name, sort) VALUES (?, ?, 0)')->execute([$parent, $name]);
                 header('Location: index.php?t=files&saved=1');
@@ -293,11 +317,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'file_upload') {
                 $folder = ($_POST['folder_id'] ?? '') === '' ? null : (int) $_POST['folder_id'];
                 if ($folder !== null && !$pdo->query("SELECT 1 FROM folders WHERE id = $folder")->fetchColumn()) {
-                    throw new RuntimeException('Folder not found.');
+                    throw new RuntimeException(t('err.folder_missing'));
                 }
                 $saved = save_file_upload('file_upload');
                 if ($saved === null) {
-                    throw new RuntimeException('Choose a file to upload.');
+                    throw new RuntimeException(t('err.choose_file'));
                 }
                 $preview = save_file_upload('file_preview', ['pdf']);
                 $pdo->prepare('INSERT INTO files (folder_id, name, path, ext, size, preview, sort) VALUES (?, ?, ?, ?, ?, ?, 0)')
@@ -311,7 +335,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $id = (int) ($_POST['id'] ?? 0);
                 $table = ($_POST['kind'] ?? '') === 'folder' ? 'folders' : (($_POST['kind'] ?? '') === 'file' ? 'files' : null);
                 if ($table === null) {
-                    throw new RuntimeException('Unknown item.');
+                    throw new RuntimeException(t('err.unknown_item'));
                 }
                 $pdo->prepare("UPDATE $table SET name = ? WHERE id = ?")->execute([$name, $id]);
                 header('Location: index.php?t=files&saved=1');
@@ -340,13 +364,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $path = trim((string) ($_POST['path'] ?? ''));
                 $content = str_replace("\r\n", "\n", (string) ($_POST['content'] ?? ''));
                 if (!$pdo->query("SELECT 1 FROM projects WHERE id = $project")->fetchColumn()) {
-                    throw new RuntimeException('Project not found.');
+                    throw new RuntimeException(t('err.project_missing'));
                 }
                 if (!valid_project_path($path)) {
-                    throw new RuntimeException('Invalid path. Use letters, numbers, dots, dashes, underscores and slashes.');
+                    throw new RuntimeException(t('err.bad_path'));
                 }
                 if (strlen($content) > 512 * 1024) {
-                    throw new RuntimeException('Content is larger than 512 KB.');
+                    throw new RuntimeException(t('err.too_large'));
                 }
                 $pdo->prepare('DELETE FROM project_files WHERE project_id = ? AND path = ?')->execute([$project, $path]);
                 $pdo->prepare('INSERT INTO project_files (project_id, path, content) VALUES (?, ?, ?)')->execute([$project, $path, $content]);
@@ -365,11 +389,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'media_upload') {
                 $project = (int) ($_POST['project_id'] ?? 0);
                 if (!$pdo->query("SELECT 1 FROM projects WHERE id = $project")->fetchColumn()) {
-                    throw new RuntimeException('Project not found.');
+                    throw new RuntimeException(t('err.project_missing'));
                 }
                 $saved = save_file_upload('file_image', ['png', 'jpg', 'jpeg', 'webp']);
                 if ($saved === null) {
-                    throw new RuntimeException('Choose an image to upload.');
+                    throw new RuntimeException(t('err.choose_image'));
                 }
                 $pdo->prepare('INSERT INTO project_media (project_id, path, sort) VALUES (?, ?, 0)')->execute([$project, $saved['path']]);
                 header('Location: index.php?t=pfiles&project=' . $project . '&saved=1');
@@ -397,7 +421,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $id = (int) ($_POST['id'] ?? 0);
                 $hasChildren = $pdo->query("SELECT (SELECT COUNT(*) FROM folders WHERE parent_id = $id) + (SELECT COUNT(*) FROM files WHERE folder_id = $id)")->fetchColumn();
                 if ((int) $hasChildren > 0) {
-                    throw new RuntimeException('Folder is not empty. Delete or move its contents first.');
+                    throw new RuntimeException(t('err.folder_not_empty'));
                 }
                 $pdo->prepare('DELETE FROM folders WHERE id = ?')->execute([$id]);
                 header('Location: index.php?t=files');
@@ -407,7 +431,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($action === 'delete') {
                 $type = $_POST['type'] ?? '';
                 if (!isset(TYPES[$type])) {
-                    throw new RuntimeException('Unknown section.');
+                    throw new RuntimeException(t('err.unknown_section'));
                 }
                 $id = (int) ($_POST['id'] ?? 0);
                 foreach (TYPES[$type]['files'] as $ext) {
@@ -452,13 +476,18 @@ if ($loggedIn) {
 }
 ?>
 <!doctype html>
-<html lang="en">
+<html lang="<?= admin_lang() ?>" dir="<?= admin_lang() === 'fa' ? 'rtl' : 'ltr' ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex">
-<title>Admin</title>
+<title><?= e(t('login.title')) ?></title>
 <style>
+@font-face { font-family: "Vazirmatn"; font-style: normal; font-weight: 400; font-display: swap; src: url("../assets/fonts/vazirmatn-arabic-400-normal.woff2") format("woff2"); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: "Vazirmatn"; font-style: normal; font-weight: 700; font-display: swap; src: url("../assets/fonts/vazirmatn-arabic-700-normal.woff2") format("woff2"); unicode-range: U+0600-06FF, U+0750-077F, U+0870-088E, U+0890-0891, U+0898-08E1, U+08E3-08FF, U+200C-200E, U+2010-2011, U+204F, U+2E41, U+FB50-FDFF, U+FE70-FE74, U+FE76-FEFC; }
+@font-face { font-family: "Vazirmatn"; font-style: normal; font-weight: 400; font-display: swap; src: url("../assets/fonts/vazirmatn-latin-400-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: "Vazirmatn"; font-style: normal; font-weight: 700; font-display: swap; src: url("../assets/fonts/vazirmatn-latin-700-normal.woff2") format("woff2"); unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  html[dir="rtl"] body { font-family: Vazirmatn, system-ui, sans-serif; }
   body { font-family: system-ui, sans-serif; margin: 0; background: #eef4f8; color: #0f2a3d; }
   main { max-width: 860px; margin: 0 auto; padding: 16px; }
   nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
@@ -491,138 +520,141 @@ if ($loggedIn) {
   .hero-mini { width: 180px; aspect-ratio: 4 / 5; border-radius: 16px; background: var(--hero-bg, #0052FF); box-shadow: 0 2px 10px rgba(15,42,61,.12); }
   @media (max-width: 760px) { .split { grid-template-columns: 1fr; } .preview { position: static; } }
 </style>
+<script>const ADMIN_T = <?= json_encode(['photo' => t('profile.photo_hint'), 'cv' => t('profile.cv_label'), 'kb' => 'KB', 'previewFailed' => t('theme.preview_failed')], JSON_HEX_TAG | JSON_UNESCAPED_UNICODE) ?>;</script>
 </head>
 <body>
 <main>
 <?php if (!$loggedIn): ?>
-  <h1>Admin login</h1>
+  <nav class="lang-nav" aria-label="<?= e(t('lang.label')) ?>"><?= admin_lang_links() ?></nav>
+  <h1><?= e(t('login.title')) ?></h1>
   <?php if ($error): ?><div class="msg err"><?= e($error) ?></div><?php endif; ?>
   <form method="post">
     <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
     <input type="hidden" name="action" value="login">
-    <label for="user">Username</label>
-    <input id="user" name="username" autocomplete="username" required autofocus>
-    <label for="pw">Password</label>
-    <input id="pw" type="password" name="password" autocomplete="current-password" required>
-    <p><button type="submit">Log in</button></p>
+    <label for="user"><?= e(t('login.username')) ?></label>
+    <input id="user" name="username" autocomplete="username" dir="ltr" required autofocus>
+    <label for="pw"><?= e(t('login.password')) ?></label>
+    <input id="pw" type="password" name="password" autocomplete="current-password" dir="ltr" required>
+    <p><button type="submit"><?= e(t('login.submit')) ?></button></p>
   </form>
 <?php else: ?>
   <nav>
-    <a href="index.php?t=profile" class="<?= $tab === 'profile' ? 'on' : '' ?>">Profile & CV</a>
-    <a href="index.php?t=files" class="<?= $tab === 'files' ? 'on' : '' ?>">Files</a>
-    <a href="index.php?t=pfiles" class="<?= $tab === 'pfiles' ? 'on' : '' ?>">Project files</a>
+    <a href="index.php?t=profile" class="<?= $tab === 'profile' ? 'on' : '' ?>"><?= e(t('nav.profile')) ?></a>
+    <a href="index.php?t=files" class="<?= $tab === 'files' ? 'on' : '' ?>"><?= e(t('nav.files')) ?></a>
+    <a href="index.php?t=pfiles" class="<?= $tab === 'pfiles' ? 'on' : '' ?>"><?= e(t('nav.pfiles')) ?></a>
     <?php foreach (TYPES as $key => $spec): ?>
-      <a href="index.php?t=<?= $key ?>" class="<?= $tab === $key ? 'on' : '' ?>"><?= e($spec['label']) ?></a>
+      <a href="index.php?t=<?= $key ?>" class="<?= $tab === $key ? 'on' : '' ?>"><?= e(t('type.' . $key)) ?></a>
     <?php endforeach; ?>
-    <a href="index.php?t=theme" class="<?= $tab === 'theme' ? 'on' : '' ?>">Theme</a>
-    <a href="index.php?t=password" class="<?= $tab === 'password' ? 'on' : '' ?>">Password</a>
-    <a href="../index.php" target="_blank">View site</a>
-    <form method="post" style="margin:0;padding:0;background:none;box-shadow:none;margin-left:auto">
+    <a href="index.php?t=theme" class="<?= $tab === 'theme' ? 'on' : '' ?>"><?= e(t('nav.theme')) ?></a>
+    <a href="index.php?t=password" class="<?= $tab === 'password' ? 'on' : '' ?>"><?= e(t('nav.password')) ?></a>
+    <a href="../index.php" target="_blank"><?= e(t('nav.view_site')) ?></a>
+    <form method="post" style="margin:0;padding:0;background:none;box-shadow:none;margin-inline-start:auto">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
-      <button name="action" value="logout" type="submit">Log out</button>
+      <button name="action" value="logout" type="submit"><?= e(t('nav.logout')) ?></button>
+      <span class="lang-nav" aria-label="<?= e(t('lang.label')) ?>"><?= admin_lang_links() ?></span>
     </form>
   </nav>
 
   <?php if ($error): ?><div class="msg err"><?= e($error) ?></div><?php endif; ?>
-  <?php if ($notice || isset($_GET['saved'])): ?><div class="msg">Saved.</div><?php endif; ?>
+  <?php if ($notice || isset($_GET['saved'])): ?><div class="msg"><?= e(t('common.saved')) ?></div><?php endif; ?>
 
   <?php if ($tab === 'theme'): ?>
     <?php $current = theme_published($pdo); ?>
-    <?php if (isset($_GET['published'])): ?><div class="msg">Theme published.</div><?php endif; ?>
-    <?php if (isset($_GET['reset'])): ?><div class="msg">Theme reset to the default.</div><?php endif; ?>
+    <?php if (isset($_GET['published'])): ?><div class="msg"><?= e(t('theme.published')) ?></div><?php endif; ?>
+    <?php if (isset($_GET['reset'])): ?><div class="msg"><?= e(t('theme.reset_done')) ?></div><?php endif; ?>
     <div class="split">
     <form id="theme-form" method="post" autocomplete="off" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="theme_publish">
-      <h2>Theme</h2>
-      <label for="t-preset">Colour preset</label>
+      <h2><?= e(t('theme.heading')) ?></h2>
+      <label for="t-preset"><?= e(t('theme.preset')) ?></label>
       <select id="t-preset" name="theme_preset">
         <?php foreach (THEME_PRESETS as $key => $preset): ?>
-          <option value="<?= e($key) ?>" <?= $current['theme_preset'] === $key ? 'selected' : '' ?>><?= e($preset['label']) ?></option>
+          <option value="<?= e($key) ?>" <?= $current['theme_preset'] === $key ? 'selected' : '' ?>><?= e(t('preset.' . $key)) ?></option>
         <?php endforeach; ?>
       </select>
       <div class="swatches" aria-hidden="true">
         <?php foreach (THEME_PRESETS as $key => $preset): if ($key === 'custom') continue; ?>
-          <span title="<?= e($preset['label']) ?>" style="background:linear-gradient(135deg,<?= e($preset['light']) ?>,<?= e($preset['accent']) ?>)"></span>
+          <span title="<?= e(t('preset.' . $key)) ?>" style="background:linear-gradient(135deg,<?= e($preset['light']) ?>,<?= e($preset['accent']) ?>)"></span>
         <?php endforeach; ?>
       </div>
-      <label for="t-primary">Custom primary colour (used with "Custom colours")</label>
+      <label for="t-primary"><?= e(t('theme.primary')) ?></label>
       <input id="t-primary" type="color" name="theme_primary" value="<?= e(strtolower($current['theme_primary'])) ?>">
-      <label for="t-accent">Custom accent colour</label>
+      <label for="t-accent"><?= e(t('theme.accent')) ?></label>
       <input id="t-accent" type="color" name="theme_accent" value="<?= e(strtolower($current['theme_accent'])) ?>">
-      <label for="t-radius">Corner radius</label>
+      <label for="t-radius"><?= e(t('theme.radius')) ?></label>
       <select id="t-radius" name="theme_radius">
-        <?php foreach (['sharp' => 'Sharp', 'soft' => 'Soft (current)', 'round' => 'Round'] as $key => $label): ?>
+        <?php foreach (['sharp' => t('theme.radius_sharp'), 'soft' => t('theme.radius_soft'), 'round' => t('theme.radius_round')] as $key => $label): ?>
           <option value="<?= $key ?>" <?= $current['theme_radius'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
         <?php endforeach; ?>
       </select>
-      <label for="t-density">Spacing between sections</label>
+      <label for="t-density"><?= e(t('theme.density')) ?></label>
       <select id="t-density" name="theme_density">
-        <?php foreach (['compact' => 'Compact', 'comfortable' => 'Comfortable (current)', 'airy' => 'Airy'] as $key => $label): ?>
+        <?php foreach (['compact' => t('theme.density_compact'), 'comfortable' => t('theme.density_comfortable'), 'airy' => t('theme.density_airy')] as $key => $label): ?>
           <option value="<?= $key ?>" <?= $current['theme_density'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
         <?php endforeach; ?>
       </select>
-      <label for="t-mode">Default mode for new visitors</label>
+      <label for="t-mode"><?= e(t('theme.mode')) ?></label>
       <select id="t-mode" name="theme_mode">
-        <?php foreach (['system' => 'Follow the visitor\'s system', 'light' => 'Light', 'dark' => 'Dark'] as $key => $label): ?>
+        <?php foreach (['system' => t('theme.mode_system'), 'light' => t('theme.mode_light'), 'dark' => t('theme.mode_dark')] as $key => $label): ?>
           <option value="<?= $key ?>" <?= $current['theme_mode'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
         <?php endforeach; ?>
       </select>
-      <label class="check"><input type="checkbox" name="theme_motion" value="on" <?= $current['theme_motion'] === 'on' ? 'checked' : '' ?>> Animations on</label>
-      <h2>Hero photo background</h2>
-      <label for="t-bg-preset">Background preset</label>
+      <label class="check"><input type="checkbox" name="theme_motion" value="on" <?= $current['theme_motion'] === 'on' ? 'checked' : '' ?>> <?= e(t('theme.motion')) ?></label>
+      <h2><?= e(t('theme.bg_heading')) ?></h2>
+      <label for="t-bg-preset"><?= e(t('theme.bg_preset')) ?></label>
       <select id="t-bg-preset" name="theme_bg_preset">
         <?php foreach (HERO_PRESETS as $key => $preset): ?>
-          <option value="<?= e($key) ?>" <?= $current['theme_bg_preset'] === $key ? 'selected' : '' ?>><?= e($preset['label']) ?></option>
+          <option value="<?= e($key) ?>" <?= $current['theme_bg_preset'] === $key ? 'selected' : '' ?>><?= e(t('hero.' . $key)) ?></option>
         <?php endforeach; ?>
-        <option value="custom" <?= $current['theme_bg_preset'] === 'custom' ? 'selected' : '' ?>>Custom (your own colours)</option>
+        <option value="custom" <?= $current['theme_bg_preset'] === 'custom' ? 'selected' : '' ?>><?= e(t('theme.bg_custom')) ?></option>
       </select>
-      <label for="t-bg-type">Style</label>
+      <label for="t-bg-type"><?= e(t('theme.bg_type')) ?></label>
       <select id="t-bg-type" name="theme_bg_type">
-        <?php foreach (['radial' => 'Radial glow', 'linear' => 'Linear gradient', 'mesh' => 'Soft mesh', 'solid' => 'Solid colour'] as $key => $label): ?>
+        <?php foreach (['radial' => t('theme.bg_radial'), 'linear' => t('theme.bg_linear'), 'mesh' => t('theme.bg_mesh'), 'solid' => t('theme.bg_solid')] as $key => $label): ?>
           <option value="<?= $key ?>" <?= $current['theme_bg_type'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
         <?php endforeach; ?>
       </select>
-      <label for="t-bg-c1">First colour</label>
+      <label for="t-bg-c1"><?= e(t('theme.bg_c1')) ?></label>
       <input id="t-bg-c1" type="color" name="theme_bg_c1" value="<?= e(strtolower($current['theme_bg_c1'])) ?>">
-      <label for="t-bg-c2">Middle colour</label>
+      <label for="t-bg-c2"><?= e(t('theme.bg_c2')) ?></label>
       <input id="t-bg-c2" type="color" name="theme_bg_c2" value="<?= e(strtolower($current['theme_bg_c2'])) ?>">
-      <label for="t-bg-c3">End colour</label>
+      <label for="t-bg-c3"><?= e(t('theme.bg_c3')) ?></label>
       <input id="t-bg-c3" type="color" name="theme_bg_c3" value="<?= e(strtolower($current['theme_bg_c3'])) ?>">
-      <label for="t-bg-angle">Angle (linear gradient): <span id="t-bg-angle-out"><?= (int) $current['theme_bg_angle'] ?></span>°</label>
+      <label for="t-bg-angle"><?= e(t('theme.bg_angle')) ?> <span id="t-bg-angle-out"><?= (int) $current['theme_bg_angle'] ?></span>°</label>
       <input id="t-bg-angle" type="range" name="theme_bg_angle" min="0" max="360" value="<?= (int) $current['theme_bg_angle'] ?>">
-      <label for="t-bg-x">Glow centre, left to right (radial): <span id="t-bg-x-out"><?= (int) $current['theme_bg_x'] ?></span>%</label>
+      <label for="t-bg-x"><?= e(t('theme.bg_x')) ?> <span id="t-bg-x-out"><?= (int) $current['theme_bg_x'] ?></span>%</label>
       <input id="t-bg-x" type="range" name="theme_bg_x" min="0" max="100" value="<?= (int) $current['theme_bg_x'] ?>">
-      <label for="t-bg-y">Glow centre, top to bottom (radial): <span id="t-bg-y-out"><?= (int) $current['theme_bg_y'] ?></span>%</label>
+      <label for="t-bg-y"><?= e(t('theme.bg_y')) ?> <span id="t-bg-y-out"><?= (int) $current['theme_bg_y'] ?></span>%</label>
       <input id="t-bg-y" type="range" name="theme_bg_y" min="0" max="100" value="<?= (int) $current['theme_bg_y'] ?>">
-      <label for="t-bg-pattern">Pattern overlay</label>
+      <label for="t-bg-pattern"><?= e(t('theme.bg_pattern')) ?></label>
       <select id="t-bg-pattern" name="theme_bg_pattern">
-        <?php foreach (['none' => 'None', 'dots' => 'Dots', 'grid' => 'Grid', 'noise' => 'Grain (noise)'] as $key => $label): ?>
+        <?php foreach (['none' => t('theme.pattern_none'), 'dots' => t('theme.pattern_dots'), 'grid' => t('theme.pattern_grid'), 'noise' => t('theme.pattern_noise')] as $key => $label): ?>
           <option value="<?= $key ?>" <?= $current['theme_bg_pattern'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
         <?php endforeach; ?>
       </select>
-      <label for="t-bg-file">Background image (optional, PNG, WebP or JPG; it is shown under the colours)</label>
+      <label for="t-bg-file"><?= e(t('theme.bg_image')) ?></label>
       <input id="t-bg-file" type="file" name="file_bg" accept=".png,.webp,.jpg,.jpeg">
-      <label class="check"><input type="checkbox" name="theme_bg_clear" value="1"> Remove the background image</label>
+      <label class="check"><input type="checkbox" name="theme_bg_clear" value="1"> <?= e(t('theme.bg_clear')) ?></label>
       <input type="hidden" id="t-bg-image" name="theme_bg_image" value="<?= e($current['theme_bg_image']) ?>">
       <div id="t-warnings" class="msg err" hidden></div>
-      <p><button type="submit">Publish theme</button></p>
+      <p><button type="submit"><?= e(t('theme.publish')) ?></button></p>
     </form>
     <aside class="preview">
-      <h3>Live preview</h3>
+      <h3><?= e(t('theme.live')) ?></h3>
       <p>
-        <button type="button" data-width="100%">Desktop</button>
-        <button type="button" data-width="390px">390px phone</button>
-        <a class="button" id="t-open" href="../index.php" target="_blank">Open preview in a new tab</a>
+        <button type="button" data-width="100%"><?= e(t('theme.desktop')) ?></button>
+        <button type="button" data-width="390px"><?= e(t('theme.phone')) ?></button>
+        <a class="button" id="t-open" href="../index.php" target="_blank"><?= e(t('theme.open_tab')) ?></a>
       </p>
-      <div class="frame-wrap"><iframe id="t-frame" title="Site preview" src="../index.php?preview=none" style="width:100%;height:560px;border:1px solid #d6e4ec;border-radius:10px;background:#fff"></iframe></div>
-      <p class="muted">The preview shows your changes before they are published. Publish only when you are happy with it.</p>
-      <h3>Photo card</h3>
+      <div class="frame-wrap"><iframe id="t-frame" title="<?= e(t('theme.frame_title')) ?>" src="../index.php?preview=none" style="width:100%;height:560px;border:1px solid #d6e4ec;border-radius:10px;background:#fff"></iframe></div>
+      <p class="muted"><?= e(t('theme.help')) ?></p>
+      <h3><?= e(t('theme.photo_card')) ?></h3>
       <div id="t-hero-mini" class="hero-mini"></div>
-      <form method="post" onsubmit="return confirm('Reset the theme to the default? Your draft is discarded.')">
+      <form method="post" onsubmit="return confirm('<?= e(t('theme.reset_confirm')) ?>')">
         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
         <input type="hidden" name="action" value="theme_reset">
-        <button class="danger" type="submit">Reset to default</button>
+        <button class="danger" type="submit"><?= e(t('theme.reset_button')) ?></button>
       </form>
     </aside>
     </div>
@@ -667,7 +699,7 @@ if ($loggedIn) {
           fetch('index.php?t=theme', { method: 'POST', body, headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' })
             .then((r) => r.json().then((data) => ({ ok: r.ok, data })).catch(() => ({ ok: false, data: {} })))
             .then(({ ok, data }) => {
-              if (!ok) { warnings.hidden = false; warnings.textContent = data.error || 'The preview could not be updated. Try again.'; return; }
+              if (!ok) { warnings.hidden = false; warnings.textContent = data.error || ADMIN_T.previewFailed; return; }
               frame.src = '../index.php?preview=' + data.token;
               open.href = '../index.php?preview=' + data.token;
               warnings.hidden = data.warnings.length === 0;
@@ -678,7 +710,7 @@ if ($loggedIn) {
               bgClear.checked = false;
               heroMini.style.setProperty('--hero-bg', data.hero);
             })
-            .catch(() => { warnings.hidden = false; warnings.textContent = 'The preview could not be updated. Try again.'; });
+            .catch(() => { warnings.hidden = false; warnings.textContent = ADMIN_T.previewFailed; });
         };
         form.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(update, 350); });
         form.addEventListener('change', () => { clearTimeout(timer); timer = setTimeout(update, 0); });
@@ -687,30 +719,30 @@ if ($loggedIn) {
       })();
     </script>
   <?php elseif ($tab === 'password'): ?>
-    <?php if (isset($_GET['changed'])): ?><div class="msg">Password changed. Use the new password next time you log in.</div><?php endif; ?>
+    <?php if (isset($_GET['changed'])): ?><div class="msg"><?= e(t('password.changed')) ?></div><?php endif; ?>
     <form method="post" autocomplete="off">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="password">
-      <h2>Change password</h2>
-      <label for="pw-current">Current password</label>
+      <h2><?= e(t('password.heading')) ?></h2>
+      <label for="pw-current"><?= e(t('password.current')) ?></label>
       <input id="pw-current" type="password" name="current" autocomplete="current-password" required>
-      <label for="pw-new">New password (at least 12 characters)</label>
+      <label for="pw-new"><?= e(t('password.new')) ?></label>
       <input id="pw-new" type="password" name="new" autocomplete="new-password" minlength="12" required>
-      <label for="pw-repeat">Repeat the new password</label>
+      <label for="pw-repeat"><?= e(t('password.repeat')) ?></label>
       <input id="pw-repeat" type="password" name="repeat" autocomplete="new-password" minlength="12" required>
-      <p><button type="submit">Change password</button></p>
+      <p><button type="submit"><?= e(t('password.submit')) ?></button></p>
     </form>
-    <?php if (isset($_GET['renamed'])): ?><div class="msg">Username changed. Use it next time you log in.</div><?php endif; ?>
+    <?php if (isset($_GET['renamed'])): ?><div class="msg"><?= e(t('password.username_changed')) ?></div><?php endif; ?>
     <form method="post" autocomplete="off">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="username">
-      <h2>Change username</h2>
-      <p class="muted">Current username: <strong><?= e(admin_account($config)['username']) ?></strong></p>
-      <label for="us-new">New username (3 to 40 characters: letters, digits, dot, dash, underscore)</label>
-      <input id="us-new" name="username" pattern="[A-Za-z0-9._-]{3,40}" required>
-      <label for="us-current">Current password</label>
+      <h2><?= e(t('password.username_heading')) ?></h2>
+      <p class="muted"><?= e(t('password.current_username')) ?> <strong><?= e(admin_account($config)['username']) ?></strong></p>
+      <label for="us-new"><?= e(t('password.new_username')) ?></label>
+      <input id="us-new" name="username" pattern="[A-Za-z0-9._-]{3,40}" dir="ltr" required>
+      <label for="us-current"><?= e(t('password.current')) ?></label>
       <input id="us-current" type="password" name="current" autocomplete="current-password" required>
-      <p><button type="submit">Change username</button></p>
+      <p><button type="submit"><?= e(t('password.username_submit')) ?></button></p>
     </form>
   <?php elseif ($tab === 'profile'): ?>
     <div class="split">
@@ -722,26 +754,26 @@ if ($loggedIn) {
         <?php if (in_array($field, PROFILE_LONG, true)): ?>
           <textarea id="p-<?= $field ?>" name="<?= $field ?>"><?= e($profile[$field] ?? '') ?></textarea>
         <?php else: ?>
-          <input id="p-<?= $field ?>" name="<?= $field ?>" value="<?= e($profile[$field] ?? '') ?>">
+          <input id="p-<?= $field ?>" name="<?= $field ?>"<?= ltr_attr($field) ?> value="<?= e($profile[$field] ?? '') ?>">
         <?php endif; ?>
       <?php endforeach; ?>
       <fieldset>
-        <legend>Visible sections on the site</legend>
+        <legend><?= e(t('profile.sections')) ?></legend>
         <?php foreach (SECTION_SWITCHES as $switch => $title): ?>
-          <label class="check"><input type="checkbox" name="<?= $switch ?>" <?= ($profile[$switch] ?? '1') !== '0' ? 'checked' : '' ?>> <?= e($title) ?></label>
+          <label class="check"><input type="checkbox" name="<?= $switch ?>" <?= ($profile[$switch] ?? '1') !== '0' ? 'checked' : '' ?>> <?= e(t('section.' . $switch)) ?></label>
         <?php endforeach; ?>
       </fieldset>
-      <label for="cv">CV (PDF)</label>
+      <label for="cv"><?= e(t('profile.cv')) ?></label>
       <input id="cv" type="file" name="file_cv" accept="application/pdf,.pdf">
-      <p class="muted">Current CV: <?= !empty($profile['cv']) ? '<a href="../' . e($profile['cv']) . '" target="_blank">open</a>' : 'none' ?></p>
-      <label for="photo">Hero photo (PNG or WebP with a transparent background)</label>
+      <p class="muted"><?= e(t('profile.current_cv')) ?> <?= !empty($profile['cv']) ? '<a href="../' . e($profile['cv']) . '" target="_blank">' . e(t('common.open')) . '</a>' : e(t('common.none')) ?></p>
+      <label for="photo"><?= e(t('profile.photo')) ?></label>
       <input id="photo" type="file" name="file_photo" accept="image/png,image/webp,.png,.webp">
-      <p class="muted">Current hero photo: <?= !empty($profile['hero_photo']) ? '<a href="../' . e($profile['hero_photo']) . '" target="_blank">open</a>' : 'built-in cutout' ?></p>
-      <p><button type="submit">Save profile</button> <a class="button" href="../index.php" target="_blank">Preview site (saved version)</a></p>
+      <p class="muted"><?= e(t('profile.current_photo')) ?> <?= !empty($profile['hero_photo']) ? '<a href="../' . e($profile['hero_photo']) . '" target="_blank">' . e(t('common.open')) . '</a>' : e(t('common.built_in')) ?></p>
+      <p><button type="submit"><?= e(t('profile.save')) ?></button> <a class="button" href="../index.php" target="_blank"><?= e(t('profile.preview_saved')) ?></a></p>
     </form>
     <aside class="preview" aria-label="Live preview">
-      <h3>Live preview</h3>
-      <p class="muted">Updates while you type. Nothing is saved until you press Save.</p>
+      <h3><?= e(t('profile.live')) ?></h3>
+      <p class="muted"><?= e(t('profile.live_help')) ?></p>
       <div class="pv-card">
         <p class="pv-pill" id="pv-headline"><?= e($profile['headline'] ?? '') ?></p>
         <h4 id="pv-name"><?= e($profile['name'] ?? '') ?></h4>
@@ -773,12 +805,12 @@ if ($loggedIn) {
           const f = photo.files[0];
           if (!f) { img.hidden = true; file.textContent = ''; return; }
           img.src = URL.createObjectURL(f); img.hidden = false;
-          file.textContent = f.name + ' · ' + Math.round(f.size / 1024) + ' KB (PNG or WebP, transparent background)';
+          file.textContent = f.name + ' · ' + Math.round(f.size / 1024) + ' ' + ADMIN_T.kb + ' (' + ADMIN_T.photo + ')';
         });
         const cv = document.getElementById('cv');
         if (cv) cv.addEventListener('change', () => {
           const f = cv.files[0];
-          file.textContent = f ? 'CV: ' + f.name + ' · ' + Math.round(f.size / 1024) + ' KB' : '';
+          file.textContent = f ? ADMIN_T.cv + ' ' + f.name + ' · ' + Math.round(f.size / 1024) + ' ' + ADMIN_T.kb : '';
         });
       })();
     </script>
@@ -802,41 +834,41 @@ if ($loggedIn) {
       };
       foreach ($folders as $f) { $pathOf((int) $f['id']); }
     ?>
-    <h2>Files</h2>
-    <p class="muted">These appear as the Project file tree on the public site. Allowed: pdf, pptx, docx, zip, png, jpg, webp (100 MB max). A PDF preview can be attached to a PPTX or DOCX so visitors can read it in the browser.</p>
+    <h2><?= e(t('files.heading')) ?></h2>
+    <p class="muted"><?= e(t('files.help')) ?></p>
 
     <form method="post">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="folder_create">
-      <h3>New folder</h3>
-      <label for="fc-name">Name</label>
+      <h3><?= e(t('files.new_folder')) ?></h3>
+      <label for="fc-name"><?= e(t('files.name')) ?></label>
       <input id="fc-name" name="name" required maxlength="120">
-      <label for="fc-parent">Inside</label>
+      <label for="fc-parent"><?= e(t('files.inside')) ?></label>
       <select id="fc-parent" name="parent_id">
-        <option value="">Project root</option>
+        <option value=""><?= e(t('files.root')) ?></option>
         <?php foreach ($folders as $f): ?><option value="<?= (int) $f['id'] ?>"><?= e($paths[(int) $f['id']]) ?></option><?php endforeach; ?>
       </select>
-      <p><button type="submit">Create folder</button></p>
+      <p><button type="submit"><?= e(t('files.create_folder')) ?></button></p>
     </form>
 
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="file_upload">
-      <h3>Upload file</h3>
-      <label for="fu-folder">Folder</label>
+      <h3><?= e(t('files.upload_heading')) ?></h3>
+      <label for="fu-folder"><?= e(t('files.folder')) ?></label>
       <select id="fu-folder" name="folder_id">
-        <option value="">Project root</option>
+        <option value=""><?= e(t('files.root')) ?></option>
         <?php foreach ($folders as $f): ?><option value="<?= (int) $f['id'] ?>"><?= e($paths[(int) $f['id']]) ?></option><?php endforeach; ?>
       </select>
-      <label for="fu-file">File</label>
+      <label for="fu-file"><?= e(t('files.file')) ?></label>
       <input id="fu-file" type="file" name="file_upload" required>
-      <label for="fu-preview">Optional PDF preview (for PPTX or DOCX)</label>
+      <label for="fu-preview"><?= e(t('files.pdf_preview')) ?></label>
       <input id="fu-preview" type="file" name="file_preview" accept=".pdf">
-      <p><button type="submit">Upload</button></p>
+      <p><button type="submit"><?= e(t('common.upload')) ?></button></p>
     </form>
 
     <div class="card">
-      <h3>Folders</h3>
+      <h3><?= e(t('files.folders')) ?></h3>
       <?php foreach ($folders as $f): ?>
         <div class="row">
           <span><?= e($paths[(int) $f['id']]) ?>/</span>
@@ -844,45 +876,45 @@ if ($loggedIn) {
             <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0">
               <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
               <input type="hidden" name="action" value="rename"><input type="hidden" name="kind" value="folder"><input type="hidden" name="id" value="<?= (int) $f['id'] ?>">
-              <input name="name" value="<?= e($f['name']) ?>" maxlength="120" aria-label="Folder name" style="width:160px;display:inline-block">
-              <button type="submit">Rename</button>
+              <input name="name" value="<?= e($f['name']) ?>" maxlength="120" aria-label="<?= e(t('files.folder_name')) ?>" style="width:160px;display:inline-block">
+              <button type="submit"><?= e(t('common.rename')) ?></button>
             </form>
-            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Delete this folder?')">
+            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('<?= e(t('files.delete_folder')) ?>')">
               <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
               <input type="hidden" name="action" value="delete_folder"><input type="hidden" name="id" value="<?= (int) $f['id'] ?>">
-              <button class="danger" type="submit">Delete</button>
+              <button class="danger" type="submit"><?= e(t('common.delete')) ?></button>
             </form>
           </span>
         </div>
       <?php endforeach; ?>
-      <?php if (!$folders): ?><p class="muted">No folders yet.</p><?php endif; ?>
+      <?php if (!$folders): ?><p class="muted"><?= e(t('files.no_folders')) ?></p><?php endif; ?>
     </div>
 
     <div class="card">
-      <h3>Files</h3>
+      <h3><?= e(t('files.files')) ?></h3>
       <?php foreach ($files as $fl): ?>
         <div class="row">
           <span>
             <?= e($fl['folder_id'] ? ($paths[(int) $fl['folder_id']] . ' / ') : '') ?><?= e($fl['name']) ?>
-            <span class="muted"><?= e(strtoupper($fl['ext'])) ?><?= $fl['preview'] ? ' + preview' : '' ?></span>
+            <span class="muted"><?= e(strtoupper($fl['ext'])) ?><?= $fl['preview'] ? ' ' . t('common.with_preview') : '' ?></span>
           </span>
           <span>
             <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0">
               <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
               <input type="hidden" name="action" value="rename"><input type="hidden" name="kind" value="file"><input type="hidden" name="id" value="<?= (int) $fl['id'] ?>">
-              <input name="name" value="<?= e($fl['name']) ?>" maxlength="120" aria-label="File name" style="width:160px;display:inline-block">
-              <button type="submit">Rename</button>
+              <input name="name" value="<?= e($fl['name']) ?>" maxlength="120" aria-label="<?= e(t('files.file_name')) ?>" style="width:160px;display:inline-block">
+              <button type="submit"><?= e(t('common.rename')) ?></button>
             </form>
-            <a href="../<?= e($fl['path']) ?>" target="_blank">open</a>
-            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Delete this file?')">
+            <a href="../<?= e($fl['path']) ?>" target="_blank"><?= e(t('common.open')) ?></a>
+            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('<?= e(t('files.delete_file')) ?>')">
               <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
               <input type="hidden" name="action" value="delete_file"><input type="hidden" name="id" value="<?= (int) $fl['id'] ?>">
-              <button class="danger" type="submit">Delete</button>
+              <button class="danger" type="submit"><?= e(t('common.delete')) ?></button>
             </form>
           </span>
         </div>
       <?php endforeach; ?>
-      <?php if (!$files): ?><p class="muted">No files yet.</p><?php endif; ?>
+      <?php if (!$files): ?><p class="muted"><?= e(t('files.no_files')) ?></p><?php endif; ?>
     </div>
 
   <?php elseif ($tab === 'pfiles'): ?>
@@ -901,18 +933,18 @@ if ($loggedIn) {
       }
       $templatePaths = ['README.md', 'pubspec.yaml', 'main.dart', 'analysis_options.yaml', '.gitignore', 'links.md'];
     ?>
-    <h2>Project files</h2>
-    <p class="muted">Each project shows a Flutter project tree. Its README, pubspec, links and placeholder code are generated from the project fields (title, summary, tags as tech stack, url). Paste real file contents here to replace a generated file or add one. Screenshots go into assets/images/.</p>
+    <h2><?= e(t('pfiles.heading')) ?></h2>
+    <p class="muted"><?= e(t('pfiles.help')) ?></p>
 
     <form method="get">
       <input type="hidden" name="t" value="pfiles">
-      <label for="pf-project">Project</label>
+      <label for="pf-project"><?= e(t('pfiles.project')) ?></label>
       <select id="pf-project" name="project">
         <?php foreach ($projectList as $pr): ?>
           <option value="<?= (int) $pr['id'] ?>" <?= (int) $pr['id'] === $pid ? 'selected' : '' ?>><?= e($pr['title']) ?></option>
         <?php endforeach; ?>
       </select>
-      <p><button type="submit">Show</button></p>
+      <p><button type="submit"><?= e(t('common.show')) ?></button></p>
     </form>
 
     <?php if ($pid > 0): ?>
@@ -920,53 +952,53 @@ if ($loggedIn) {
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="pf_save">
       <input type="hidden" name="project_id" value="<?= $pid ?>">
-      <h3>Set file contents</h3>
-      <label for="pf-path">Path inside the project (shown under lib/projects/&lt;name&gt;/)</label>
-      <input id="pf-path" name="path" list="pf-paths" required maxlength="200" placeholder="lib/screens/home.dart">
+      <h3><?= e(t('pfiles.set_heading')) ?></h3>
+      <label for="pf-path"><?= t('pfiles.path') ?></label>
+      <input id="pf-path" dir="ltr" name="path" list="pf-paths" required maxlength="200" placeholder="lib/screens/home.dart">
       <datalist id="pf-paths"><?php foreach ($templatePaths as $tp): ?><option value="<?= e($tp) ?>"><?php endforeach; ?></datalist>
-      <label for="pf-content">Contents (leave empty for an empty file)</label>
+      <label for="pf-content"><?= e(t('pfiles.contents')) ?></label>
       <textarea id="pf-content" name="content" rows="14" style="font-family:ui-monospace,Menlo,monospace"></textarea>
-      <p><button type="submit">Save file</button></p>
+      <p><button type="submit"><?= e(t('pfiles.save_file')) ?></button></p>
     </form>
 
     <div class="card">
-      <h3>Saved file contents</h3>
+      <h3><?= e(t('pfiles.saved_heading')) ?></h3>
       <?php foreach ($overrides as $ov): ?>
         <div class="row">
-          <span><?= e($ov['path']) ?> <span class="muted"><?= (int) $ov['size'] ?> bytes</span></span>
-          <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Remove this saved file? The generated version will show again.')">
+          <span><?= e($ov['path']) ?> <span class="muted"><?= (int) $ov['size'] ?> <?= e(t('common.bytes')) ?></span></span>
+          <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('<?= e(t('pfiles.remove_confirm')) ?>')">
             <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
             <input type="hidden" name="action" value="pf_delete"><input type="hidden" name="id" value="<?= (int) $ov['id'] ?>">
-            <button class="danger" type="submit">Remove</button>
+            <button class="danger" type="submit"><?= e(t('common.remove')) ?></button>
           </form>
         </div>
       <?php endforeach; ?>
-      <?php if (!$overrides): ?><p class="muted">No saved contents. The generated overview is shown.</p><?php endif; ?>
+      <?php if (!$overrides): ?><p class="muted"><?= e(t('pfiles.none_saved')) ?></p><?php endif; ?>
     </div>
 
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="media_upload">
       <input type="hidden" name="project_id" value="<?= $pid ?>">
-      <h3>Add a screenshot</h3>
-      <label for="pm-file">Image (png, jpg, webp)</label>
+      <h3><?= e(t('pfiles.screenshot_heading')) ?></h3>
+      <label for="pm-file"><?= e(t('pfiles.image')) ?></label>
       <input id="pm-file" type="file" name="file_image" accept=".png,.jpg,.jpeg,.webp" required>
-      <p><button type="submit">Upload screenshot</button></p>
+      <p><button type="submit"><?= e(t('pfiles.upload_screenshot')) ?></button></p>
     </form>
 
     <div class="card">
-      <h3>Screenshots</h3>
+      <h3><?= e(t('pfiles.screenshots')) ?></h3>
       <?php foreach ($media as $m): ?>
         <div class="row">
           <span>assets/images/<?= e(basename($m['path'])) ?></span>
-          <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Delete this screenshot?')">
+          <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('<?= e(t('pfiles.delete_screenshot')) ?>')">
             <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
             <input type="hidden" name="action" value="media_delete"><input type="hidden" name="id" value="<?= (int) $m['id'] ?>">
-            <button class="danger" type="submit">Delete</button>
+            <button class="danger" type="submit"><?= e(t('common.delete')) ?></button>
           </form>
         </div>
       <?php endforeach; ?>
-      <?php if (!$media): ?><p class="muted">No screenshots yet.</p><?php endif; ?>
+      <?php if (!$media): ?><p class="muted"><?= e(t('pfiles.no_screenshots')) ?></p><?php endif; ?>
     </div>
     <?php endif; ?>
 
@@ -975,33 +1007,33 @@ if ($loggedIn) {
     <?php
       $rows = $pdo->query("SELECT * FROM $tab ORDER BY id DESC")->fetchAll();
     ?>
-    <h2><?= e($spec['label']) ?></h2>
+    <h2><?= e(t('type.' . $tab)) ?></h2>
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="save">
       <input type="hidden" name="type" value="<?= e($tab) ?>">
       <input type="hidden" name="id" value="<?= (int) ($edit['id'] ?? 0) ?>">
-      <h3><?= $edit ? 'Edit item' : 'Add item' ?></h3>
+      <h3><?= $edit ? e(t('item.edit')) : e(t('item.add')) ?></h3>
       <?php foreach ($spec['fields'] as $field): ?>
         <label for="f-<?= $field ?>"><?= e(label($field)) ?></label>
         <?php if (in_array($field, $spec['long'], true)): ?>
           <textarea id="f-<?= $field ?>" name="<?= $field ?>"><?= e($edit[$field] ?? '') ?></textarea>
         <?php else: ?>
-          <input id="f-<?= $field ?>" name="<?= $field ?>" value="<?= e((string) ($edit[$field] ?? '')) ?>">
+          <input id="f-<?= $field ?>" name="<?= $field ?>"<?= ltr_attr($field) ?> value="<?= e((string) ($edit[$field] ?? '')) ?>">
         <?php endif; ?>
       <?php endforeach; ?>
       <?php foreach ($spec['files'] as $ext): ?>
-        <label for="f-<?= $ext ?>"><?= strtoupper($ext) ?> file</label>
+        <label for="f-<?= $ext ?>"><?= e(t('common.file_of', ['ext' => strtoupper($ext)])) ?></label>
         <input id="f-<?= $ext ?>" type="file" name="file_<?= $ext ?>" accept=".<?= $ext ?>">
-        <p class="muted">Current: <?= !empty($edit[$ext]) ? e($edit[$ext]) : 'none' ?></p>
+        <p class="muted"><?= e(t('common.current')) ?>: <?= !empty($edit[$ext]) ? e($edit[$ext]) : e(t('common.none')) ?></p>
       <?php endforeach; ?>
       <?php if ($tab === 'projects'): ?>
-        <label for="f-icon">Icon (PNG, WebP or JPG, optional)</label>
+        <label for="f-icon"><?= e(t('item.icon')) ?></label>
         <input id="f-icon" type="file" name="file_icon" accept=".png,.webp,.jpg,.jpeg">
-        <p class="muted">Current: <?= !empty($edit['icon']) ? e($edit['icon']) : 'generated tile' ?></p>
+        <p class="muted"><?= e(t('common.current')) ?>: <?= !empty($edit['icon']) ? e($edit['icon']) : e(t('common.generated_tile')) ?></p>
       <?php endif; ?>
-      <p><button type="submit">Save</button>
-        <?php if ($edit): ?><a href="index.php?t=<?= $tab ?>">Cancel</a><?php endif; ?></p>
+      <p><button type="submit"><?= e(t('common.save')) ?></button>
+        <?php if ($edit): ?><a href="index.php?t=<?= $tab ?>"><?= e(t('common.cancel')) ?></a><?php endif; ?></p>
     </form>
 
     <div class="card">
@@ -1009,18 +1041,18 @@ if ($loggedIn) {
         <div class="row">
           <span><?= e($row['title']) ?> <span class="muted"><?= e((string) ($row['year'] ?? $row['kind'] ?? '')) ?></span></span>
           <span>
-            <a href="index.php?t=<?= $tab ?>&id=<?= (int) $row['id'] ?>">Edit</a>
-            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('Delete this item?')">
+            <a href="index.php?t=<?= $tab ?>&id=<?= (int) $row['id'] ?>"><?= e(t('common.edit')) ?></a>
+            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('<?= e(t('common.confirm_delete')) ?>')">
               <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
               <input type="hidden" name="action" value="delete">
               <input type="hidden" name="type" value="<?= e($tab) ?>">
               <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
-              <button class="danger" type="submit">Delete</button>
+              <button class="danger" type="submit"><?= e(t('common.delete')) ?></button>
             </form>
           </span>
         </div>
       <?php endforeach; ?>
-      <?php if (!$rows): ?><p class="muted">Nothing here yet.</p><?php endif; ?>
+      <?php if (!$rows): ?><p class="muted"><?= e(t('common.nothing_yet')) ?></p><?php endif; ?>
     </div>
   <?php endif; ?>
 <?php endif; ?>

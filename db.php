@@ -147,27 +147,27 @@ function save_file_upload(string $field, ?array $onlyExts = null): ?array {
         return null;
     }
     if ($f['error'] !== UPLOAD_ERR_OK) {
-        throw new RuntimeException('Upload failed (code ' . $f['error'] . ').');
+        throw new RuntimeException(t('err.upload_failed', ['code' => $f['error']]));
     }
     if ($f['size'] > MAX_UPLOAD_BYTES) {
-        throw new RuntimeException('File is larger than 100 MB.');
+        throw new RuntimeException(t('err.too_big'));
     }
     $ext = strtolower(pathinfo($f['name'], PATHINFO_EXTENSION));
     if (!isset(FILE_TYPES[$ext]) || ($onlyExts !== null && !in_array($ext, $onlyExts, true))) {
-        throw new RuntimeException('This file type is not allowed.');
+        throw new RuntimeException(t('err.type_not_allowed'));
     }
     $head = (string) file_get_contents($f['tmp_name'], false, null, 0, 12);
     $signatureOk = str_starts_with($head, FILE_TYPES[$ext])
         && ($ext !== 'webp' || substr($head, 8, 4) === 'WEBP');
     if (!$signatureOk) {
-        throw new RuntimeException('The file content does not match its extension.');
+        throw new RuntimeException(t('err.signature'));
     }
     if (!is_dir(UPLOAD_DIR)) {
         mkdir(UPLOAD_DIR, 0755, true);
     }
     $stored = bin2hex(random_bytes(8)) . '.' . $ext;
     if (!move_uploaded_file($f['tmp_name'], UPLOAD_DIR . '/' . $stored)) {
-        throw new RuntimeException('Could not save the uploaded file.');
+        throw new RuntimeException(t('err.save_upload'));
     }
     return ['path' => 'uploads/' . $stored, 'ext' => $ext, 'size' => (int) $f['size'], 'name' => clean_name($f['name'])];
 }
@@ -215,27 +215,27 @@ function save_upload(string $field, string $ext): ?string {
         return null;
     }
     if ($f['error'] !== UPLOAD_ERR_OK) {
-        throw new RuntimeException('Upload failed (code ' . $f['error'] . ').');
+        throw new RuntimeException(t('err.upload_failed', ['code' => $f['error']]));
     }
     if ($f['size'] > MAX_UPLOAD_BYTES) {
-        throw new RuntimeException('File is larger than 100 MB.');
+        throw new RuntimeException(t('err.too_big'));
     }
     if (strtolower(pathinfo($f['name'], PATHINFO_EXTENSION)) !== $ext) {
-        throw new RuntimeException("Expected a .$ext file.");
+        throw new RuntimeException(t('err.expected_ext', ['ext' => $ext]));
     }
     $magic = file_get_contents($f['tmp_name'], false, null, 0, 5);
     if ($ext === 'pdf' && !str_starts_with((string) $magic, '%PDF-')) {
-        throw new RuntimeException('That file is not a valid PDF.');
+        throw new RuntimeException(t('err.not_pdf'));
     }
     if ($ext === 'pptx' && !str_starts_with((string) $magic, 'PK')) {
-        throw new RuntimeException('That file is not a valid PowerPoint file.');
+        throw new RuntimeException(t('err.not_pptx'));
     }
     if (!is_dir(UPLOAD_DIR)) {
         mkdir(UPLOAD_DIR, 0755, true);
     }
     $name = bin2hex(random_bytes(8)) . '.' . $ext;
     if (!move_uploaded_file($f['tmp_name'], UPLOAD_DIR . '/' . $name)) {
-        throw new RuntimeException('Could not save the uploaded file.');
+        throw new RuntimeException(t('err.save_upload'));
     }
     return 'uploads/' . $name;
 }
