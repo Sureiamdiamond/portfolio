@@ -19,28 +19,24 @@ function timeline_dot_opacity(int $fromOldest): string {
     return (string) (TIMELINE_DOT_OPACITY[$fromOldest] ?? 1.0);
 }
 
-/** One education entry as a card: logo, degree, institution and dates show at once; the rest opens on hover, focus or tap. */
-function education_item_html(array $item, string $lang): string {
-    $id = 'edu-panel-' . (int) $item['id'];
-    $title = loc($item, 'title', $lang);
-    $org = loc($item, 'org', $lang);
+/** One education entry on the horizontal timeline: logo, a node on the line, then every detail. Dot fade follows the entry's position, oldest faintest. */
+function education_item_html(array $item, int $index, string $lang): string {
     $period = loc($item, 'period', $lang);
     $city = loc($item, 'city', $lang);
     $details = loc($item, 'details', $lang);
     $bullets = timeline_bullets($item, $lang);
-    $site = timeline_site($item, $lang);
-    $more = '';
-    if (trim($city) !== '') { $more .= '<p class="edu-city">' . e($city) . '</p>'; }
-    if (trim($details) !== '') { $more .= '<p>' . nl2br(e($details)) . '</p>'; }
-    if ($bullets) { $more .= '<ul>' . implode('', array_map(fn($b) => '<li>' . e($b) . '</li>', $bullets)) . '</ul>'; }
-    if ($site !== '') { $more .= '<p>' . $site . '</p>'; }
-    $brief = '<span class="edu-brief"><span class="edu-title">' . e($title) . '</span>'
-        . ($org !== '' ? '<span class="edu-org">' . e($org) . '</span>' : '')
-        . (trim($period) !== '' ? '<span class="edu-when">' . e($period) . '</span>' : '') . '</span>';
-    $expand = $more !== '' ? ' aria-expanded="false" aria-controls="' . $id . '"' : '';
-    $button = '<button type="button" class="edu-card"' . $expand . '>' . org_tile($item, $lang) . $brief . '</button>';
-    $panel = $more !== '' ? '<div class="edu-more" id="' . $id . '">' . $more . '</div>' : '';
-    return '<li class="edu-item">' . $button . $panel . '</li>';
+    $org = loc($item, 'org', $lang);
+    $text = '<p class="edu-title">' . e(loc($item, 'title', $lang)) . '</p>'
+        . ($org !== '' ? '<p class="edu-org">' . e($org) . '</p>' : '')
+        . (trim($period) !== '' ? '<p class="edu-when">' . e($period) . '</p>' : '')
+        . (trim($city) !== '' ? '<p class="edu-city">' . e($city) . '</p>' : '')
+        . (trim($details) !== '' ? '<p class="edu-details">' . nl2br(e($details)) . '</p>' : '')
+        . ($bullets ? '<ul class="edu-bullets">' . implode('', array_map(fn($b) => '<li>' . e($b) . '</li>', $bullets)) . '</ul>' : '')
+        . timeline_site($item, $lang);
+    return '<li class="edu-item" style="--dot-o: ' . timeline_dot_opacity($index) . '">'
+        . '<div class="edu-logo">' . org_tile($item, $lang) . '</div>'
+        . '<span class="edu-node" aria-hidden="true"></span>'
+        . '<div class="edu-text">' . $text . '</div></li>';
 }
 
 /** Bullet points, one per line; falls back to the description paragraph when there are none. */

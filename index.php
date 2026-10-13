@@ -180,7 +180,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
         <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
         <?php if ($label === 'education'): ?>
           <ul class="edu-row">
-            <?php foreach ($items as $item): echo education_item_html($item, $lang); endforeach; ?>
+            <?php foreach ($items as $index => $item): echo education_item_html($item, $index, $lang); endforeach; ?>
           </ul>
         <?php else: ?>
         <ol class="tl tl-career">

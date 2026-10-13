@@ -314,14 +314,3 @@
     });
   });
 })();
-
-// Education cards: a tap or click opens the details, so it also works on touch screens.
-(() => {
-  document.querySelectorAll('.edu-card[aria-controls]').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      const item = btn.closest('.edu-item');
-      const open = item.classList.toggle('is-open');
-      btn.setAttribute('aria-expanded', String(open));
-    });
-  });
-})();

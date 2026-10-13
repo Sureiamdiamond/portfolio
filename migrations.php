@@ -305,7 +305,7 @@ function cv_timeline_rows(): array {
             'kind' => 'education', 'title' => 'Master of Science in Computer Engineering (software)', 'title_fa' => 'کارشناسی ارشد مهندسی کامپیوتر (گرایش نرم‌افزار)',
             'org' => 'Islamic Azad University, Central Tehran Branch', 'org_fa' => 'دانشگاه آزاد اسلامی واحد تهران مرکز',
             'city' => 'Tehran', 'city_fa' => 'تهران', 'period' => 'Oct 2025 – now', 'period_fa' => 'مهر ۱۴۰۴ – اکنون',
-            'website' => $azad['website_c'], 'details' => 'Major: Software', 'details_fa' => 'گرایش: نرم‌افزار', 'bullets' => '', 'bullets_fa' => '', 'sort' => 1,
+            'website' => $azad['website_c'], 'details' => 'Major: Software', 'details_fa' => 'گرایش: نرم‌افزار', 'bullets' => '', 'bullets_fa' => '', 'sort' => 3,
         ],
         [
             'kind' => 'education', 'title' => 'Bachelor of Science in Computer Engineering (software)', 'title_fa' => 'کارشناسی مهندسی کامپیوتر (گرایش نرم‌افزار)',
@@ -630,7 +630,7 @@ function run_baqer_diploma_migration(PDO $pdo): void {
     }
     if (!$pdo->query("SELECT 1 FROM timeline WHERE org = 'Baqer al-Oloum High School'")->fetchColumn()) {
         $pdo->prepare("INSERT INTO timeline (kind, title, title_fa, org, org_fa, city, city_fa, period, period_fa, website, details, details_fa, bullets, bullets_fa, logo, sort)
-            VALUES ('education', 'High School Diploma', 'دیپلم', 'Baqer al-Oloum High School', 'دبیرستان باقرالعلوم', '', '', '', '', '', '', '', '', '', ?, 3)")
+            VALUES ('education', 'High School Diploma', 'دیپلم', 'Baqer al-Oloum High School', 'دبیرستان باقرالعلوم', '', '', '', '', '', '', '', '', '', ?, 1)")
             ->execute([TIMELINE_LOGOS['Baqer al-Oloum High School']]);
         migration_log('baqer diploma: timeline entry added');
     }
@@ -663,6 +663,35 @@ function run_azad_website_migration(PDO $pdo): void {
         $update->execute([$row['id']]);
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . AZAD_WEBSITE_MIGRATION . "', '1')");
+}
+
+// Education reads oldest to newest from left to right: diploma, bachelor, master. The diploma's dates are filled in.
+const EDU_ORDER_MIGRATION = 'migration_edu_order_dates_v1';
+function run_edu_order_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . EDU_ORDER_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $order = [
+        'Baqer al-Oloum High School' => 1,
+        'Islamic Azad University, West Tehran Branch' => 2,
+        'Islamic Azad University, Central Tehran Branch' => 3,
+    ];
+    $sort = $pdo->prepare('UPDATE timeline SET sort = ? WHERE id = ?');
+    $dates = $pdo->prepare("UPDATE timeline SET period = 'Jul 2018 – Jul 2021', period_fa = 'تیر ۱۳۹۷ – تیر ۱۴۰۰' WHERE id = ?");
+    foreach ($pdo->query("SELECT id, org, sort, period, period_fa FROM timeline WHERE kind = 'education'")->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        if (!isset($order[(string) $row['org']])) {
+            continue;
+        }
+        if ((int) $row['sort'] !== $order[(string) $row['org']]) {
+            migration_log("edu order: timeline {$row['id']} previous sort {$row['sort']}");
+            $sort->execute([$order[(string) $row['org']], $row['id']]);
+        }
+        if ($row['org'] === 'Baqer al-Oloum High School' && trim((string) $row['period']) === '') {
+            migration_log("edu dates: timeline {$row['id']} previous period " . json_encode([$row['period'], $row['period_fa']], JSON_UNESCAPED_UNICODE));
+            $dates->execute([$row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . EDU_ORDER_MIGRATION . "', '1')");
 }
 
 // Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.

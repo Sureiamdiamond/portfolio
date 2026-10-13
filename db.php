@@ -88,6 +88,7 @@ function db(): PDO {
     run_baqer_diploma_migration($pdo);
     run_baqer_major_migration($pdo);
     run_azad_website_migration($pdo);
+    run_edu_order_migration($pdo);
     return $pdo;
 }
 
