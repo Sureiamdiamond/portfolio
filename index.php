@@ -179,9 +179,13 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     <div class="timeline">
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
         <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
-        <ol class="tl">
-          <?php foreach ($items as $item): ?>
-            <li class="tl-item">
+        <ol class="tl<?= $label === 'experience' ? ' tl-career' : '' ?>">
+          <?php foreach ($items as $item):
+            $career = $label === 'experience';
+            $current = $career && str_contains(strtolower((string) $item['period']), 'now');
+            $duration = $career ? timeline_duration((string) $item['period'], $lang) : '';
+          ?>
+            <li class="tl-item<?= $career ? ' reveal' : '' ?><?= $current ? ' is-current' : '' ?>">
               <article class="tl-card">
                 <?= org_tile($item, $lang) ?>
                 <div class="tl-body">
@@ -192,6 +196,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
                   </div>
                   <p class="tl-meta">
                     <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
+                    <?php if ($duration !== ''): ?><span class="tl-dur"><?= e($duration) ?></span><?php endif; ?>
                     <?php if (trim(loc($item, 'city', $lang)) !== ''): ?><span class="tl-city"><?= e(loc($item, 'city', $lang)) ?></span><?php endif; ?>
                   </p>
                   <?php // Workplaces show only organisation, position and years; education can also show its major and points

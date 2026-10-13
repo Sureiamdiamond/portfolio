@@ -13,6 +13,29 @@ function org_tile(array $item, string $lang): string {
     return '<span class="tl-slot"><span class="tl-logo tl-initials" style="--hue:' . (crc32($name) % 360) . '" aria-hidden="true">' . e($initials !== '' ? $initials : '•') . '</span></span>';
 }
 
+/** Length of a job from its English period ("Mar 2024 – now"), e.g. "2 yr 7 mo" or the Persian form. Empty when it cannot be read. */
+function timeline_duration(string $period, string $lang): string {
+    $months = ['jan' => 1, 'feb' => 2, 'mar' => 3, 'apr' => 4, 'may' => 5, 'jun' => 6, 'jul' => 7, 'aug' => 8, 'sep' => 9, 'oct' => 10, 'nov' => 11, 'dec' => 12];
+    if (!preg_match('/([A-Za-z]{3})[a-z]*\s+(\d{4})\s*[–-]\s*(?:([A-Za-z]{3})[a-z]*\s+(\d{4})|now)/iu', $period, $m)) {
+        return '';
+    }
+    $start = (int) $m[2] * 12 + ($months[strtolower($m[1])] ?? 1);
+    $end = isset($m[4]) && $m[4] !== '' ? (int) $m[4] * 12 + ($months[strtolower($m[3])] ?? 1) : (int) date('Y') * 12 + (int) date('n');
+    $total = max(0, $end - $start);
+    $years = intdiv($total, 12);
+    $rest = $total % 12;
+    if ($lang === 'fa') {
+        $parts = [];
+        if ($years > 0) { $parts[] = $years . ' سال'; }
+        if ($rest > 0 || $years === 0) { $parts[] = $rest . ' ماه'; }
+        return strtr(implode(' و ', $parts), ['0' => '۰', '1' => '۱', '2' => '۲', '3' => '۳', '4' => '۴', '5' => '۵', '6' => '۶', '7' => '۷', '8' => '۸', '9' => '۹']);
+    }
+    $parts = [];
+    if ($years > 0) { $parts[] = $years . ' yr'; }
+    if ($rest > 0 || $years === 0) { $parts[] = $rest . ' mo'; }
+    return implode(' ', $parts);
+}
+
 /** Bullet points, one per line; falls back to the description paragraph when there are none. */
 function timeline_bullets(array $item, string $lang): array {
     $text = loc($item, 'bullets', $lang);
