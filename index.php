@@ -257,11 +257,16 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       <div class="grid">
         <?php foreach ($projects as $p): $shots = $projectShots[$p['id']] ?? []; ?>
           <?php
-            // The title is the card's main link: GitHub first, then the website or store, and the IDE view when there is no external link.
+            // The card's link: GitHub first, then the website or store. A card with no external link has none.
             $primary = '';
-            foreach (['github_url', 'url', 'playstore_url', 'appstore_url', 'bazaar_url'] as $key) {
+            $primaryName = ['', ''];
+            $primaryNames = [
+                'github_url' => ['GitHub', 'گیت‌هاب'], 'url' => ['Website', 'وب‌سایت'], 'playstore_url' => ['Google Play', 'گوگل‌پلی'],
+                'appstore_url' => ['App Store', 'اپ‌استور'], 'bazaar_url' => ['Bazaar', 'بازار'],
+            ];
+            foreach (array_keys($primaryNames) as $key) {
                 $candidate = trim((string) ($p[$key] ?? ''));
-                if (preg_match('#^https?://#i', $candidate)) { $primary = $candidate; break; }
+                if (preg_match('#^https?://#i', $candidate)) { $primary = $candidate; $primaryName = $primaryNames[$key]; break; }
             }
           ?>
           <article class="card pcard" data-kind="<?= e($p['kind']) ?>">
@@ -269,7 +274,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
               <figure class="pcard-shot"><img src="<?= e($shots[0]) ?>" alt="" loading="lazy"></figure>
             <?php endif; ?>
             <?= project_tile($p) ?>
-            <h3><?php if ($primary !== ''): ?><a class="pcard-link" href="<?= e($primary) ?>" target="_blank" rel="noopener"><?= e(loc($p, 'title', $lang)) ?></a><?php else: ?><a class="pcard-link" href="#projects-ide"><?= e(loc($p, 'title', $lang)) ?></a><?php endif; ?></h3>
+            <h3><?php if ($primary !== ''): ?><a class="pcard-link" href="<?= e($primary) ?>" target="_blank" rel="noopener"><?= e(loc($p, 'title', $lang)) ?></a><?php else: ?><?= e(loc($p, 'title', $lang)) ?><?php endif; ?></h3>
             <p class="muted pcard-summary"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
             <?php $tags = array_filter(array_map('trim', explode(',', (string) $p['tags']))); ?>
             <?php if ($tags): ?>
@@ -278,7 +283,9 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
             <?php if (count($shots) > 1): ?>
               <ul class="pcard-shots"><?php foreach (array_slice($shots, 1) as $more): ?><li><img src="<?= e($more) ?>" alt="" loading="lazy"></li><?php endforeach; ?></ul>
             <?php endif; ?>
-            <a class="pcard-ide" href="#projects-ide"><?= e(t('view_in_ide', $lang)) ?> <span class="arr" aria-hidden="true">→</span></a>
+            <?php if ($primary !== ''): ?>
+              <a class="pcard-ext" href="<?= e($primary) ?>" target="_blank" rel="noopener"><?= e($primaryName[$lang === 'fa' ? 1 : 0]) ?> <span class="arr" aria-hidden="true">→</span></a>
+            <?php endif; ?>
           </article>
         <?php endforeach; ?>
       </div>
