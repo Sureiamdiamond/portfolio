@@ -606,21 +606,13 @@ html[data-theme="dark"] img.tl-logo { filter: drop-shadow(0 0 0.6px rgba(255, 25
 }
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) .tl-initials { background: hsl(var(--hue) 45% 22%); color: hsl(var(--hue) 80% 85%); } }
 html[data-theme="dark"] .tl-initials { background: hsl(var(--hue) 45% 22%); color: hsl(var(--hue) 80% 85%); }
-/* Education: a horizontal timeline, oldest on the left. Logos sit above nodes on one line; all details show under each logo. */
-.edu-row { position: relative; list-style: none; margin: 0; padding: 0; display: flex; gap: 0; }
-.edu-item { position: relative; flex: 1 1 0; min-width: 0; text-align: center; }
-.edu-item::before, .edu-item::after { content: ""; position: absolute; top: 90px; height: 2px; background: var(--accent); }
-.edu-item::before { inset-inline-start: 0; inset-inline-end: 50%; }
-.edu-item::after { inset-inline-start: 50%; inset-inline-end: 0; }
-.edu-item:first-child::before, .edu-item:last-child::after { display: none; }
-.edu-logo { height: 80px; display: flex; align-items: center; justify-content: center; }
-.edu-logo .tl-slot { transition: transform .3s var(--ease); }
+/* Education: three entries side by side, oldest on the left. Each shows its logo, then every detail; the logo grows slightly on hover. */
+.edu-row { list-style: none; margin: 0; padding: 0; display: flex; gap: 18px; }
+.edu-item { flex: 1 1 0; min-width: 0; text-align: center; }
+.edu-logo { height: 92px; display: flex; align-items: center; justify-content: center; }
+.edu-logo .tl-slot { width: 92px; height: 92px; transition: transform .3s var(--ease); }
 .edu-item:hover .edu-logo .tl-slot { transform: scale(1.12); }
-.edu-node {
-  position: absolute; top: 84px; inset-inline-start: calc(50% - 7px); width: 14px; height: 14px; border-radius: 50%;
-  background: color-mix(in srgb, var(--accent) calc(var(--dot-o, 1) * 100%), var(--bg)); box-shadow: 0 0 0 4px var(--bg);
-}
-.edu-text { margin-top: 34px; padding-inline: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.edu-text { margin-top: 14px; padding-inline: 8px; display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .edu-title { margin: 0; font-weight: 600; font-size: 1rem; line-height: 1.35; color: var(--fg); }
 .edu-org { margin: 0; font-size: .85rem; font-weight: 600; color: var(--accent); }
 .edu-when, .edu-city, .edu-details { margin: 0; font-size: .85rem; color: var(--muted); }
@@ -630,14 +622,10 @@ html[data-theme="dark"] .tl-initials { background: hsl(var(--hue) 45% 22%); colo
 .edu-text .tl-site { margin-top: 4px; }
 @media (max-width: 560px) {
   .edu-row { flex-direction: column; gap: 22px; }
-  .edu-item { display: grid; grid-template-columns: 24px minmax(0, 1fr); column-gap: 14px; text-align: start; padding-bottom: 4px; }
-  .edu-item::before { display: none; }
-  .edu-item::after { top: 14px; bottom: 0; inset-inline-start: 11px; width: 2px; height: auto; }
-  .edu-item:last-child::after { display: none; }
-  .edu-logo { grid-column: 2; grid-row: 1; height: 64px; justify-content: flex-start; }
-  .edu-logo .tl-slot { width: 64px; height: 64px; }
-  .edu-node { top: 5px; inset-inline-start: 4px; }
-  .edu-text { grid-column: 2; grid-row: 2; margin-top: 10px; padding-inline: 0; align-items: flex-start; text-align: start; }
+  .edu-item { display: grid; grid-template-columns: 86px minmax(0, 1fr); column-gap: 14px; text-align: start; }
+  .edu-logo { grid-column: 1; grid-row: 1; height: 74px; justify-content: flex-start; }
+  .edu-logo .tl-slot { width: 74px; height: 74px; }
+  .edu-text { grid-column: 2; grid-row: 1; margin-top: 0; padding-inline: 0; align-items: flex-start; text-align: start; }
 }
 @media (prefers-reduced-motion: reduce) { .edu-logo .tl-slot { transition: none; } }
 .tl-body { min-width: 0; }

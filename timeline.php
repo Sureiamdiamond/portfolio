@@ -19,7 +19,7 @@ function timeline_dot_opacity(int $fromOldest): string {
     return (string) (TIMELINE_DOT_OPACITY[$fromOldest] ?? 1.0);
 }
 
-/** One education entry on the horizontal timeline: logo, a node on the line, then every detail. Dot fade follows the entry's position, oldest faintest. */
+/** One education entry: logo, then every detail. The fade class is kept for the entry's position, oldest faintest. */
 function education_item_html(array $item, int $index, string $lang): string {
     $period = loc($item, 'period', $lang);
     $city = loc($item, 'city', $lang);
@@ -35,7 +35,6 @@ function education_item_html(array $item, int $index, string $lang): string {
         . timeline_site($item, $lang);
     return '<li class="edu-item" style="--dot-o: ' . timeline_dot_opacity($index) . '">'
         . '<div class="edu-logo">' . org_tile($item, $lang) . '</div>'
-        . '<span class="edu-node" aria-hidden="true"></span>'
         . '<div class="edu-text">' . $text . '</div></li>';
 }
 
