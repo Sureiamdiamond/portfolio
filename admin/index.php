@@ -1,5 +1,7 @@
 <?php
 declare(strict_types=1);
+// Admin session: not readable from scripts, not sent cross-site, and sent only over HTTPS when the site uses it
+session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', 'httponly' => true, 'samesite' => 'Strict']);
 session_start();
 require __DIR__ . '/../db.php';
 
@@ -63,15 +65,22 @@ const TYPES = [
     'presentations' => ['label' => 'Slides', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
     'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'period', 'period_fa', 'details', 'details_fa', 'sort'], 'long' => ['details', 'details_fa'], 'files' => []],
 ];
-const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'linkedin', 'github'];
-const PROFILE_LONG = ['about', 'about_fa'];
+const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'linkedin', 'github', 'meta_description', 'footer_text'];
+const PROFILE_LONG = ['about', 'about_fa', 'meta_description'];
+// Sections of the public page that can be hidden; stored as '1' (shown) or '0' (hidden)
+const SECTION_SWITCHES = [
+    'show_journey' => 'Education & experience',
+    'show_projects' => 'Projects',
+    'show_research' => 'Research',
+    'show_slides' => 'Slides',
+];
 
 /** Human label for a field; Persian fields are marked so the admin knows where to type them. */
 function label(string $field): string {
     if (str_ends_with($field, '_fa')) {
-        return ucfirst(substr($field, 0, -3)) . ' (Persian)';
+        return ucfirst(str_replace('_', ' ', substr($field, 0, -3))) . ' (Persian)';
     }
-    return ucfirst($field);
+    return ucfirst(str_replace('_', ' ', $field));
 }
 
 $error = null;
@@ -135,6 +144,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 foreach (PROFILE_FIELDS as $field) {
                     $stmt = $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)');
                     $stmt->execute([$field, trim($_POST[$field] ?? '')]);
+                }
+                foreach (array_keys(SECTION_SWITCHES) as $switch) {
+                    $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)')->execute([$switch, isset($_POST[$switch]) ? '1' : '0']);
                 }
                 if ($cv = save_upload('file_cv', 'pdf')) {
                     $old = $pdo->query("SELECT v FROM profile WHERE k = 'cv'")->fetchColumn();
@@ -376,6 +388,19 @@ if ($loggedIn) {
   .msg { padding: 10px; border-radius: 8px; margin-bottom: 12px; background: #e3f4ea; }
   .err { background: #fbe4e4; }
   .muted { color: #5b7385; font-size: 13px; }
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .preview { position: sticky; top: 8px; background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 10px rgba(15,42,61,.08); }
+  .pv-card { border: 1px solid #d6e4ec; border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #0f1a2e; color: #e8f1f7; }
+  .pv-pill { display: inline-block; margin: 0 0 8px; padding: 4px 10px; border-radius: 999px; background: #1f2d4a; font-size: 13px; }
+  .pv-card h4 { margin: 0 0 8px; font-size: 22px; }
+  .pv-about { margin: 0; font-size: 14px; color: #c2d0dc; white-space: pre-line; }
+  #pv-photo { max-width: 160px; border-radius: 12px; margin-top: 8px; }
+  fieldset { border: 1px solid #d6e4ec; border-radius: 8px; margin: 12px 0; padding: 8px 12px; }
+  legend { font-size: 14px; padding: 0 4px; }
+  label.check { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+  label.check input { width: auto; }
+  a.button { padding: 8px 12px; border-radius: 8px; border: 1px solid #9bb8c9; text-decoration: none; color: #0f2a3d; background: #fff; }
+  @media (max-width: 760px) { .split { grid-template-columns: 1fr; } .preview { position: static; } }
 </style>
 </head>
 <body>
@@ -424,6 +449,7 @@ if ($loggedIn) {
       <p><button type="submit">Change password</button></p>
     </form>
   <?php elseif ($tab === 'profile'): ?>
+    <div class="split">
     <form method="post" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="profile">
@@ -435,14 +461,63 @@ if ($loggedIn) {
           <input id="p-<?= $field ?>" name="<?= $field ?>" value="<?= e($profile[$field] ?? '') ?>">
         <?php endif; ?>
       <?php endforeach; ?>
+      <fieldset>
+        <legend>Visible sections on the site</legend>
+        <?php foreach (SECTION_SWITCHES as $switch => $title): ?>
+          <label class="check"><input type="checkbox" name="<?= $switch ?>" <?= ($profile[$switch] ?? '1') !== '0' ? 'checked' : '' ?>> <?= e($title) ?></label>
+        <?php endforeach; ?>
+      </fieldset>
       <label for="cv">CV (PDF)</label>
       <input id="cv" type="file" name="file_cv" accept="application/pdf,.pdf">
       <p class="muted">Current CV: <?= !empty($profile['cv']) ? '<a href="../' . e($profile['cv']) . '" target="_blank">open</a>' : 'none' ?></p>
       <label for="photo">Hero photo (PNG or WebP with a transparent background)</label>
       <input id="photo" type="file" name="file_photo" accept="image/png,image/webp,.png,.webp">
       <p class="muted">Current hero photo: <?= !empty($profile['hero_photo']) ? '<a href="../' . e($profile['hero_photo']) . '" target="_blank">open</a>' : 'built-in cutout' ?></p>
-      <p><button type="submit">Save profile</button></p>
+      <p><button type="submit">Save profile</button> <a class="button" href="../index.php" target="_blank">Preview site (saved version)</a></p>
     </form>
+    <aside class="preview" aria-label="Live preview">
+      <h3>Live preview</h3>
+      <p class="muted">Updates while you type. Nothing is saved until you press Save.</p>
+      <div class="pv-card">
+        <p class="pv-pill" id="pv-headline"><?= e($profile['headline'] ?? '') ?></p>
+        <h4 id="pv-name"><?= e($profile['name'] ?? '') ?></h4>
+        <p class="pv-about" id="pv-about"><?= nl2br(e($profile['about'] ?? '')) ?></p>
+        <p class="pv-photo"><img id="pv-photo" alt="" hidden></p>
+      </div>
+      <div class="pv-card" dir="rtl">
+        <p class="pv-pill" id="pv-headline-fa"><?= e($profile['headline_fa'] ?? '') ?></p>
+        <h4 id="pv-name-fa"><?= e($profile['name_fa'] ?? '') ?></h4>
+        <p class="pv-about" id="pv-about-fa"><?= nl2br(e($profile['about_fa'] ?? '')) ?></p>
+      </div>
+      <p class="muted" id="pv-file"></p>
+    </aside>
+    </div>
+    <script>
+      // Live preview of the profile text and the chosen photo, before anything is uploaded
+      (function () {
+        const pairs = { 'p-name': 'pv-name', 'p-name_fa': 'pv-name-fa', 'p-headline': 'pv-headline', 'p-headline_fa': 'pv-headline-fa' };
+        Object.keys(pairs).forEach((id) => {
+          const input = document.getElementById(id), target = document.getElementById(pairs[id]);
+          if (input && target) input.addEventListener('input', () => { target.textContent = input.value; });
+        });
+        const about = document.getElementById('p-about'), aboutOut = document.getElementById('pv-about');
+        if (about && aboutOut) about.addEventListener('input', () => { aboutOut.textContent = about.value; });
+        const aboutFa = document.getElementById('p-about_fa'), aboutFaOut = document.getElementById('pv-about-fa');
+        if (aboutFa && aboutFaOut) aboutFa.addEventListener('input', () => { aboutFaOut.textContent = aboutFa.value; });
+        const photo = document.getElementById('photo'), img = document.getElementById('pv-photo'), file = document.getElementById('pv-file');
+        if (photo) photo.addEventListener('change', () => {
+          const f = photo.files[0];
+          if (!f) { img.hidden = true; file.textContent = ''; return; }
+          img.src = URL.createObjectURL(f); img.hidden = false;
+          file.textContent = f.name + ' · ' + Math.round(f.size / 1024) + ' KB (PNG or WebP, transparent background)';
+        });
+        const cv = document.getElementById('cv');
+        if (cv) cv.addEventListener('change', () => {
+          const f = cv.files[0];
+          file.textContent = f ? 'CV: ' + f.name + ' · ' + Math.round(f.size / 1024) + ' KB' : '';
+        });
+      })();
+    </script>
   <?php elseif ($tab === 'files'): ?>
     <?php
       $folders = $pdo->query('SELECT * FROM folders ORDER BY sort, id')->fetchAll();

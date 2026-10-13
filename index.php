@@ -56,6 +56,9 @@ $siteUrl = 'https://parsabanitaba.ir';
 $pageUrl = $lang === 'fa' ? $siteUrl . '/?lang=fa' : $siteUrl . '/';
 $summary = trim(preg_replace('/\s+/u', ' ', strip_tags($about)));
 $description = mb_substr(trim($name . ' · ' . $headline . ($summary !== '' ? ' — ' . $summary : '')), 0, 160);
+if (trim((string) ($profile['meta_description'] ?? '')) !== '') {
+    $description = trim((string) $profile['meta_description']);
+}
 $shareImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png');
 $personData = [
     '@context' => 'https://schema.org',
@@ -111,10 +114,10 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 <header class="topbar">
   <div class="topbar-inner">
     <nav class="nav-links" aria-label="<?= e(t('projects', $lang)) ?>">
-      <a href="#journey"><?= e(t('journey', $lang)) ?></a>
-      <a href="#projects"><?= e(t('projects', $lang)) ?></a>
-      <a href="#research"><?= e(t('papers', $lang)) ?></a>
-      <a href="#slides"><?= e(t('presentations', $lang)) ?></a>
+      <?php if (($profile['show_journey'] ?? '1') !== '0'): ?><a href="#journey"><?= e(t('journey', $lang)) ?></a><?php endif; ?>
+      <?php if (($profile['show_projects'] ?? '1') !== '0'): ?><a href="#projects"><?= e(t('projects', $lang)) ?></a><?php endif; ?>
+      <?php if (($profile['show_research'] ?? '1') !== '0'): ?><a href="#research"><?= e(t('papers', $lang)) ?></a><?php endif; ?>
+      <?php if (($profile['show_slides'] ?? '1') !== '0'): ?><a href="#slides"><?= e(t('presentations', $lang)) ?></a><?php endif; ?>
     </nav>
     <div class="nav-actions">
       <a class="tool" href="?lang=<?= $switchLang ?>" hreflang="<?= $switchLang ?>"><?= e(t('lang_switch', $lang)) ?></a>
@@ -153,6 +156,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     </div>
   </section>
 
+<?php if (($profile['show_journey'] ?? '1') !== '0'): ?>
   <section id="journey" class="block reveal">
     <p class="label"><?= e(t('journey', $lang)) ?></p>
     <h2><?= e(t('journey', $lang)) ?></h2>
@@ -170,7 +174,9 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       <?php endforeach; ?>
     </div>
   </section>
+<?php endif; ?>
 
+<?php if (($profile['show_projects'] ?? '1') !== '0'): ?>
   <section id="projects" class="block reveal">
     <p class="label"><?= e(t('projects', $lang)) ?></p>
     <h2><?= e(t('projects', $lang)) ?></h2>
@@ -248,7 +254,9 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       <div hidden id="pt-sources"><?= implode('', $projectSources) ?></div>
     </div>
   </section>
+<?php endif; ?>
 
+<?php if (($profile['show_research'] ?? '1') !== '0'): ?>
   <section id="research" class="block reveal">
     <p class="label"><?= e(t('papers', $lang)) ?></p>
     <h2><?= e(t('papers', $lang)) ?></h2>
@@ -266,7 +274,9 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     <?php endforeach; ?>
     <?php if (!$papers): ?><p class="muted"><?= e(t('empty_papers', $lang)) ?></p><?php endif; ?>
   </section>
+<?php endif; ?>
 
+<?php if (($profile['show_slides'] ?? '1') !== '0'): ?>
   <section id="slides" class="block reveal">
     <p class="label"><?= e(t('presentations', $lang)) ?></p>
     <h2><?= e(t('presentations', $lang)) ?></h2>
@@ -287,6 +297,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     <?php endforeach; ?>
     <?php if (!$slides): ?><p class="muted"><?= e(t('empty_slides', $lang)) ?></p><?php endif; ?>
   </section>
+<?php endif; ?>
 
   <section id="contact" class="inverted reveal">
     <dl class="stats">
@@ -329,7 +340,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 <a class="to-top" href="#top" aria-label="<?= e(t('back_to_top', $lang)) ?>" title="<?= e(t('back_to_top', $lang)) ?>"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 14l6-6 6 6"/></svg></a>
 
 <footer class="muted">
-  © <?= date('Y') ?> <?= e($name) ?>
+  <?= trim((string) ($profile['footer_text'] ?? '')) !== '' ? e($profile['footer_text']) : '© ' . date('Y') . ' ' . e($name) ?>
 </footer>
 <!-- build <?= $assetVersion ?> -->
 
