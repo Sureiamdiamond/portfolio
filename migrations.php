@@ -547,6 +547,29 @@ function run_ipaam_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_MIGRATION . "', '1')");
 }
 
+// Logos for the workplace and both universities, matched by organisation name. Previous logo values are logged.
+const TIMELINE_LOGOS_MIGRATION = 'migration_timeline_logos_v1';
+const TIMELINE_LOGOS = [
+    'Ideh Pardaz Danesh Novin Arsham (IPAAM)' => 'assets/img/timeline/ipaam.webp',
+    'Islamic Azad University, Central Tehran Branch' => 'assets/img/timeline/iau-ctb.png',
+    'Islamic Azad University, West Tehran Branch' => 'assets/img/timeline/iau-west.png',
+];
+
+function run_timeline_logos_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TIMELINE_LOGOS_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare('UPDATE timeline SET logo = ? WHERE id = ?');
+    foreach ($pdo->query('SELECT id, org, logo FROM timeline')->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $logo = TIMELINE_LOGOS[(string) $row['org']] ?? null;
+        if ($logo !== null && (string) $row['logo'] !== $logo) {
+            migration_log("timeline logo {$row['id']} ({$row['org']}): previous logo " . json_encode($row['logo'], JSON_UNESCAPED_UNICODE));
+            $update->execute([$logo, $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TIMELINE_LOGOS_MIGRATION . "', '1')");
+}
+
 // English becomes a panel with CAE and TTC as sub-items. Rewrites both language fields; the previous values are logged.
 const LANGUAGES_PANEL_MIGRATION = 'migration_languages_v2';
 
