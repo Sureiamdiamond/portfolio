@@ -182,7 +182,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
           <?php foreach ($items as $item):
             $career = $label === 'experience';
             $current = $career && str_contains(strtolower((string) $item['period']), 'now');
-            $duration = $career ? timeline_duration((string) $item['period'], $lang) : '';
           ?>
             <li class="tl-item<?= $career ? ' reveal' : '' ?><?= $current ? ' is-current' : '' ?>">
               <article class="tl-card">
@@ -192,7 +191,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
                   <h4 class="tl-role"><?= e(loc($item, 'title', $lang)) ?></h4>
                   <p class="tl-meta">
                     <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
-                    <?php if ($duration !== ''): ?><span class="tl-dur"><?= e($duration) ?></span><?php endif; ?>
                     <?php if (trim(loc($item, 'city', $lang)) !== ''): ?><span class="tl-city"><?= e(loc($item, 'city', $lang)) ?></span><?php endif; ?>
                   </p>
                   <?php // Workplaces show only organisation, position and years; education can also show its major and points

@@ -574,7 +574,7 @@ html[data-motion="off"][data-glass="on"] .btn:hover, html[data-motion="off"][dat
 /* Education and experience as a timeline of cards: logo, organisation, role, dates, city, points and website.
    Logical properties keep the spacing right in Persian (RTL) as well as English. */
 .timeline ol.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
-/* Work history as a connected timeline: a gradient spine, a dot per job (the current one pulses) and a duration chip. */
+/* Work history as a connected timeline: a gradient spine, a dot per job (the current one pulses). */
 .timeline ol.tl.tl-career { position: relative; padding-inline-start: 34px; }
 .tl-career::before {
   content: ""; position: absolute; inset-block: 16px 16px; inset-inline-start: 8px; width: 2px; border-radius: 2px;
@@ -589,10 +589,6 @@ html[data-motion="off"][data-glass="on"] .btn:hover, html[data-motion="off"][dat
 @keyframes tl-pulse {
   0%, 100% { box-shadow: 0 0 0 4px var(--bg), 0 0 0 4px color-mix(in srgb, var(--accent) 35%, transparent); }
   60% { box-shadow: 0 0 0 4px var(--bg), 0 0 0 12px transparent; }
-}
-.tl-dur {
-  display: inline-flex; align-items: center; padding: 2px 10px; border-radius: 999px;
-  font-size: .78rem; font-weight: 600; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent);
 }
 @media (prefers-reduced-motion: reduce) { .tl-career .tl-item.is-current::before { animation: none; } }
 .tl-card {
