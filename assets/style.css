@@ -584,7 +584,7 @@ html[data-motion="off"][data-glass="on"] .btn:hover, html[data-motion="off"][dat
 .tl-career .tl-item { position: relative; }
 .tl-career .tl-item::before {
   content: ""; position: absolute; inset-inline-start: -32px; top: 30px; width: 14px; height: 14px; border-radius: 50%;
-  background: var(--accent); box-shadow: 0 0 0 4px var(--bg); opacity: var(--dot-o, 1);
+  background: color-mix(in srgb, var(--accent) calc(var(--dot-o, 1) * 100%), var(--bg)); box-shadow: 0 0 0 4px var(--bg);
 }
 .tl-career .tl-item.is-current::before { animation: tl-pulse 2.4s var(--ease) infinite; }
 @keyframes tl-pulse {
