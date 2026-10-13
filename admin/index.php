@@ -104,6 +104,11 @@ function ltr_attr(string $field): string {
     return preg_match('/(url|doi|email|phone|linkedin|github|path)$/', $field) ? ' dir="ltr"' : '';
 }
 
+/** The "(current)" marker follows the published value; "(default)" marks the factory setting. */
+function marker(string $value, string $published, ?string $default): string {
+    return ($default !== null && $value === $default ? ' ' . t('marker.default') : '') . ($value === $published ? ' ' . t('marker.current') : '');
+}
+
 /** Links that switch the admin language, keeping the current page. */
 function admin_lang_links(): string {
     $links = [];
@@ -570,7 +575,7 @@ if ($loggedIn) {
       <label for="t-preset"><?= e(t('theme.preset')) ?></label>
       <select id="t-preset" name="theme_preset">
         <?php foreach (THEME_PRESETS as $key => $preset): ?>
-          <option value="<?= e($key) ?>" <?= $current['theme_preset'] === $key ? 'selected' : '' ?>><?= e(t('preset.' . $key)) ?></option>
+          <option value="<?= e($key) ?>" <?= $current['theme_preset'] === $key ? 'selected' : '' ?>><?= e(t('preset.' . $key) . marker($key, $current['theme_preset'], 'electric')) ?></option>
         <?php endforeach; ?>
       </select>
       <div class="swatches" aria-hidden="true">
@@ -585,19 +590,19 @@ if ($loggedIn) {
       <label for="t-radius"><?= e(t('theme.radius')) ?></label>
       <select id="t-radius" name="theme_radius">
         <?php foreach (['sharp' => t('theme.radius_sharp'), 'soft' => t('theme.radius_soft'), 'round' => t('theme.radius_round')] as $key => $label): ?>
-          <option value="<?= $key ?>" <?= $current['theme_radius'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+          <option value="<?= $key ?>" <?= $current['theme_radius'] === $key ? 'selected' : '' ?>><?= e($label . marker($key, $current['theme_radius'], 'soft')) ?></option>
         <?php endforeach; ?>
       </select>
       <label for="t-density"><?= e(t('theme.density')) ?></label>
       <select id="t-density" name="theme_density">
         <?php foreach (['compact' => t('theme.density_compact'), 'comfortable' => t('theme.density_comfortable'), 'airy' => t('theme.density_airy')] as $key => $label): ?>
-          <option value="<?= $key ?>" <?= $current['theme_density'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+          <option value="<?= $key ?>" <?= $current['theme_density'] === $key ? 'selected' : '' ?>><?= e($label . marker($key, $current['theme_density'], 'comfortable')) ?></option>
         <?php endforeach; ?>
       </select>
       <label for="t-mode"><?= e(t('theme.mode')) ?></label>
       <select id="t-mode" name="theme_mode">
         <?php foreach (['system' => t('theme.mode_system'), 'light' => t('theme.mode_light'), 'dark' => t('theme.mode_dark')] as $key => $label): ?>
-          <option value="<?= $key ?>" <?= $current['theme_mode'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+          <option value="<?= $key ?>" <?= $current['theme_mode'] === $key ? 'selected' : '' ?>><?= e($label . marker($key, $current['theme_mode'], 'system')) ?></option>
         <?php endforeach; ?>
       </select>
       <label class="check"><input type="checkbox" name="theme_motion" value="on" <?= $current['theme_motion'] === 'on' ? 'checked' : '' ?>> <?= e(t('theme.motion')) ?></label>
@@ -605,14 +610,14 @@ if ($loggedIn) {
       <label for="t-bg-preset"><?= e(t('theme.bg_preset')) ?></label>
       <select id="t-bg-preset" name="theme_bg_preset">
         <?php foreach (HERO_PRESETS as $key => $preset): ?>
-          <option value="<?= e($key) ?>" <?= $current['theme_bg_preset'] === $key ? 'selected' : '' ?>><?= e(t('hero.' . $key)) ?></option>
+          <option value="<?= e($key) ?>" <?= $current['theme_bg_preset'] === $key ? 'selected' : '' ?>><?= e(t('hero.' . $key) . marker($key, $current['theme_bg_preset'], 'blue')) ?></option>
         <?php endforeach; ?>
-        <option value="custom" <?= $current['theme_bg_preset'] === 'custom' ? 'selected' : '' ?>><?= e(t('theme.bg_custom')) ?></option>
+        <option value="custom" <?= $current['theme_bg_preset'] === 'custom' ? 'selected' : '' ?>><?= e(t('theme.bg_custom') . marker('custom', $current['theme_bg_preset'], null)) ?></option>
       </select>
       <label for="t-bg-type"><?= e(t('theme.bg_type')) ?></label>
       <select id="t-bg-type" name="theme_bg_type">
         <?php foreach (['radial' => t('theme.bg_radial'), 'linear' => t('theme.bg_linear'), 'mesh' => t('theme.bg_mesh'), 'solid' => t('theme.bg_solid')] as $key => $label): ?>
-          <option value="<?= $key ?>" <?= $current['theme_bg_type'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+          <option value="<?= $key ?>" <?= $current['theme_bg_type'] === $key ? 'selected' : '' ?>><?= e($label . marker($key, $current['theme_bg_type'], 'radial')) ?></option>
         <?php endforeach; ?>
       </select>
       <label for="t-bg-c1"><?= e(t('theme.bg_c1')) ?></label>
@@ -630,7 +635,7 @@ if ($loggedIn) {
       <label for="t-bg-pattern"><?= e(t('theme.bg_pattern')) ?></label>
       <select id="t-bg-pattern" name="theme_bg_pattern">
         <?php foreach (['none' => t('theme.pattern_none'), 'dots' => t('theme.pattern_dots'), 'grid' => t('theme.pattern_grid'), 'noise' => t('theme.pattern_noise')] as $key => $label): ?>
-          <option value="<?= $key ?>" <?= $current['theme_bg_pattern'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+          <option value="<?= $key ?>" <?= $current['theme_bg_pattern'] === $key ? 'selected' : '' ?>><?= e($label . marker($key, $current['theme_bg_pattern'], 'none')) ?></option>
         <?php endforeach; ?>
       </select>
       <label for="t-bg-file"><?= e(t('theme.bg_image')) ?></label>

@@ -7,7 +7,7 @@ declare(strict_types=1);
  */
 
 const THEME_PRESETS = [
-    'electric' => ['label' => 'Electric Blue (current)', 'light' => '#0052FF', 'accent' => '#4D7CFF', 'dark' => '#7DA2FF'],
+    'electric' => ['label' => 'Electric Blue', 'light' => '#0052FF', 'accent' => '#4D7CFF', 'dark' => '#7DA2FF'],
     'ocean' => ['label' => 'Ocean', 'light' => '#0369A1', 'accent' => '#0EA5E9', 'dark' => '#7DD3FC'],
     'emerald' => ['label' => 'Emerald', 'light' => '#047857', 'accent' => '#10B981', 'dark' => '#6EE7B7'],
     'sunset' => ['label' => 'Sunset', 'light' => '#C2410C', 'accent' => '#F97316', 'dark' => '#FDBA74'],
@@ -22,7 +22,7 @@ const THEME_MODES = ['system', 'light', 'dark'];
 const THEME_BG = ['#FAFAFA', '#0B1222'];
 /** Hero photo card background presets: type, three colours, angle and centre of the radial gradient. */
 const HERO_PRESETS = [
-    'blue' => ['label' => 'Electric Blue (current)', 'type' => 'radial', 'c1' => '#4D7CFF', 'c2' => '#0052FF', 'c3' => '#0A2A8C', 'angle' => 135, 'x' => 50, 'y' => 42],
+    'blue' => ['label' => 'Electric Blue', 'type' => 'radial', 'c1' => '#4D7CFF', 'c2' => '#0052FF', 'c3' => '#0A2A8C', 'angle' => 135, 'x' => 50, 'y' => 42],
     'orange-purple' => ['label' => 'Orange and purple', 'type' => 'linear', 'c1' => '#FB923C', 'c2' => '#C026D3', 'c3' => '#4C1D95', 'angle' => 145, 'x' => 50, 'y' => 50],
     'emerald' => ['label' => 'Emerald', 'type' => 'radial', 'c1' => '#34D399', 'c2' => '#047857', 'c3' => '#064E3B', 'angle' => 135, 'x' => 50, 'y' => 42],
     'sunset' => ['label' => 'Sunset', 'type' => 'linear', 'c1' => '#FDBA74', 'c2' => '#F97316', 'c3' => '#BE123C', 'angle' => 160, 'x' => 50, 'y' => 50],
