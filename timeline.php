@@ -13,6 +13,12 @@ function org_tile(array $item, string $lang): string {
     return '<span class="tl-slot"><span class="tl-logo tl-initials" style="--hue:' . (crc32($name) % 360) . '" aria-hidden="true">' . e($initials !== '' ? $initials : '•') . '</span></span>';
 }
 
+/** Dot opacity for each work-history entry, newest first: faint at the top, full brand blue from the third entry on. Edit the list to change it. */
+const TIMELINE_DOT_OPACITY = [0.2, 0.5];
+function timeline_dot_opacity(int $index): string {
+    return (string) (TIMELINE_DOT_OPACITY[$index] ?? 1.0);
+}
+
 /** Bullet points, one per line; falls back to the description paragraph when there are none. */
 function timeline_bullets(array $item, string $lang): array {
     $text = loc($item, 'bullets', $lang);

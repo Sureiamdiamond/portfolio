@@ -179,11 +179,11 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
         <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
         <ol class="tl<?= $label === 'experience' ? ' tl-career' : '' ?>">
-          <?php foreach ($items as $item):
+          <?php foreach ($items as $index => $item):
             $career = $label === 'experience';
             $current = $career && str_contains(strtolower((string) $item['period']), 'now');
           ?>
-            <li class="tl-item<?= $career ? ' reveal' : '' ?><?= $current ? ' is-current' : '' ?>">
+            <li class="tl-item<?= $career ? ' reveal' : '' ?><?= $current ? ' is-current' : '' ?>"<?= $career ? ' style="--dot-o: ' . timeline_dot_opacity($index) . '"' : '' ?>>
               <article class="tl-card">
                 <?= org_tile($item, $lang) ?>
                 <div class="tl-body">
