@@ -632,8 +632,12 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 @media (prefers-reduced-motion: reduce) {
   .skill-panel, .skill-child, .skill-head::after { transition: none !important; }
 }
-.skills-more { margin-top: 12px; }
-.skills-more > summary { display: inline-block; padding: 6px 0; cursor: pointer; color: var(--accent); font-weight: 600; list-style: none; }
+.skills-more { margin-top: 14px; }
+.skills-more > summary { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: 999px; background: color-mix(in srgb, var(--accent) 8%, transparent); color: var(--accent); font-weight: 600; cursor: pointer; list-style: none; }
+.skills-more > summary:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); }
+.skills-more > summary .count { font-weight: 500; opacity: .8; }
+.skills-more > summary::after { content: ""; width: 6px; height: 6px; border-inline-end: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); margin-inline-start: 2px; transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+.skills-more[open] > summary::after { transform: rotate(-135deg); }
 .skills-more > summary::-webkit-details-marker { display: none; }
 .skills-more > summary .when-open { display: none; }
 .skills-more[open] > summary .when-open { display: inline; }

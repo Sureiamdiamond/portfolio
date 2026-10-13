@@ -228,7 +228,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
           <?php endif; ?>
           <?php if ($skillGroups['more']): ?>
             <details class="skills-more">
-              <summary><span class="when-closed"><?= e(t('skills_more', $lang)) ?></span><span class="when-open"><?= e(t('skills_less', $lang)) ?></span></summary>
+              <summary><span class="when-closed"><?= e(t('skills_more', $lang)) ?> <span class="count">(<?= count($skillGroups['more']) ?>)</span></span><span class="when-open"><?= e(t('skills_less', $lang)) ?></span></summary>
               <ul class="skill-grid">
                 <?php foreach ($skillGroups['more'] as $group): ?><?= skill_card_html($group) ?><?php endforeach; ?>
               </ul>
