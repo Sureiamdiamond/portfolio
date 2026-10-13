@@ -153,6 +153,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($action === 'theme_draft' || $action === 'theme_publish') {
                 $settings = theme_clean($_POST);
+                $published = theme_published($pdo);
+                // A new background image is saved as soon as it is chosen; the old draft image is removed once replaced
+                if ($upload = save_file_upload('file_bg', ['png', 'webp', 'jpg', 'jpeg'])) {
+                    $settings['theme_bg_image'] = $upload['path'];
+                } elseif (!empty($_POST['theme_bg_clear'])) {
+                    $settings['theme_bg_image'] = '';
+                }
+                $draftImage = ((theme_draft() ?? [])['settings'] ?? [])['theme_bg_image'] ?? '';
+                if ($draftImage !== '' && $draftImage !== $settings['theme_bg_image'] && $draftImage !== $published['theme_bg_image']) {
+                    remove_upload($draftImage);
+                }
                 if ($action === 'theme_draft') {
                     // The preview reads the draft through a random token; nothing changes on the public site yet
                     $token = bin2hex(random_bytes(16));
@@ -161,8 +172,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         throw new RuntimeException('The draft could not be saved. Check that the data folder is writable.');
                     }
                     header('Content-Type: application/json; charset=utf-8');
-                    echo json_encode(['token' => $token, 'warnings' => theme_warnings($settings)], JSON_UNESCAPED_UNICODE);
+                    echo json_encode([
+                        'token' => $token,
+                        'warnings' => theme_warnings($settings),
+                        'bg_image' => $settings['theme_bg_image'],
+                        'hero' => theme_hero_background($settings, '../'),
+                    ], JSON_UNESCAPED_UNICODE);
                     exit;
+                }
+                if ($published['theme_bg_image'] !== '' && $published['theme_bg_image'] !== $settings['theme_bg_image']) {
+                    remove_upload($published['theme_bg_image']);
                 }
                 foreach ($settings as $key => $value) {
                     $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)')->execute([$key, $value]);
@@ -173,6 +192,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($action === 'theme_reset') {
+                remove_upload(theme_published($pdo)['theme_bg_image']);
+                remove_upload(((theme_draft() ?? [])['settings'] ?? [])['theme_bg_image'] ?? null);
                 $pdo->exec("DELETE FROM profile WHERE k LIKE 'theme_%'");
                 @unlink(THEME_DRAFT_FILE);
                 header('Location: index.php?t=theme&reset=1');
@@ -405,6 +426,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     } catch (Throwable $ex) {
+        // The live preview reads errors as JSON; the other forms show them on the page
+        if (($_POST['action'] ?? '') === 'theme_draft') {
+            http_response_code(422);
+            header('Content-Type: application/json; charset=utf-8');
+            exit(json_encode(['error' => $ex->getMessage()], JSON_UNESCAPED_UNICODE));
+        }
         $error = $ex->getMessage();
     }
 }
@@ -461,6 +488,7 @@ if ($loggedIn) {
   label.check { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
   label.check input { width: auto; }
   a.button { padding: 8px 12px; border-radius: 8px; border: 1px solid #9bb8c9; text-decoration: none; color: #0f2a3d; background: #fff; }
+  .hero-mini { width: 180px; aspect-ratio: 4 / 5; border-radius: 16px; background: var(--hero-bg, #0052FF); box-shadow: 0 2px 10px rgba(15,42,61,.12); }
   @media (max-width: 760px) { .split { grid-template-columns: 1fr; } .preview { position: static; } }
 </style>
 </head>
@@ -503,7 +531,7 @@ if ($loggedIn) {
     <?php if (isset($_GET['published'])): ?><div class="msg">Theme published.</div><?php endif; ?>
     <?php if (isset($_GET['reset'])): ?><div class="msg">Theme reset to the default.</div><?php endif; ?>
     <div class="split">
-    <form id="theme-form" method="post" autocomplete="off">
+    <form id="theme-form" method="post" autocomplete="off" enctype="multipart/form-data">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="theme_publish">
       <h2>Theme</h2>
@@ -541,6 +569,42 @@ if ($loggedIn) {
         <?php endforeach; ?>
       </select>
       <label class="check"><input type="checkbox" name="theme_motion" value="on" <?= $current['theme_motion'] === 'on' ? 'checked' : '' ?>> Animations on</label>
+      <h2>Hero photo background</h2>
+      <label for="t-bg-preset">Background preset</label>
+      <select id="t-bg-preset" name="theme_bg_preset">
+        <?php foreach (HERO_PRESETS as $key => $preset): ?>
+          <option value="<?= e($key) ?>" <?= $current['theme_bg_preset'] === $key ? 'selected' : '' ?>><?= e($preset['label']) ?></option>
+        <?php endforeach; ?>
+        <option value="custom" <?= $current['theme_bg_preset'] === 'custom' ? 'selected' : '' ?>>Custom (your own colours)</option>
+      </select>
+      <label for="t-bg-type">Style</label>
+      <select id="t-bg-type" name="theme_bg_type">
+        <?php foreach (['radial' => 'Radial glow', 'linear' => 'Linear gradient', 'mesh' => 'Soft mesh', 'solid' => 'Solid colour'] as $key => $label): ?>
+          <option value="<?= $key ?>" <?= $current['theme_bg_type'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <label for="t-bg-c1">First colour</label>
+      <input id="t-bg-c1" type="color" name="theme_bg_c1" value="<?= e(strtolower($current['theme_bg_c1'])) ?>">
+      <label for="t-bg-c2">Middle colour</label>
+      <input id="t-bg-c2" type="color" name="theme_bg_c2" value="<?= e(strtolower($current['theme_bg_c2'])) ?>">
+      <label for="t-bg-c3">End colour</label>
+      <input id="t-bg-c3" type="color" name="theme_bg_c3" value="<?= e(strtolower($current['theme_bg_c3'])) ?>">
+      <label for="t-bg-angle">Angle (linear gradient): <span id="t-bg-angle-out"><?= (int) $current['theme_bg_angle'] ?></span>°</label>
+      <input id="t-bg-angle" type="range" name="theme_bg_angle" min="0" max="360" value="<?= (int) $current['theme_bg_angle'] ?>">
+      <label for="t-bg-x">Glow centre, left to right (radial): <span id="t-bg-x-out"><?= (int) $current['theme_bg_x'] ?></span>%</label>
+      <input id="t-bg-x" type="range" name="theme_bg_x" min="0" max="100" value="<?= (int) $current['theme_bg_x'] ?>">
+      <label for="t-bg-y">Glow centre, top to bottom (radial): <span id="t-bg-y-out"><?= (int) $current['theme_bg_y'] ?></span>%</label>
+      <input id="t-bg-y" type="range" name="theme_bg_y" min="0" max="100" value="<?= (int) $current['theme_bg_y'] ?>">
+      <label for="t-bg-pattern">Pattern overlay</label>
+      <select id="t-bg-pattern" name="theme_bg_pattern">
+        <?php foreach (['none' => 'None', 'dots' => 'Dots', 'grid' => 'Grid', 'noise' => 'Grain (noise)'] as $key => $label): ?>
+          <option value="<?= $key ?>" <?= $current['theme_bg_pattern'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <label for="t-bg-file">Background image (optional, PNG, WebP or JPG; it is shown under the colours)</label>
+      <input id="t-bg-file" type="file" name="file_bg" accept=".png,.webp,.jpg,.jpeg">
+      <label class="check"><input type="checkbox" name="theme_bg_clear" value="1"> Remove the background image</label>
+      <input type="hidden" id="t-bg-image" name="theme_bg_image" value="<?= e($current['theme_bg_image']) ?>">
       <div id="t-warnings" class="msg err" hidden></div>
       <p><button type="submit">Publish theme</button></p>
     </form>
@@ -553,6 +617,8 @@ if ($loggedIn) {
       </p>
       <div class="frame-wrap"><iframe id="t-frame" title="Site preview" src="../index.php?preview=none" style="width:100%;height:560px;border:1px solid #d6e4ec;border-radius:10px;background:#fff"></iframe></div>
       <p class="muted">The preview shows your changes before they are published. Publish only when you are happy with it.</p>
+      <h3>Photo card</h3>
+      <div id="t-hero-mini" class="hero-mini"></div>
       <form method="post" onsubmit="return confirm('Reset the theme to the default? Your draft is discarded.')">
         <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
         <input type="hidden" name="action" value="theme_reset">
@@ -567,18 +633,50 @@ if ($loggedIn) {
         const frame = document.getElementById('t-frame');
         const open = document.getElementById('t-open');
         const warnings = document.getElementById('t-warnings');
+        const heroMini = document.getElementById('t-hero-mini');
+        const bgPreset = document.getElementById('t-bg-preset');
+        const bgFile = document.getElementById('t-bg-file');
+        const bgImage = document.getElementById('t-bg-image');
+        const bgClear = form.theme_bg_clear;
+        const heroPresets = <?= json_encode(HERO_PRESETS, JSON_HEX_TAG | JSON_UNESCAPED_UNICODE) ?>;
+        const bgFields = ['theme_bg_type', 'theme_bg_c1', 'theme_bg_c2', 'theme_bg_c3', 'theme_bg_angle', 'theme_bg_x', 'theme_bg_y'];
         let timer = null;
+        // Picking a preset fills the fields; editing a field by hand switches the preset to "Custom"
+        bgPreset.addEventListener('change', () => {
+          const p = heroPresets[bgPreset.value];
+          if (!p) return;
+          form.theme_bg_type.value = p.type;
+          form.theme_bg_c1.value = p.c1;
+          form.theme_bg_c2.value = p.c2;
+          form.theme_bg_c3.value = p.c3;
+          form.theme_bg_angle.value = p.angle;
+          form.theme_bg_x.value = p.x;
+          form.theme_bg_y.value = p.y;
+        });
+        bgFields.forEach((name) => form[name].addEventListener('input', () => { bgPreset.value = 'custom'; }));
+        form.theme_bg_angle.addEventListener('input', () => { document.getElementById('t-bg-angle-out').textContent = form.theme_bg_angle.value; });
+        form.theme_bg_x.addEventListener('input', () => { document.getElementById('t-bg-x-out').textContent = form.theme_bg_x.value; });
+        form.theme_bg_y.addEventListener('input', () => { document.getElementById('t-bg-y-out').textContent = form.theme_bg_y.value; });
+        bgFile.addEventListener('change', () => { bgClear.checked = false; });
+        bgClear.addEventListener('change', () => { if (bgClear.checked) bgFile.value = ''; });
         const update = () => {
           const body = new FormData(form);
           body.set('action', 'theme_draft');
           body.set('theme_motion', form.theme_motion.checked ? 'on' : 'off');
+          body.set('theme_bg_clear', bgClear.checked ? '1' : '');
           fetch('index.php?t=theme', { method: 'POST', body, headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' })
-            .then((r) => r.json())
-            .then((data) => {
+            .then((r) => r.json().then((data) => ({ ok: r.ok, data })).catch(() => ({ ok: false, data: {} })))
+            .then(({ ok, data }) => {
+              if (!ok) { warnings.hidden = false; warnings.textContent = data.error || 'The preview could not be updated. Try again.'; return; }
               frame.src = '../index.php?preview=' + data.token;
               open.href = '../index.php?preview=' + data.token;
               warnings.hidden = data.warnings.length === 0;
               warnings.textContent = data.warnings.join(' ');
+              // The uploaded image is now part of the draft; clear the picker so the next change does not upload it again
+              bgImage.value = data.bg_image;
+              bgFile.value = '';
+              bgClear.checked = false;
+              heroMini.style.setProperty('--hero-bg', data.hero);
             })
             .catch(() => { warnings.hidden = false; warnings.textContent = 'The preview could not be updated. Try again.'; });
         };

@@ -117,8 +117,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 }
 .portrait {
   position: relative; width: min(363px, 92%); aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden; isolation: isolate;
-  background:
-    radial-gradient(60% 55% at 50% 42%, #4D7CFF 0%, #0052FF 58%, #0A2A8C 100%);
+  background: var(--hero-bg, radial-gradient(60% 55% at 50% 42%, #4D7CFF 0%, #0052FF 58%, #0A2A8C 100%));
   box-shadow: var(--shadow); animation: bob 7s var(--ease) infinite;
 }
 .portrait-img {
