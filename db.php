@@ -86,6 +86,7 @@ function db(): PDO {
     run_ipam_fa_spelling_migration($pdo);
     run_techblog_github_migration($pdo);
     run_baqer_diploma_migration($pdo);
+    run_baqer_major_migration($pdo);
     return $pdo;
 }
 

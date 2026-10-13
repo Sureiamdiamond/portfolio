@@ -178,12 +178,16 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     <div class="timeline">
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
         <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
-        <ol class="tl<?= $label === 'experience' ? ' tl-career' : '' ?>">
+        <?php if ($label === 'education'): ?>
+          <ul class="edu-row">
+            <?php foreach ($items as $item): echo education_item_html($item, $lang); endforeach; ?>
+          </ul>
+        <?php else: ?>
+        <ol class="tl tl-career">
           <?php foreach ($items as $index => $item):
-            $career = $label === 'experience';
-            $current = $career && str_contains(strtolower((string) $item['period']), 'now');
+            $current = str_contains(strtolower((string) $item['period']), 'now');
           ?>
-            <li class="tl-item<?= $career ? ' reveal' : '' ?><?= $current ? ' is-current' : '' ?>"<?= $career ? ' style="--dot-o: ' . timeline_dot_opacity(count($items) - 1 - $index) . '"' : '' ?>>
+            <li class="tl-item reveal<?= $current ? ' is-current' : '' ?>" style="--dot-o: <?= timeline_dot_opacity(count($items) - 1 - $index) ?>">
               <article class="tl-card">
                 <?= org_tile($item, $lang) ?>
                 <div class="tl-body">
@@ -196,22 +200,12 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
                     <?= timeline_site($item, $lang) ?>
                   </p>
                   <?php endif; ?>
-                  <?php // Workplaces show only organisation, position and years; education can also show its major and points
-                    if ($label === 'education'):
-                      $bullets = timeline_bullets($item, $lang);
-                      if ($bullets): ?>
-                        <ul class="tl-bullets">
-                          <?php foreach ($bullets as $b): ?><li><?= e($b) ?></li><?php endforeach; ?>
-                        </ul>
-                      <?php elseif (trim(loc($item, 'details', $lang)) !== ''): ?>
-                        <p class="tl-details"><?= nl2br(e(loc($item, 'details', $lang))) ?></p>
-                      <?php endif;
-                    endif; ?>
                 </div>
               </article>
             </li>
           <?php endforeach; ?>
         </ol>
+        <?php endif; ?>
       <?php endforeach; ?>
     </div>
     <?php

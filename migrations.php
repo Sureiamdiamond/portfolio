@@ -637,6 +637,20 @@ function run_baqer_diploma_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BAQER_DIPLOMA_MIGRATION . "', '1')");
 }
 
+// The high-school diploma is in mathematics: the entry's title names the diploma. Only the default title is changed.
+const BAQER_MAJOR_MIGRATION = 'migration_baqer_major_v1';
+function run_baqer_major_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . BAQER_MAJOR_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare("UPDATE timeline SET title = 'Diploma in Mathematics', title_fa = 'دیپلم ریاضی' WHERE id = ?");
+    foreach ($pdo->query("SELECT id, title, title_fa FROM timeline WHERE org = 'Baqer al-Oloum High School' AND title = 'High School Diploma'")->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        migration_log("baqer major: timeline {$row['id']} previous title " . json_encode([$row['title'], $row['title_fa']], JSON_UNESCAPED_UNICODE));
+        $update->execute([$row['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BAQER_MAJOR_MIGRATION . "', '1')");
+}
+
 // Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.
 const TIMELINE_LOGOS_MIGRATION = 'migration_timeline_logos_v2';
 const TIMELINE_LOGOS = [

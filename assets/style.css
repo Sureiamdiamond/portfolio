@@ -610,6 +610,45 @@ html[data-theme="dark"] img.tl-logo { filter: drop-shadow(0 0 0.6px rgba(255, 25
 }
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) .tl-initials { background: hsl(var(--hue) 45% 22%); color: hsl(var(--hue) 80% 85%); } }
 html[data-theme="dark"] .tl-initials { background: hsl(var(--hue) 45% 22%); color: hsl(var(--hue) 80% 85%); }
+/* Education as a row of cards: the brief shows at once, and the card grows on hover, focus or tap to show the rest. */
+.edu-row { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 18px; }
+.edu-item { position: relative; flex: 0 1 220px; min-width: 0; }
+.edu-card {
+  appearance: none; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 16px;
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+  color: var(--fg); font: inherit; text-align: center; cursor: pointer;
+  transition: transform .25s var(--ease), border-color .25s var(--ease), box-shadow .25s var(--ease);
+}
+.edu-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.edu-card .tl-slot { margin-inline: auto; }
+.edu-brief { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.edu-title { font-weight: 600; font-size: .98rem; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.edu-org { font-size: .82rem; font-weight: 600; color: var(--accent); }
+.edu-when { font-size: .8rem; color: var(--muted); }
+.edu-more {
+  position: absolute; top: calc(100% + 10px); inset-inline-start: 0; width: 280px; z-index: 5; padding: 14px 16px;
+  border: 1px solid var(--border); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow);
+  font-size: .9rem; color: var(--muted); text-align: start;
+  opacity: 0; visibility: hidden; transform: translateY(-6px);
+  transition: opacity .25s var(--ease), transform .25s var(--ease), visibility .25s;
+}
+.edu-more p, .edu-more ul { margin: 0 0 6px; }
+.edu-more ul { padding-inline-start: 1.1em; }
+.edu-more .edu-city { font-weight: 600; color: var(--fg); }
+.edu-item:last-child .edu-more { inset-inline-start: auto; inset-inline-end: 0; }
+.edu-item.is-open .edu-more, .edu-item:focus-within .edu-more { opacity: 1; visibility: visible; transform: none; }
+.edu-item.is-open .edu-card, .edu-item:focus-within .edu-card { transform: scale(1.04); border-color: var(--accent); }
+@media (hover: hover) and (min-width: 561px) {
+  .edu-item:hover .edu-more { opacity: 1; visibility: visible; transform: none; }
+  .edu-item:hover .edu-card { transform: scale(1.06); border-color: var(--accent); }
+}
+@media (max-width: 560px) {
+  .edu-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .edu-item { flex: none; }
+  .edu-more { position: static; width: auto; margin-top: 8px; display: none; box-shadow: none; opacity: 1; visibility: visible; transform: none; }
+  .edu-item.is-open .edu-more { display: block; }
+}
+@media (prefers-reduced-motion: reduce) { .edu-card, .edu-more { transition: none; } }
 .tl-body { min-width: 0; }
 .tl-org { margin: 0; font-size: .85rem; font-weight: 600; color: var(--accent); }
 .tl-role { margin: 2px 0 0; font-size: 1.12rem; font-weight: 600; color: var(--fg); }
