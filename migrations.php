@@ -298,7 +298,7 @@ function cv_timeline_rows(): array {
         "زبان‌ها و فریم‌ورک‌ها: Dart، Flutter\nمدیریت وضعیت: BLoC، GetX؛ استفاده از Freezed برای مدل‌سازی داده و مدیریت ایونت‌ها و استیت‌ها\nمعماری نرم‌افزار: MVP، Clean Architecture، MVVM\nپروژه SDUI\nارتباط با سرور: کار با Dio و HTTP برای API Integration\nتم و ظاهر اپلیکیشن: پیاده‌سازی تم‌های پویا و سفارشی‌سازی کامل UI\nرابط کاربری: تبدیل طراحی‌های Figma به UI واکنش‌گرا\nچندزبانه‌سازی اپلیکیشن: تجربه در پیاده‌سازی Localization\nابزارهای تیمی و مدیریتی: Jira، Git (GitHub/GitLab)\nتوسعه تیمی: آشنایی با متدولوژی Agile و کار گروهی",
         "Languages and frameworks: Dart, Flutter\nState management: BLoC and GetX, with Freezed for data models and events and states\nSoftware architecture: MVP, Clean Architecture, MVVM\nSDUI project\nServer communication: Dio and HTTP for API integration\nApp theming: dynamic themes and full UI customisation\nUI: turning Figma designs into responsive UI\nLocalisation: experience implementing multi-language apps\nTeam tools: Jira, Git (GitHub and GitLab)\nTeamwork: familiar with Agile and group work",
     ];
-    $ipam = ['org' => 'ایپاام (ایده‌پرداز دانش نوین ارشم)', 'org_en' => 'IPAAM (Ideh Pardaz Danesh Novin Arsham)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
+    $ipam = ['org' => 'ایپام (ایده‌پرداز دانش نوین ارشم)', 'org_en' => 'IPAAM (Ideh Pardaz Danesh Novin Arsham)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
     $azad = ['website_w' => 'https://wtb.iau.ir/', 'website_c' => 'https://ctb.iau.ir/'];
     return [
         [
@@ -581,6 +581,30 @@ function run_codeyad_period_migration(PDO $pdo): void {
         }
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CODEYAD_PERIOD_MIGRATION . "', '1')");
+}
+
+// The Persian spelling of the workplace is ایپام (earlier migrations wrote ایپاام). Only the Persian fields and profile values change.
+const IPAM_FA_SPELLING_MIGRATION = 'migration_ipam_fa_spelling_v1';
+function run_ipam_fa_spelling_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . IPAM_FA_SPELLING_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare('UPDATE timeline SET org_fa = ?, title_fa = ?, details_fa = ?, bullets_fa = ? WHERE id = ?');
+    $fields = ['org_fa', 'title_fa', 'details_fa', 'bullets_fa'];
+    foreach ($pdo->query('SELECT * FROM timeline')->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $old = array_map(fn($f) => (string) ($row[$f] ?? ''), $fields);
+        $new = array_map(fn($t) => str_replace('ایپاام', 'ایپام', $t), $old);
+        if ($new !== $old) {
+            migration_log("ipam fa spelling: timeline {$row['id']} previous row " . json_encode($row, JSON_UNESCAPED_UNICODE));
+            $update->execute([...$new, $row['id']]);
+        }
+    }
+    $stmt = $pdo->prepare('UPDATE profile SET v = ? WHERE k = ?');
+    foreach ($pdo->query("SELECT k, v FROM profile WHERE v LIKE '%ایپاام%'")->fetchAll(PDO::FETCH_KEY_PAIR) as $k => $v) {
+        migration_log("ipam fa spelling: profile $k previous value " . json_encode($v, JSON_UNESCAPED_UNICODE));
+        $stmt->execute([str_replace('ایپاام', 'ایپام', (string) $v), $k]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAM_FA_SPELLING_MIGRATION . "', '1')");
 }
 
 // Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.
