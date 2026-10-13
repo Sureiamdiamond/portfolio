@@ -89,6 +89,7 @@ function db(): PDO {
     run_baqer_major_migration($pdo);
     run_azad_website_migration($pdo);
     run_edu_order_migration($pdo);
+    run_sdui_links_migration($pdo);
     return $pdo;
 }
 
@@ -129,7 +130,7 @@ const RESUME_PROJECTS = [
     ['title' => 'Tobank SDUI', 'title_fa' => 'توبانک SDUI', 'kind' => 'work',
         'summary' => "Server-driven UI for the Tobank app: pages are rendered from JSON received from the server, using the Stac framework. Period: Farvardin 1405.",
         'summary_fa' => "رندر صفحات اپلیکیشن توبانک از روی JSON دریافتی از سرور با معماری Server-Driven UI و فریم‌ورک Stac. بازه: فروردین ۱۴۰۵.",
-        'tags' => 'flutter, dart, stac, server-driven ui, json', 'url' => '', 'github_url' => '', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 5],
+        'tags' => 'flutter, dart, stac, server-driven ui, json', 'url' => 'https://tobank.ir', 'github_url' => '', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 5],
 ];
 
 /** One-time seed of the CV projects. Existing rows are left alone. */

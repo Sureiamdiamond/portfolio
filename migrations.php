@@ -694,6 +694,33 @@ function run_edu_order_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . EDU_ORDER_MIGRATION . "', '1')");
 }
 
+// Tobank SDUI is part of the Tobank app, so it uses the same external links. Only empty fields are filled in.
+const SDUI_LINKS_MIGRATION = 'migration_sdui_links_v1';
+function run_sdui_links_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SDUI_LINKS_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $fields = ['url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url'];
+    $source = $pdo->query("SELECT * FROM projects WHERE title = 'Tobank' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    $target = $pdo->query("SELECT * FROM projects WHERE title = 'Tobank SDUI' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($source && $target) {
+        $set = [];
+        $values = [];
+        foreach ($fields as $f) {
+            if (trim((string) $source[$f]) !== '' && trim((string) $target[$f]) === '') {
+                $set[] = "$f = ?";
+                $values[] = $source[$f];
+            }
+        }
+        if ($set) {
+            migration_log("sdui links: project {$target['id']} previous links " . json_encode(array_intersect_key($target, array_flip($fields)), JSON_UNESCAPED_UNICODE));
+            $values[] = $target['id'];
+            $pdo->prepare('UPDATE projects SET ' . implode(', ', $set) . ' WHERE id = ?')->execute($values);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SDUI_LINKS_MIGRATION . "', '1')");
+}
+
 // Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.
 const TIMELINE_LOGOS_MIGRATION = 'migration_timeline_logos_v2';
 const TIMELINE_LOGOS = [
