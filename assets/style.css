@@ -610,7 +610,7 @@ html[data-theme="dark"] img.tl-logo { filter: drop-shadow(0 0 0.6px rgba(255, 25
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) .tl-initials { background: hsl(var(--hue) 45% 22%); color: hsl(var(--hue) 80% 85%); } }
 html[data-theme="dark"] .tl-initials { background: hsl(var(--hue) 45% 22%); color: hsl(var(--hue) 80% 85%); }
 .tl-body { min-width: 0; }
-.tl-org { margin: 0; font-size: .85rem; font-weight: 600; color: var(--accent); display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 10px; row-gap: 2px; }
+.tl-org { margin: 0; font-size: .85rem; font-weight: 600; color: var(--accent); }
 .tl-role { margin: 2px 0 0; font-size: 1.12rem; font-weight: 600; color: var(--fg); }
 .tl-meta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 6px 0 0; font-size: .88rem; color: var(--muted); }
 .tl-meta .period { font-weight: 600; color: var(--fg); }
