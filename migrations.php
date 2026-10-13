@@ -299,7 +299,7 @@ function cv_timeline_rows(): array {
         "Languages and frameworks: Dart, Flutter\nState management: BLoC and GetX, with Freezed for data models and events and states\nSoftware architecture: MVP, Clean Architecture, MVVM\nSDUI project\nServer communication: Dio and HTTP for API integration\nApp theming: dynamic themes and full UI customisation\nUI: turning Figma designs into responsive UI\nLocalisation: experience implementing multi-language apps\nTeam tools: Jira, Git (GitHub and GitLab)\nTeamwork: familiar with Agile and group work",
     ];
     $ipam = ['org' => 'ایپام (ایده‌پرداز دانش نوین ارشم)', 'org_en' => 'IPAAM (Ideh Pardaz Danesh Novin Arsham)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
-    $azad = ['website_w' => 'https://wtb.iau.ir/', 'website_c' => 'https://ctb.iau.ir/'];
+    $azad = ['website_w' => '', 'website_c' => ''];
     return [
         [
             'kind' => 'education', 'title' => 'Master of Science in Computer Engineering (software)', 'title_fa' => 'کارشناسی ارشد مهندسی کامپیوتر (گرایش نرم‌افزار)',
@@ -649,6 +649,20 @@ function run_baqer_major_migration(PDO $pdo): void {
         $update->execute([$row['id']]);
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BAQER_MAJOR_MIGRATION . "', '1')");
+}
+
+// Universities have no website link on the CV. Only the university rows are cleared; the logged previous values keep the links.
+const AZAD_WEBSITE_MIGRATION = 'migration_azad_website_v1';
+function run_azad_website_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . AZAD_WEBSITE_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare("UPDATE timeline SET website = '' WHERE id = ?");
+    foreach ($pdo->query("SELECT id, org, website FROM timeline WHERE kind = 'education' AND org LIKE 'Islamic Azad University%' AND TRIM(website) <> ''")->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        migration_log("azad website: timeline {$row['id']} ({$row['org']}): previous website " . json_encode($row['website'], JSON_UNESCAPED_UNICODE));
+        $update->execute([$row['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . AZAD_WEBSITE_MIGRATION . "', '1')");
 }
 
 // Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.
