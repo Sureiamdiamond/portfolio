@@ -504,6 +504,7 @@ if ($loggedIn) {
   html[dir="rtl"] body { font-family: Vazirmatn, system-ui, sans-serif; }
   body { font-family: system-ui, sans-serif; margin: 0; background: #eef4f8; color: #0f2a3d; }
   main { max-width: 860px; margin: 0 auto; padding: 16px; }
+  main.wide { max-width: 1320px; }
   nav { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 16px; }
   nav a, button { padding: 8px 12px; border-radius: 8px; border: 1px solid #9bb8c9; background: #fff; color: #0f2a3d; text-decoration: none; cursor: pointer; font: inherit; }
   nav a.on { background: #1a7fa8; color: #fff; border-color: #1a7fa8; }
@@ -518,8 +519,13 @@ if ($loggedIn) {
   .muted { color: #5b7385; font-size: 13px; }
   .swatches { display: flex; gap: 6px; margin: 8px 0; }
   .swatches span { width: 28px; height: 28px; border-radius: 8px; }
-  .frame-wrap { max-width: 100%; overflow: auto; }
-  .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+  .frame-wrap { max-width: 100%; display: flex; justify-content: center; }
+  .pv-toolbar { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 12px; }
+  .pv-toolbar button, .pv-toolbar a.button { white-space: nowrap; }
+  .pv-toolbar [aria-pressed="true"] { background: #1a7fa8; color: #fff; border-color: #1a7fa8; }
+  #t-frame { width: 100%; height: 640px; max-width: 100%; border: 1px solid #d6e4ec; border-radius: 10px; background: #fff; transition: width .2s ease; }
+  #t-frame.phone { width: 390px; }
+  .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.3fr); gap: 16px; align-items: start; }
   .preview { position: sticky; top: 8px; background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 10px rgba(15,42,61,.08); }
   .pv-card { border: 1px solid #d6e4ec; border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #0f1a2e; color: #e8f1f7; }
   .pv-pill { display: inline-block; margin: 0 0 8px; padding: 4px 10px; border-radius: 999px; background: #1f2d4a; font-size: 13px; }
@@ -537,7 +543,7 @@ if ($loggedIn) {
 <script>const ADMIN_T = <?= json_encode(['photo' => t('profile.photo_hint'), 'cv' => t('profile.cv_label'), 'kb' => 'KB', 'previewFailed' => t('theme.preview_failed')], JSON_HEX_TAG | JSON_UNESCAPED_UNICODE) ?>;</script>
 </head>
 <body>
-<main>
+<main class="<?= in_array($tab, ['theme', 'profile'], true) ? 'wide' : '' ?>">
 <?php if (!$loggedIn): ?>
   <nav class="lang-nav" aria-label="<?= e(t('lang.label')) ?>"><?= admin_lang_links() ?></nav>
   <h1><?= e(t('login.title')) ?></h1>
@@ -663,12 +669,12 @@ if ($loggedIn) {
     </form>
     <aside class="preview">
       <h3><?= e(t('theme.live')) ?></h3>
-      <p>
-        <button type="button" data-width="100%"><?= e(t('theme.desktop')) ?></button>
-        <button type="button" data-width="390px"><?= e(t('theme.phone')) ?></button>
+      <div class="pv-toolbar" role="group" aria-label="<?= e(t('theme.live')) ?>">
+        <button type="button" data-width="100%" aria-pressed="true"><?= e(t('theme.desktop')) ?></button>
+        <button type="button" data-width="390px" aria-pressed="false"><?= e(t('theme.phone')) ?></button>
         <a class="button" id="t-open" href="../index.php" target="_blank"><?= e(t('theme.open_tab')) ?></a>
-      </p>
-      <div class="frame-wrap"><iframe id="t-frame" title="<?= e(t('theme.frame_title')) ?>" src="../index.php?preview=none" style="width:100%;height:560px;border:1px solid #d6e4ec;border-radius:10px;background:#fff"></iframe></div>
+      </div>
+      <div class="frame-wrap"><iframe id="t-frame" title="<?= e(t('theme.frame_title')) ?>" src="../index.php?preview=none"></iframe></div>
       <p class="muted"><?= e(t('theme.help')) ?></p>
       <h3><?= e(t('theme.photo_card')) ?></h3>
       <div id="t-hero-mini" class="hero-mini"></div>
@@ -736,7 +742,12 @@ if ($loggedIn) {
         };
         form.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(update, 350); });
         form.addEventListener('change', () => { clearTimeout(timer); timer = setTimeout(update, 0); });
-        document.querySelectorAll('[data-width]').forEach((btn) => btn.addEventListener('click', () => { frame.style.width = btn.dataset.width; }));
+        // Desktop fills the preview column; phone is a centred 390px frame. The pressed button shows which one is active.
+        const sizeButtons = document.querySelectorAll('[data-width]');
+        sizeButtons.forEach((btn) => btn.addEventListener('click', () => {
+          frame.classList.toggle('phone', btn.dataset.width !== '100%');
+          sizeButtons.forEach((other) => other.setAttribute('aria-pressed', String(other === btn)));
+        }));
         update();
       })();
     </script>
