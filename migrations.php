@@ -361,16 +361,15 @@ Stac | | parent:Flutter
 Riverpod | | parent:Flutter
 AI | ai
 Claude | claude | parent:AI
-Codex | | parent:AI
-Antigravity | | parent:AI
-Grok | | parent:AI
+Codex | codex | parent:AI
+Antigravity | antigravity | parent:AI
+Grok | grok | parent:AI
 Git | git
-Http / Dio | | more
-GitHub | github | more
-GitLab | gitlab | more
-Figma | figma | more
-Jira | jira | more
-Firebase | firebase | more";
+GitHub | github
+GitLab | gitlab
+Figma | figma
+Jira | jira
+Firebase | firebase";
 
 // Same list for the Persian page: only the AI group name differs.
 const SKILLS_FA_LIST = "Dart | dart
@@ -382,16 +381,15 @@ Stac | | parent:Flutter
 Riverpod | | parent:Flutter
 هوش مصنوعی | ai
 Claude | claude | parent:هوش مصنوعی
-Codex | | parent:هوش مصنوعی
-Antigravity | | parent:هوش مصنوعی
-Grok | | parent:هوش مصنوعی
+Codex | codex | parent:هوش مصنوعی
+Antigravity | antigravity | parent:هوش مصنوعی
+Grok | grok | parent:هوش مصنوعی
 Git | git
-Http / Dio | | more
-GitHub | github | more
-GitLab | gitlab | more
-Figma | figma | more
-Jira | jira | more
-Firebase | firebase | more";
+GitHub | github
+GitLab | gitlab
+Figma | figma
+Jira | jira
+Firebase | firebase";
 
 function run_skills_migration(PDO $pdo): void {
     if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_MIGRATION . "'")->fetchColumn()) {
@@ -474,6 +472,21 @@ function run_project_icons_migration(PDO $pdo): void {
         $update->execute([PROJECT_ICONS[$slug], $id]);
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . PROJECT_ICONS_MIGRATION . "', '1')");
+}
+
+// Http / Dio removed, and the AI group gets its brand icons. Rewrites both skills lists; the previous values are logged, so the removed row can be restored from there.
+const SKILLS_HTTP_MIGRATION = 'migration_skills_v5';
+
+function run_skills_v5_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_HTTP_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('skills', 'skills_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('skills v5: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['skills', SKILLS_LIST]);
+    $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_HTTP_MIGRATION . "', '1')");
 }
 
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.

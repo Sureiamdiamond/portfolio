@@ -221,19 +221,9 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
         <h3 class="sub"><?= e(t('skills_languages', $lang)) ?></h3>
         <?php if ($skills): ?>
           <p class="skills-label"><?= e(t('skills', $lang)) ?></p>
-          <?php if ($skillGroups['visible']): ?>
-            <ul class="skill-grid">
-              <?php foreach ($skillGroups['visible'] as $group): ?><?= skill_card_html($group) ?><?php endforeach; ?>
-            </ul>
-          <?php endif; ?>
-          <?php if ($skillGroups['more']): ?>
-            <details class="skills-more">
-              <summary><span class="when-closed"><?= e(t('skills_more', $lang)) ?> <span class="count">(<?= count($skillGroups['more']) ?>)</span></span><span class="when-open"><?= e(t('skills_less', $lang)) ?></span></summary>
-              <ul class="skill-grid">
-                <?php foreach ($skillGroups['more'] as $group): ?><?= skill_card_html($group) ?><?php endforeach; ?>
-              </ul>
-            </details>
-          <?php endif; ?>
+          <ul class="skill-grid">
+            <?php foreach ($skillGroups as $group): ?><?= skill_card_html($group) ?><?php endforeach; ?>
+          </ul>
         <?php endif; ?>
         <?php if ($languages): ?>
           <p class="skills-label"><?= e(t('languages', $lang)) ?></p>

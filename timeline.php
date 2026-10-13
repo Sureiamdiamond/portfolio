@@ -33,7 +33,7 @@ function timeline_site(array $item, string $lang): string {
 
 /**
  * Skills as "name | icon key | parent:Name | more" lines. Entries without a brand icon get initials instead of a made-up logo.
- * "parent:" puts a skill inside its parent's expandable panel; "more" moves a top-level skill behind the More button.
+ * "parent:" puts a skill inside its parent's expandable panel.
  */
 function skill_items(string $text): array {
     $items = [];
@@ -43,12 +43,10 @@ function skill_items(string $text): array {
         if ($name === '') {
             continue;
         }
-        $item = ['name' => $name, 'icon' => strtolower($parts[1] ?? ''), 'parent' => '', 'more' => false];
+        $item = ['name' => $name, 'icon' => strtolower($parts[1] ?? ''), 'parent' => ''];
         foreach (array_slice($parts, 2) as $flag) {
             if (stripos($flag, 'parent:') === 0) {
                 $item['parent'] = trim(substr($flag, 7));
-            } elseif (strtolower($flag) === 'more') {
-                $item['more'] = true;
             }
         }
         $items[] = $item;
@@ -56,7 +54,7 @@ function skill_items(string $text): array {
     return $items;
 }
 
-/** Groups skills into top-level cards with their children, split into the visible ones and the ones behind More. A child whose parent is missing is shown as top-level. */
+/** Groups skills into top-level cards with their children. A child whose parent is missing is shown as top-level. */
 function skill_groups(array $items): array {
     $parents = [];
     foreach ($items as $item) {
@@ -71,15 +69,15 @@ function skill_groups(array $items): array {
             $children[$parent][] = $item;
         }
     }
-    $groups = ['visible' => [], 'more' => []];
+    $cards = [];
     foreach ($items as $item) {
         $parent = strtolower($item['parent']);
         if ($parent !== '' && isset($parents[$parent])) {
             continue;
         }
-        $groups[$item['more'] ? 'more' : 'visible'][] = ['item' => $item, 'children' => $children[strtolower($item['name'])] ?? []];
+        $cards[] = ['item' => $item, 'children' => $children[strtolower($item['name'])] ?? []];
     }
-    return $groups;
+    return $cards;
 }
 
 /** One skill card. A card with children becomes a native disclosure, so it works with keyboard and screen readers without script. */

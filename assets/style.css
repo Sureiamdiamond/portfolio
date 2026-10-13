@@ -611,7 +611,7 @@ html[lang="fa"] .skills-label { font-family: Vazirmatn, system-ui, sans-serif; l
 .skill-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 12px; margin: 0; background: none; border: 0; border-radius: 12px; color: inherit; font: inherit; text-align: start; cursor: pointer; }
 .skill-head::after { content: ""; margin-inline-start: auto; width: 7px; height: 7px; flex: none; border-inline-end: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .3s cubic-bezier(.2,.7,.2,1); }
 .skill-head[aria-expanded="true"]::after { transform: rotate(-135deg); }
-.skill-head:focus-visible, .skills-more > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.skill-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* Beside the card on the reading-direction end (inline-start is the right in RTL). Flipped: the other end. Reveal grows from the card side. */
 .skill-panel { position: absolute; top: -1px; z-index: 20; inset-inline-start: calc(100% + 8px); inset-inline-end: auto; min-width: 180px; margin: 0; padding: 10px; list-style: none; display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 14px 34px rgba(0, 0, 0, .14); visibility: hidden; opacity: 0; clip-path: inset(0 100% 0 0 round 14px); transition: clip-path .36s cubic-bezier(.2,.7,.2,1), opacity .24s ease, visibility 0s linear .36s; }
 html[dir="rtl"] .skill-panel { clip-path: inset(0 0 0 100% round 14px); }
@@ -632,17 +632,6 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 @media (prefers-reduced-motion: reduce) {
   .skill-panel, .skill-child, .skill-head::after { transition: none !important; }
 }
-.skills-more { margin-top: 14px; }
-.skills-more > summary { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border)); border-radius: 999px; background: color-mix(in srgb, var(--accent) 8%, transparent); color: var(--accent); font-weight: 600; cursor: pointer; list-style: none; }
-.skills-more > summary:hover { background: color-mix(in srgb, var(--accent) 16%, transparent); }
-.skills-more > summary .count { font-weight: 500; opacity: .8; }
-.skills-more > summary::after { content: ""; width: 6px; height: 6px; border-inline-end: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); margin-inline-start: 2px; transition: transform .3s cubic-bezier(.2,.7,.2,1); }
-.skills-more[open] > summary::after { transform: rotate(-135deg); }
-.skills-more > summary::-webkit-details-marker { display: none; }
-.skills-more > summary .when-open { display: none; }
-.skills-more[open] > summary .when-open { display: inline; }
-.skills-more[open] > summary .when-closed { display: none; }
-.skills-more .skill-grid { margin-top: 10px; }
 .loc { display: flex; align-items: center; gap: 6px; margin: 14px 0 0; color: var(--muted); font-size: .95rem; }
 .lang-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
 .lang-list li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
