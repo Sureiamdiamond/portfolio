@@ -132,6 +132,14 @@
     openFile(link);
   });
 
+  // On load the first project opens, with its README.md shown; its assets, android and ios folders stay closed.
+  const firstProject = tree.querySelector('li.it-project > details');
+  if (firstProject) {
+    firstProject.open = true;
+    const readme = Array.from(firstProject.querySelectorAll(':scope > ul.kids a.it.file')).find((a) => a.querySelector('.nm')?.textContent === 'README.md');
+    if (readme) openFile(readme);
+  }
+
   // Expand all / collapse all, and the mobile drawer
   win.querySelectorAll('[data-act]').forEach((btn) => {
     btn.addEventListener('click', () => {
