@@ -11,25 +11,32 @@ if (!is_file(__DIR__ . '/../config.php')) {
 $config = require __DIR__ . '/../config.php';
 $pdo = db();
 
-/** The admin password hash: the one changed from this panel if it exists, otherwise config.php. */
-function admin_hash(array $config): string {
+/** Default admin username, used until one is set from the Password tab. */
+const ADMIN_USERNAME = 'sureiamdiamond';
+
+/** Admin account: username and password hash. Kept in data/ once changed from the panel, otherwise config.php (old password still works). */
+function admin_account(array $config): array {
     $file = DATA_DIR . '/admin_hash.php';
     if (is_file($file)) {
         $saved = require $file;
         if (is_array($saved) && !empty($saved['admin_hash'])) {
-            return (string) $saved['admin_hash'];
+            return [
+                'username' => (string) ($saved['username'] ?? ADMIN_USERNAME),
+                'admin_hash' => (string) $saved['admin_hash'],
+            ];
         }
     }
-    return (string) $config['admin_hash'];
+    return ['username' => ADMIN_USERNAME, 'admin_hash' => (string) $config['admin_hash']];
 }
 
-/** Stores a new hash in data/, which deploys never overwrite and the web cannot read. */
-function save_admin_hash(string $hash): void {
+/** Stores the account in data/, which deploys never overwrite and the web cannot read. */
+function save_admin_account(string $username, string $hash): void {
     $file = DATA_DIR . '/admin_hash.php';
     $tmp = $file . '.tmp';
-    $body = "<?php\n// Written by the admin panel. Do not share this file.\nreturn ['admin_hash' => " . var_export($hash, true) . "];\n";
+    $body = "<?php\n// Written by the admin panel. Do not share this file.\nreturn ['username' => " . var_export($username, true)
+        . ", 'admin_hash' => " . var_export($hash, true) . "];\n";
     if (file_put_contents($tmp, $body, LOCK_EX) === false || !rename($tmp, $file)) {
-        throw new RuntimeException('The new password could not be saved. Check that the data folder is writable.');
+        throw new RuntimeException('The change could not be saved. Check that the data folder is writable.');
     }
     @chmod($file, 0600);
 }
@@ -95,7 +102,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 throw new RuntimeException('Too many wrong passwords. Try again in 15 minutes.');
             }
             usleep(500000); // slows down password guessing
-            if (password_verify($_POST['password'] ?? '', admin_hash($config))) {
+            $account = admin_account($config);
+            $typed = strtolower(trim((string) ($_POST['username'] ?? '')));
+            if (hash_equals(strtolower($account['username']), $typed) && password_verify((string) ($_POST['password'] ?? ''), $account['admin_hash'])) {
                 login_succeeded($ip);
                 session_regenerate_id(true);
                 $_SESSION['auth'] = true;
@@ -103,7 +112,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
             login_failed($ip);
-            $error = 'Wrong password.';
+            $error = 'Wrong username or password.';
         } elseif (empty($_SESSION['auth'])) {
             http_response_code(403);
             exit('Not logged in.');
@@ -123,7 +132,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     throw new RuntimeException('Too many wrong passwords. Try again in 15 minutes.');
                 }
                 $new = (string) ($_POST['new'] ?? '');
-                if (!password_verify((string) ($_POST['current'] ?? ''), admin_hash($config))) {
+                $account = admin_account($config);
+                if (!password_verify((string) ($_POST['current'] ?? ''), $account['admin_hash'])) {
                     login_failed($ip);
                     throw new RuntimeException('The current password is wrong.');
                 }
@@ -133,10 +143,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if (!hash_equals($new, (string) ($_POST['repeat'] ?? ''))) {
                     throw new RuntimeException('The two new passwords do not match.');
                 }
-                save_admin_hash(password_hash($new, PASSWORD_DEFAULT));
+                save_admin_account($account['username'], password_hash($new, PASSWORD_DEFAULT));
                 login_succeeded($ip);
                 session_regenerate_id(true);
                 header('Location: index.php?t=password&changed=1');
+                exit;
+            }
+
+            if ($action === 'username') {
+                $ip = (string) ($_SERVER['REMOTE_ADDR'] ?? '');
+                if (login_blocked($ip)) {
+                    throw new RuntimeException('Too many wrong passwords. Try again in 15 minutes.');
+                }
+                $account = admin_account($config);
+                if (!password_verify((string) ($_POST['current'] ?? ''), $account['admin_hash'])) {
+                    login_failed($ip);
+                    throw new RuntimeException('The current password is wrong.');
+                }
+                $username = strtolower(trim((string) ($_POST['username'] ?? '')));
+                if (!preg_match('/^[a-z0-9._-]{3,40}$/', $username)) {
+                    throw new RuntimeException('The username must be 3 to 40 characters: letters, digits, dot, dash or underscore.');
+                }
+                save_admin_account($username, $account['admin_hash']);
+                header('Location: index.php?t=password&renamed=1');
                 exit;
             }
 
@@ -411,8 +440,10 @@ if ($loggedIn) {
   <form method="post">
     <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
     <input type="hidden" name="action" value="login">
+    <label for="user">Username</label>
+    <input id="user" name="username" autocomplete="username" required autofocus>
     <label for="pw">Password</label>
-    <input id="pw" type="password" name="password" required autofocus>
+    <input id="pw" type="password" name="password" autocomplete="current-password" required>
     <p><button type="submit">Log in</button></p>
   </form>
 <?php else: ?>
@@ -447,6 +478,18 @@ if ($loggedIn) {
       <label for="pw-repeat">Repeat the new password</label>
       <input id="pw-repeat" type="password" name="repeat" autocomplete="new-password" minlength="12" required>
       <p><button type="submit">Change password</button></p>
+    </form>
+    <?php if (isset($_GET['renamed'])): ?><div class="msg">Username changed. Use it next time you log in.</div><?php endif; ?>
+    <form method="post" autocomplete="off">
+      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+      <input type="hidden" name="action" value="username">
+      <h2>Change username</h2>
+      <p class="muted">Current username: <strong><?= e(admin_account($config)['username']) ?></strong></p>
+      <label for="us-new">New username (3 to 40 characters: letters, digits, dot, dash, underscore)</label>
+      <input id="us-new" name="username" pattern="[A-Za-z0-9._-]{3,40}" required>
+      <label for="us-current">Current password</label>
+      <input id="us-current" type="password" name="current" autocomplete="current-password" required>
+      <p><button type="submit">Change username</button></p>
     </form>
   <?php elseif ($tab === 'profile'): ?>
     <div class="split">
