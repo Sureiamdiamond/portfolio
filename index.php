@@ -209,7 +209,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
               <figure class="pcard-shot"><img src="<?= e($shots[0]) ?>" alt="" loading="lazy"></figure>
             <?php endif; ?>
             <?= project_tile($p) ?>
-            <span class="tag"><?= e($p['kind']) ?></span>
             <h3><?= e(loc($p, 'title', $lang)) ?></h3>
             <p class="muted pcard-summary"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
             <?php $tags = array_filter(array_map('trim', explode(',', (string) $p['tags']))); ?>

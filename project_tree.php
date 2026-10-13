@@ -48,18 +48,14 @@ function project_generated_files(array $p, string $lang, string $slug): array {
     // Headings and labels follow the page language; the description is the project's text in that language
     $fa = $lang === 'fa';
     $h = $fa
-        ? ['kind' => 'نوع', 'stack' => 'فناوری‌ها', 'links' => 'لینک‌ها', 'nolinks' => 'هنوز لینکی ثبت نشده است.', 'nodesc' => 'توضیحی ثبت نشده است.',
-            'work' => 'کاری', 'academic' => 'دانشگاهی']
-        : ['kind' => 'Kind', 'stack' => 'Tech stack', 'links' => 'Links', 'nolinks' => 'No links yet.', 'nodesc' => 'No description yet.',
-            'work' => 'Work', 'academic' => 'Academic'];
+        ? ['stack' => 'فناوری‌ها', 'links' => 'لینک‌ها', 'nolinks' => 'هنوز لینکی ثبت نشده است.', 'nodesc' => 'توضیحی ثبت نشده است.']
+        : ['stack' => 'Tech stack', 'links' => 'Links', 'nolinks' => 'No links yet.', 'nodesc' => 'No description yet.'];
     $title = loc($p, 'title', $lang);
     $summary = trim(loc($p, 'summary', $lang));
     $tags = array_values(array_filter(array_map('trim', explode(',', (string) $p['tags']))));
     $links = project_links($p);
-    $kind = $h[$p['kind']] ?? $p['kind'];
 
     $readme = "# $title\n\n";
-    $readme .= "{$h['kind']}: $kind\n\n";
     $readme .= ($summary !== '' ? "$summary\n" : "{$h['nodesc']}\n");
     if ($tags) {
         $readme .= "\n## {$h['stack']}\n\n" . implode("\n", array_map(fn($t) => "- $t", $tags)) . "\n";
