@@ -357,7 +357,7 @@ Flutter | flutter
 GetX | getx | parent:Flutter
 Bloc | bloc | parent:Flutter
 SDUI | sdui | parent:Flutter
-Stac | | parent:Flutter
+Stac | stac | parent:Flutter
 Riverpod | | parent:Flutter
 Git | git
 GitHub | github
@@ -377,7 +377,7 @@ Flutter | flutter
 GetX | getx | parent:Flutter
 Bloc | bloc | parent:Flutter
 SDUI | sdui | parent:Flutter
-Stac | | parent:Flutter
+Stac | stac | parent:Flutter
 Riverpod | | parent:Flutter
 Git | git
 GitHub | github
@@ -532,6 +532,21 @@ function run_languages_panel_migration(PDO $pdo): void {
     $stmt->execute(['languages', "English | Advanced (C1)\nCAE | | parent:English\nTTC | | parent:English"]);
     $stmt->execute(['languages_fa', "انگلیسی | پیشرفته (C1)\nCAE | | parent:انگلیسی\nTTC | | parent:انگلیسی"]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LANGUAGES_PANEL_MIGRATION . "', '1')");
+}
+
+// Stac gets its logo mark. Rewrites both skills lists; the previous values are logged.
+const SKILLS_STAC_MIGRATION = 'migration_skills_v8';
+
+function run_skills_v8_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_STAC_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('skills', 'skills_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('skills v8: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['skills', SKILLS_LIST]);
+    $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_STAC_MIGRATION . "', '1')");
 }
 
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
