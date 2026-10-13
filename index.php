@@ -183,7 +183,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
             $career = $label === 'experience';
             $current = $career && str_contains(strtolower((string) $item['period']), 'now');
           ?>
-            <li class="tl-item<?= $career ? ' reveal' : '' ?><?= $current ? ' is-current' : '' ?>"<?= $career ? ' style="--dot-o: ' . timeline_dot_opacity($index) . '"' : '' ?>>
+            <li class="tl-item<?= $career ? ' reveal' : '' ?><?= $current ? ' is-current' : '' ?>"<?= $career ? ' style="--dot-o: ' . timeline_dot_opacity(count($items) - 1 - $index) . '"' : '' ?>>
               <article class="tl-card">
                 <?= org_tile($item, $lang) ?>
                 <div class="tl-body">

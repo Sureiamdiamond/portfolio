@@ -579,7 +579,7 @@ html[data-motion="off"][data-glass="on"] .btn:hover, html[data-motion="off"][dat
 .timeline ol.tl.tl-career { position: relative; padding-inline-start: 34px; }
 .tl-career::before {
   content: ""; position: absolute; inset-block: 16px 16px; inset-inline-start: 8px; width: 2px; border-radius: 2px;
-  background: linear-gradient(180deg, var(--accent), #4D7CFF 70%, color-mix(in srgb, #4D7CFF 15%, transparent));
+  background: linear-gradient(180deg, var(--accent) 0%, color-mix(in srgb, var(--accent) 50%, transparent) 55%, color-mix(in srgb, var(--accent) 20%, transparent) 100%);
 }
 .tl-career .tl-item { position: relative; }
 .tl-career .tl-item::before {
