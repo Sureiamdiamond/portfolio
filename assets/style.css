@@ -147,7 +147,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 @keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
 /* Timeline */
-.timeline h3.sub { margin: 36px 0 10px; padding-bottom: 8px; border-bottom: 1px solid var(--border); font: 600 1.15rem var(--sans); color: var(--fg); }
+.timeline h3.sub { margin: 36px 0 34px; padding-bottom: 8px; border-bottom: 1px solid var(--border); font: 600 1.15rem var(--sans); color: var(--fg); }
 .node {
   padding: 20px 22px; margin: 12px 0; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--border);
   border-inline-start: 3px solid var(--accent);
