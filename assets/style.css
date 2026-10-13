@@ -579,7 +579,7 @@ html[data-motion="off"][data-glass="on"] .btn:hover, html[data-motion="off"][dat
    Logical properties keep the spacing right in Persian (RTL) as well as English. */
 .timeline ol.tl { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
 .tl-card {
-  display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 20px; align-items: start;
+  display: grid; grid-template-columns: 80px minmax(0, 1fr); gap: 20px; align-items: center;
   padding: 18px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface);
 }
 /* Logos are bare images, sized by height and kept at their own proportions. */
