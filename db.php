@@ -80,6 +80,7 @@ function db(): PDO {
     run_skills_v9_migration($pdo);
     run_project_icons_migration($pdo);
     run_ipaam_migration($pdo);
+    run_ipaam_order_migration($pdo);
     run_timeline_logos_migration($pdo);
     return $pdo;
 }

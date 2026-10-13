@@ -298,7 +298,7 @@ function cv_timeline_rows(): array {
         "زبان‌ها و فریم‌ورک‌ها: Dart، Flutter\nمدیریت وضعیت: BLoC، GetX؛ استفاده از Freezed برای مدل‌سازی داده و مدیریت ایونت‌ها و استیت‌ها\nمعماری نرم‌افزار: MVP، Clean Architecture، MVVM\nپروژه SDUI\nارتباط با سرور: کار با Dio و HTTP برای API Integration\nتم و ظاهر اپلیکیشن: پیاده‌سازی تم‌های پویا و سفارشی‌سازی کامل UI\nرابط کاربری: تبدیل طراحی‌های Figma به UI واکنش‌گرا\nچندزبانه‌سازی اپلیکیشن: تجربه در پیاده‌سازی Localization\nابزارهای تیمی و مدیریتی: Jira، Git (GitHub/GitLab)\nتوسعه تیمی: آشنایی با متدولوژی Agile و کار گروهی",
         "Languages and frameworks: Dart, Flutter\nState management: BLoC and GetX, with Freezed for data models and events and states\nSoftware architecture: MVP, Clean Architecture, MVVM\nSDUI project\nServer communication: Dio and HTTP for API integration\nApp theming: dynamic themes and full UI customisation\nUI: turning Figma designs into responsive UI\nLocalisation: experience implementing multi-language apps\nTeam tools: Jira, Git (GitHub and GitLab)\nTeamwork: familiar with Agile and group work",
     ];
-    $ipam = ['org' => 'شرکت دانش‌بنیان ایده‌پرداز دانش نوین آرشام (ایپاام)', 'org_en' => 'Ideh Pardaz Danesh Novin Arsham (IPAAM)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
+    $ipam = ['org' => 'ایپاام (ایده‌پرداز دانش نوین ارشم)', 'org_en' => 'IPAAM (Ideh Pardaz Danesh Novin Arsham)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
     $azad = ['website_w' => 'https://wtb.iau.ir/', 'website_c' => 'https://ctb.iau.ir/'];
     return [
         [
@@ -547,12 +547,32 @@ function run_ipaam_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_MIGRATION . "', '1')");
 }
 
-// Logos for the workplace and both universities, matched by organisation name. Previous logo values are logged.
-const TIMELINE_LOGOS_MIGRATION = 'migration_timeline_logos_v1';
+// Workplace name reads "IPAAM (full name)", short name first, in both languages. Changed rows are logged with their previous values.
+const IPAAM_ORDER_MIGRATION = 'migration_ipaam_order_v1';
+
+function run_ipaam_order_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . IPAAM_ORDER_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare('UPDATE timeline SET org = ?, org_fa = ? WHERE id = ?');
+    foreach ($pdo->query('SELECT id, org, org_fa FROM timeline')->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        $org = (string) $row['org'] === 'Ideh Pardaz Danesh Novin Arsham (IPAAM)' ? 'IPAAM (Ideh Pardaz Danesh Novin Arsham)' : (string) $row['org'];
+        $orgFa = str_contains((string) $row['org_fa'], 'دانش نوین') ? 'ایپاام (ایده‌پرداز دانش نوین ارشم)' : (string) $row['org_fa'];
+        if ($org !== (string) $row['org'] || $orgFa !== (string) $row['org_fa']) {
+            migration_log("ipaam order: timeline {$row['id']} previous org " . json_encode([$row['org'], $row['org_fa']], JSON_UNESCAPED_UNICODE));
+            $update->execute([$org, $orgFa, $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_ORDER_MIGRATION . "', '1')");
+}
+
+// Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.
+const TIMELINE_LOGOS_MIGRATION = 'migration_timeline_logos_v2';
 const TIMELINE_LOGOS = [
-    'Ideh Pardaz Danesh Novin Arsham (IPAAM)' => 'assets/img/timeline/ipaam.webp',
+    'IPAAM (Ideh Pardaz Danesh Novin Arsham)' => 'assets/img/timeline/ipaam.webp',
     'Islamic Azad University, Central Tehran Branch' => 'assets/img/timeline/iau-ctb.png',
     'Islamic Azad University, West Tehran Branch' => 'assets/img/timeline/iau-west.png',
+    'Codeyad' => 'assets/img/timeline/codeyad.png',
 ];
 
 function run_timeline_logos_migration(PDO $pdo): void {
