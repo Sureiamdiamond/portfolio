@@ -164,20 +164,6 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 .node-edu strong { font-size: 1.15rem; }
 .node-edu .period { font-size: .9rem; font-weight: 600; }
 .node-exp strong { font-size: 1.05rem; }
-/* Hand-drawn splash around the hero portrait: cream shapes with dark outlines, drifting slowly. Behind the chips, over the photo's edges only. */
-.splash { --sp-fill: #FFF8EC; --sp-line: #111318; position: absolute; left: 50%; top: 50%; width: min(420px, 116%); height: auto; aspect-ratio: 4 / 5; transform: translate(-50%, -50%); z-index: 2; pointer-events: none; overflow: visible; }
-@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) .splash { --sp-fill: #34497A; --sp-line: #DDE6FF; } }
-html[data-theme="dark"] .splash { --sp-fill: #34497A; --sp-line: #DDE6FF; }
-.splash path { fill: var(--sp-fill); stroke: var(--sp-line); stroke-width: 3; stroke-linejoin: round; stroke-linecap: round; }
-.splash path.hl { fill: none; }
-.sp { transform-box: fill-box; transform-origin: center; animation: sp-float 9s ease-in-out infinite; }
-.sp-2 { animation-duration: 11s; animation-delay: -3s; }
-.sp-3 { animation-duration: 8s; animation-delay: -5s; }
-.sp-4 { animation-duration: 12s; animation-delay: -2s; }
-.sp-5 { animation-duration: 10s; animation-delay: -6s; }
-@keyframes sp-float { 0%, 100% { transform: translate(0, 0) rotate(0deg); } 50% { transform: translate(3px, -6px) rotate(2deg); } }
-@media (max-width: 760px) { .splash { width: 100%; } }
-@media (prefers-reduced-motion: reduce) { .sp { animation: none; } }
 /* Floating CV button: appears after the hero, bottom-right; visible without JS */
 .cv-fab {
   position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 20;
