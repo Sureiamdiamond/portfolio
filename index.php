@@ -186,7 +186,10 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
                 <?= org_tile($item, $lang) ?>
                 <div class="tl-body">
                   <p class="tl-org"><?= e(loc($item, 'org', $lang)) ?></p>
-                  <h4 class="tl-role"><?= e(loc($item, 'title', $lang)) ?></h4>
+                  <div class="tl-head">
+                    <h4 class="tl-role"><?= e(loc($item, 'title', $lang)) ?></h4>
+                    <?= timeline_site($item, $lang) ?>
+                  </div>
                   <p class="tl-meta">
                     <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
                     <?php if (trim(loc($item, 'city', $lang)) !== ''): ?><span class="tl-city"><?= e(loc($item, 'city', $lang)) ?></span><?php endif; ?>
@@ -202,7 +205,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
                         <p class="tl-details"><?= nl2br(e(loc($item, 'details', $lang))) ?></p>
                       <?php endif;
                     endif; ?>
-                  <?= timeline_site($item, $lang) ?>
                 </div>
               </article>
             </li>
