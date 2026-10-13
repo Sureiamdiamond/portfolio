@@ -328,7 +328,7 @@ function cv_timeline_rows(): array {
         [
             'kind' => 'experience', 'title' => 'Intern (Codeyad project-based course)', 'title_fa' => 'کاراموز (دوره پروژه‌محور کدیاد)',
             'org' => 'Codeyad', 'org_fa' => 'کدیاد', 'city' => 'Tehran', 'city_fa' => 'تهران',
-            'period' => 'Apr 2023 – Nov 2023', 'period_fa' => 'اردیبهشت ۱۴۰۲ – آبان ۱۴۰۲',
+            'period' => 'Apr 2023 – Aug 2023', 'period_fa' => 'اردیبهشت ۱۴۰۲ – مرداد ۱۴۰۲',
             'website' => 'https://codeyad.com/', 'details' => '', 'details_fa' => '', 'bullets' => $bullets[1], 'bullets_fa' => $bullets[0], 'sort' => 3,
         ],
     ];
@@ -564,6 +564,23 @@ function run_ipaam_order_migration(PDO $pdo): void {
         }
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_ORDER_MIGRATION . "', '1')");
+}
+
+// The Codeyad internship ends in Mordad 1402 (Aug 2023), not Aban 1402 (Nov 2023). Only the exact old values are changed.
+const CODEYAD_PERIOD_MIGRATION = 'migration_codeyad_period_v1';
+function run_codeyad_period_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CODEYAD_PERIOD_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare('UPDATE timeline SET period = ?, period_fa = ? WHERE id = ?');
+    $old = ['Apr 2023 – Nov 2023', 'اردیبهشت ۱۴۰۲ – آبان ۱۴۰۲'];
+    foreach ($pdo->query('SELECT id, period, period_fa FROM timeline WHERE org = \'Codeyad\'')->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        if ([(string) $row['period'], (string) $row['period_fa']] === $old) {
+            migration_log("codeyad period: timeline {$row['id']} previous period " . json_encode([$row['period'], $row['period_fa']], JSON_UNESCAPED_UNICODE));
+            $update->execute(['Apr 2023 – Aug 2023', 'اردیبهشت ۱۴۰۲ – مرداد ۱۴۰۲', $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CODEYAD_PERIOD_MIGRATION . "', '1')");
 }
 
 // Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.
