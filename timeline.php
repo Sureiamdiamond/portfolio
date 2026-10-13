@@ -104,14 +104,41 @@ function skill_card_html(array $group): string {
         . '<ul class="skill-panel" id="' . $panelId . '">' . $list . '</ul></li>';
 }
 
-/** Languages as "language | level" lines. */
+/** Languages as "language | level" lines. A certificate or other sub-item is "name | | parent:Language" and sits in that language's panel. */
 function language_items(string $text): array {
     $items = [];
     foreach (preg_split('/\R/u', $text) ?: [] as $line) {
-        [$name, $level] = array_pad(array_map('trim', explode('|', $line, 2)), 2, '');
-        if ($name !== '') {
-            $items[] = ['name' => $name, 'level' => $level];
+        $parts = array_map('trim', explode('|', $line));
+        $name = $parts[0];
+        if ($name === '') {
+            continue;
         }
+        $item = ['name' => $name, 'level' => '', 'parent' => '', 'icon' => ''];
+        foreach (array_slice($parts, 1) as $part) {
+            if (stripos($part, 'parent:') === 0) {
+                $item['parent'] = trim(substr($part, 7));
+            } elseif ($part !== '' && $item['level'] === '') {
+                $item['level'] = $part;
+            }
+        }
+        $items[] = $item;
     }
     return $items;
+}
+
+/** One language card. A language with sub-items opens a panel with them, the same way as a skill group. */
+function language_card_html(array $group): string {
+    $item = $group['item'];
+    $text = '<span class="lang-text"><span class="lang-name">' . e($item['name']) . '</span>'
+        . ($item['level'] !== '' ? '<span class="lang-level">' . e($item['level']) . '</span>' : '') . '</span>';
+    if (!$group['children']) {
+        return '<li class="skill lang-card">' . $text . '</li>';
+    }
+    $panelId = 'lang-panel-' . substr(md5($item['name']), 0, 8);
+    $list = '';
+    foreach ($group['children'] as $index => $child) {
+        $list .= '<li class="skill-child" style="--i:' . $index . '"><span>' . e($child['name']) . '</span></li>';
+    }
+    return '<li class="skill skill-parent lang-card"><button type="button" class="skill-head" aria-expanded="false" aria-controls="' . $panelId . '">' . $text . '</button>'
+        . '<ul class="skill-panel" id="' . $panelId . '">' . $list . '</ul></li>';
 }

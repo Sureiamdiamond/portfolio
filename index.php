@@ -214,6 +214,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       $skills = skill_items(loc($profile, 'skills', $lang));
       $skillGroups = skill_groups($skills);
       $languages = language_items(loc($profile, 'languages', $lang));
+      $languageGroups = skill_groups($languages);
       $location = loc($profile, 'location', $lang);
     ?>
     <?php if ($skills || $languages): ?>
@@ -227,10 +228,8 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
         <?php endif; ?>
         <?php if ($languages): ?>
           <p class="skills-label"><?= e(t('languages', $lang)) ?></p>
-          <ul class="lang-list">
-            <?php foreach ($languages as $language): ?>
-              <li><strong><?= e($language['name']) ?></strong><?php if ($language['level'] !== ''): ?> <span class="muted"><?= e($language['level']) ?></span><?php endif; ?></li>
-            <?php endforeach; ?>
+          <ul class="skill-grid">
+            <?php foreach ($languageGroups as $group): ?><?= language_card_html($group) ?><?php endforeach; ?>
           </ul>
         <?php endif; ?>
       </div>

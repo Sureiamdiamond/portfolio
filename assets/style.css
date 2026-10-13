@@ -641,5 +641,7 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
   .skill-panel, .skill-child, .skill-head::after { transition: none !important; }
 }
 .loc { display: flex; align-items: center; gap: 6px; margin: 14px 0 0; color: var(--muted); font-size: .95rem; }
-.lang-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
-.lang-list li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: baseline; }
+.lang-card .skill-head, .lang-card { min-height: 48px; }
+.lang-text { display: flex; flex-direction: column; gap: 2px; text-align: start; }
+.lang-name { font-weight: 600; }
+.lang-level { font-size: .85rem; color: var(--muted); }

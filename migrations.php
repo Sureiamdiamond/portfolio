@@ -519,6 +519,21 @@ function run_skills_v7_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_ORDER_MIGRATION . "', '1')");
 }
 
+// English becomes a panel with CAE and TTC as sub-items. Rewrites both language fields; the previous values are logged.
+const LANGUAGES_PANEL_MIGRATION = 'migration_languages_v2';
+
+function run_languages_panel_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . LANGUAGES_PANEL_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('languages', 'languages_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('languages v2: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['languages', "English | Advanced (C1)\nCAE | | parent:English\nTTC | | parent:English"]);
+    $stmt->execute(['languages_fa', "انگلیسی | پیشرفته (C1)\nCAE | | parent:انگلیسی\nTTC | | parent:انگلیسی"]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LANGUAGES_PANEL_MIGRATION . "', '1')");
+}
+
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
 const LOCATION_LANGUAGES_MIGRATION = 'migration_location_langs_v1';
 
