@@ -622,6 +622,21 @@ function run_techblog_github_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_GITHUB_MIGRATION . "', '1')");
 }
 
+// High-school diploma from Baqer al-Oloum High School, added below the two university entries. Only the name, the diploma title and the logo are known; dates, field and location are left empty for the owner to fill in on /admin.
+const BAQER_DIPLOMA_MIGRATION = 'migration_baqer_diploma_v1';
+function run_baqer_diploma_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . BAQER_DIPLOMA_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    if (!$pdo->query("SELECT 1 FROM timeline WHERE org = 'Baqer al-Oloum High School'")->fetchColumn()) {
+        $pdo->prepare("INSERT INTO timeline (kind, title, title_fa, org, org_fa, city, city_fa, period, period_fa, website, details, details_fa, bullets, bullets_fa, logo, sort)
+            VALUES ('education', 'High School Diploma', 'دیپلم', 'Baqer al-Oloum High School', 'دبیرستان باقرالعلوم', '', '', '', '', '', '', '', '', '', ?, 3)")
+            ->execute([TIMELINE_LOGOS['Baqer al-Oloum High School']]);
+        migration_log('baqer diploma: timeline entry added');
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BAQER_DIPLOMA_MIGRATION . "', '1')");
+}
+
 // Logos for the workplace, both universities and Codeyad, matched by organisation name. Previous logo values are logged.
 const TIMELINE_LOGOS_MIGRATION = 'migration_timeline_logos_v2';
 const TIMELINE_LOGOS = [
@@ -629,6 +644,7 @@ const TIMELINE_LOGOS = [
     'Islamic Azad University, Central Tehran Branch' => 'assets/img/timeline/iau-ctb.png',
     'Islamic Azad University, West Tehran Branch' => 'assets/img/timeline/iau-west.png',
     'Codeyad' => 'assets/img/timeline/codeyad.png',
+    'Baqer al-Oloum High School' => 'assets/img/timeline/baqer.svg',
 ];
 
 function run_timeline_logos_migration(PDO $pdo): void {

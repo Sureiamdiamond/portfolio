@@ -189,11 +189,13 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
                 <div class="tl-body">
                   <p class="tl-org"><?= e(loc($item, 'org', $lang)) ?></p>
                   <h4 class="tl-role"><?= e(loc($item, 'title', $lang)) ?></h4>
+                  <?php if (trim(loc($item, 'period', $lang)) !== '' || trim(loc($item, 'city', $lang)) !== '' || trim((string) $item['website']) !== ''): ?>
                   <p class="tl-meta">
                     <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
                     <?php if (trim(loc($item, 'city', $lang)) !== ''): ?><span class="tl-city"><?= e(loc($item, 'city', $lang)) ?></span><?php endif; ?>
                     <?= timeline_site($item, $lang) ?>
                   </p>
+                  <?php endif; ?>
                   <?php // Workplaces show only organisation, position and years; education can also show its major and points
                     if ($label === 'education'):
                       $bullets = timeline_bullets($item, $lang);
