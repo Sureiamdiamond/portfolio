@@ -81,10 +81,10 @@ const TYPES = [
     'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'sort'], 'long' => ['summary', 'summary_fa'], 'files' => []],
     'papers' => ['label' => 'Research', 'fields' => ['title', 'title_fa', 'venue', 'year', 'doi', 'sort'], 'long' => [], 'files' => ['pdf']],
     'presentations' => ['label' => 'Slides', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
-    'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'period', 'period_fa', 'details', 'details_fa', 'sort'], 'long' => ['details', 'details_fa'], 'files' => []],
+    'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'city', 'city_fa', 'period', 'period_fa', 'website', 'bullets', 'bullets_fa', 'details', 'details_fa', 'sort'], 'long' => ['bullets', 'bullets_fa', 'details', 'details_fa'], 'files' => []],
 ];
-const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'linkedin', 'github', 'meta_description', 'footer_text'];
-const PROFILE_LONG = ['about', 'about_fa', 'meta_description'];
+const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'linkedin', 'github', 'skills', 'languages', 'meta_description', 'footer_text'];
+const PROFILE_LONG = ['about', 'about_fa', 'skills', 'languages', 'meta_description'];
 // Sections of the public page that can be hidden; stored as '1' (shown) or '0' (hidden)
 const SECTION_SWITCHES = [
     'show_journey' => 'Education & experience',
@@ -284,6 +284,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($path = save_upload('file_' . $ext, $ext)) {
                         $data[$ext] = $path;
                     }
+                }
+                // Education and experience entries can have a logo; without one the site shows initials
+                if ($type === 'timeline' && ($logo = save_file_upload('file_logo', ['png', 'webp', 'jpg', 'jpeg']))) {
+                    if ($id > 0) {
+                        $old = $pdo->prepare('SELECT logo FROM timeline WHERE id = ?');
+                        $old->execute([$id]);
+                        remove_upload($old->fetchColumn() ?: null);
+                    }
+                    $data['logo'] = $logo['path'];
                 }
                 // Projects can have their own icon; without one the site shows a generated tile
                 if ($type === 'projects' && ($icon = save_file_upload('file_icon', ['png', 'webp', 'jpg', 'jpeg']))) {
@@ -1040,6 +1049,11 @@ if ($loggedIn) {
         <input id="f-<?= $ext ?>" type="file" name="file_<?= $ext ?>" accept=".<?= $ext ?>">
         <p class="muted"><?= e(t('common.current')) ?>: <?= !empty($edit[$ext]) ? e($edit[$ext]) : e(t('common.none')) ?></p>
       <?php endforeach; ?>
+      <?php if ($tab === 'timeline'): ?>
+        <label for="f-logo"><?= e(t('item.logo')) ?></label>
+        <input id="f-logo" type="file" name="file_logo" accept=".png,.webp,.jpg,.jpeg">
+        <p class="muted"><?= e(t('common.current')) ?>: <?= !empty($edit['logo']) ? e($edit['logo']) : e(t('common.none')) ?></p>
+      <?php endif; ?>
       <?php if ($tab === 'projects'): ?>
         <label for="f-icon"><?= e(t('item.icon')) ?></label>
         <input id="f-icon" type="file" name="file_icon" accept=".png,.webp,.jpg,.jpeg">

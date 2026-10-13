@@ -47,7 +47,7 @@ function db(): PDO {
         'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'icon'],
         'papers' => ['title_fa'],
         'presentations' => ['title_fa'],
-        'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa'],
+        'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa', 'city', 'city_fa', 'website', 'logo', 'bullets', 'bullets_fa'],
     ];
     foreach ($persianColumns as $table => $columns) {
         $existing = array_column($pdo->query("PRAGMA table_info($table)")->fetchAll(), 'name');

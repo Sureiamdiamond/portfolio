@@ -13,6 +13,8 @@ foreach ($pdo->query('SELECT k, v FROM profile') as $row) {
 }
 // Theme: the published settings, or the draft when the admin's preview link is used
 require_once __DIR__ . '/theme.php';
+require_once __DIR__ . '/timeline.php';
+require_once __DIR__ . '/skill_icons.php';
 $themeSettings = theme_published($pdo);
 $isPreview = false;
 $previewToken = (string) ($_GET['preview'] ?? '');
@@ -173,16 +175,62 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     <div class="timeline">
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
         <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
-        <?php foreach ($items as $item): ?>
-          <div class="node node-<?= $label === 'education' ? 'edu' : 'exp' ?>">
-            <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
-            <strong><?= e(loc($item, 'title', $lang)) ?></strong>
-            <?php if ($item['org'] || $item['org_fa']): ?><span class="muted"><?= e(loc($item, 'org', $lang)) ?></span><?php endif; ?>
-            <?php if ($item['details'] || $item['details_fa']): ?><p><?= nl2br(e(loc($item, 'details', $lang))) ?></p><?php endif; ?>
-          </div>
-        <?php endforeach; ?>
+        <ol class="tl">
+          <?php foreach ($items as $item): ?>
+            <li class="tl-item">
+              <article class="tl-card">
+                <?= org_tile($item, $lang) ?>
+                <div class="tl-body">
+                  <p class="tl-org"><?= e(loc($item, 'org', $lang)) ?></p>
+                  <h4 class="tl-role"><?= e(loc($item, 'title', $lang)) ?></h4>
+                  <p class="tl-meta">
+                    <span class="period"><?= e(loc($item, 'period', $lang)) ?></span>
+                    <?php if (trim(loc($item, 'city', $lang)) !== ''): ?><span class="tl-city"><?= e(loc($item, 'city', $lang)) ?></span><?php endif; ?>
+                  </p>
+                  <?php $bullets = timeline_bullets($item, $lang); ?>
+                  <?php if ($bullets): ?>
+                    <ul class="tl-bullets">
+                      <?php foreach ($bullets as $b): ?><li><?= e($b) ?></li><?php endforeach; ?>
+                    </ul>
+                  <?php elseif (trim(loc($item, 'details', $lang)) !== ''): ?>
+                    <p class="tl-details"><?= nl2br(e(loc($item, 'details', $lang))) ?></p>
+                  <?php endif; ?>
+                  <?= timeline_site($item, $lang) ?>
+                </div>
+              </article>
+            </li>
+          <?php endforeach; ?>
+        </ol>
       <?php endforeach; ?>
     </div>
+    <?php
+      $skills = skill_items((string) ($profile['skills'] ?? ''));
+      $languages = language_items((string) ($profile['languages'] ?? ''));
+    ?>
+    <?php if ($skills || $languages): ?>
+      <div class="skills-langs">
+        <h3 class="sub"><?= e(t('skills_languages', $lang)) ?></h3>
+        <?php if ($skills): ?>
+          <p class="skills-label"><?= e(t('skills', $lang)) ?></p>
+          <ul class="skill-grid">
+            <?php foreach ($skills as $skill): $svg = skill_icon_svg($skill['icon']); ?>
+              <li class="skill">
+                <?php if ($svg !== null): ?><span class="skill-icon"><?= $svg ?></span><?php else: ?><span class="skill-icon skill-initials" aria-hidden="true"><?= e(mb_strtoupper(mb_substr($skill['name'], 0, 2))) ?></span><?php endif; ?>
+                <span><?= e($skill['name']) ?></span>
+              </li>
+            <?php endforeach; ?>
+          </ul>
+        <?php endif; ?>
+        <?php if ($languages): ?>
+          <p class="skills-label"><?= e(t('languages', $lang)) ?></p>
+          <ul class="lang-list">
+            <?php foreach ($languages as $language): ?>
+              <li><strong><?= e($language['name']) ?></strong><?php if ($language['level'] !== ''): ?> <span class="muted"><?= e($language['level']) ?></span><?php endif; ?></li>
+            <?php endforeach; ?>
+          </ul>
+        <?php endif; ?>
+      </div>
+    <?php endif; ?>
   </section>
 <?php endif; ?>
 
