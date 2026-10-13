@@ -606,6 +606,13 @@ if ($loggedIn) {
         <?php endforeach; ?>
       </select>
       <label class="check"><input type="checkbox" name="theme_motion" value="on" <?= $current['theme_motion'] === 'on' ? 'checked' : '' ?>> <?= e(t('theme.motion')) ?></label>
+      <label class="check"><input type="checkbox" name="theme_glass" value="on" <?= $current['theme_glass'] === 'on' ? 'checked' : '' ?>> <?= e(t('theme.glass')) ?></label>
+      <label for="t-glass-intensity"><?= e(t('theme.glass_intensity')) ?></label>
+      <select id="t-glass-intensity" name="theme_glass_intensity">
+        <?php foreach (['soft' => t('theme.glass_soft'), 'medium' => t('theme.glass_medium'), 'strong' => t('theme.glass_strong')] as $key => $label): ?>
+          <option value="<?= $key ?>" <?= $current['theme_glass_intensity'] === $key ? 'selected' : '' ?>><?= e($label . marker($key, $current['theme_glass_intensity'], 'medium')) ?></option>
+        <?php endforeach; ?>
+      </select>
       <h2><?= e(t('theme.bg_heading')) ?></h2>
       <label for="t-bg-preset"><?= e(t('theme.bg_preset')) ?></label>
       <select id="t-bg-preset" name="theme_bg_preset">
@@ -700,6 +707,7 @@ if ($loggedIn) {
           const body = new FormData(form);
           body.set('action', 'theme_draft');
           body.set('theme_motion', form.theme_motion.checked ? 'on' : 'off');
+          body.set('theme_glass', form.theme_glass.checked ? 'on' : 'off');
           body.set('theme_bg_clear', bgClear.checked ? '1' : '');
           fetch('index.php?t=theme', { method: 'POST', body, headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' })
             .then((r) => r.json().then((data) => ({ ok: r.ok, data })).catch(() => ({ ok: false, data: {} })))

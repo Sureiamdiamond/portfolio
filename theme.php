@@ -30,13 +30,20 @@ const HERO_PRESETS = [
 ];
 const HERO_TYPES = ['radial', 'linear', 'mesh', 'solid'];
 const HERO_PATTERNS = ['none', 'dots', 'grid', 'noise'];
+/** Liquid glass buttons: fill opacity and backdrop blur for each intensity. */
+const THEME_GLASS = [
+    'soft' => ['alpha' => '0.35', 'blur' => '10px'],
+    'medium' => ['alpha' => '0.55', 'blur' => '16px'],
+    'strong' => ['alpha' => '0.75', 'blur' => '24px'],
+];
 
 function theme_defaults(): array {
     return ['theme_preset' => 'electric', 'theme_primary' => '#0052FF', 'theme_accent' => '#4D7CFF',
         'theme_radius' => 'soft', 'theme_density' => 'comfortable', 'theme_motion' => 'on', 'theme_mode' => 'system',
         'theme_bg_preset' => 'blue', 'theme_bg_type' => 'radial', 'theme_bg_c1' => '#4D7CFF', 'theme_bg_c2' => '#0052FF',
         'theme_bg_c3' => '#0A2A8C', 'theme_bg_angle' => '135', 'theme_bg_x' => '50', 'theme_bg_y' => '42',
-        'theme_bg_pattern' => 'none', 'theme_bg_image' => ''];
+        'theme_bg_pattern' => 'none', 'theme_bg_image' => '',
+        'theme_glass' => 'on', 'theme_glass_intensity' => 'medium'];
 }
 
 /** Keeps only valid values; anything else falls back to the default. */
@@ -60,6 +67,8 @@ function theme_clean(array $in): array {
         'theme_bg_x' => (string) max(0, min(100, (int) ($in['theme_bg_x'] ?? $d['theme_bg_x']))),
         'theme_bg_y' => (string) max(0, min(100, (int) ($in['theme_bg_y'] ?? $d['theme_bg_y']))),
         'theme_bg_pattern' => in_array($in['theme_bg_pattern'] ?? '', HERO_PATTERNS, true) ? (string) $in['theme_bg_pattern'] : $d['theme_bg_pattern'],
+        'theme_glass' => ($in['theme_glass'] ?? '') === 'on' ? 'on' : 'off',
+        'theme_glass_intensity' => array_key_exists($in['theme_glass_intensity'] ?? '', THEME_GLASS) ? (string) $in['theme_glass_intensity'] : $d['theme_glass_intensity'],
         'theme_bg_image' => is_string($in['theme_bg_image'] ?? null) && preg_match('~^uploads/[A-Za-z0-9_./-]+$~', $in['theme_bg_image']) && !str_contains($in['theme_bg_image'], '..') ? $in['theme_bg_image'] : '',
     ];
 }
@@ -144,7 +153,8 @@ function theme_css(array $s): string {
     $radius = THEME_RADII[$s['theme_radius']];
     $pad = THEME_DENSITY[$s['theme_density']];
     $hero = theme_hero_background($s);
-    return ":root { --accent: {$c['light']}; --accent-2: {$c['accent']}; --gradient: {$gradient}; --radius: {$radius}; --block-pad: {$pad}; --inv-accent: {$c['dark']}; --hero-bg: {$hero}; }\n"
+    $glass = THEME_GLASS[$s['theme_glass_intensity']];
+    return ":root { --accent: {$c['light']}; --accent-2: {$c['accent']}; --gradient: {$gradient}; --radius: {$radius}; --block-pad: {$pad}; --inv-accent: {$c['dark']}; --hero-bg: {$hero}; --brand: {$c['light']}; --glass-a: {$glass['alpha']}; --glass-blur: {$glass['blur']}; }\n"
         . "@media (prefers-color-scheme: dark) { :root:not([data-theme=\"light\"]) { --accent: {$c['dark']}; --accent-2: {$c['accent']}; --inv-accent: {$c['dark']}; } }\n"
         . ":root[data-theme=\"dark\"] { --accent: {$c['dark']}; --accent-2: {$c['accent']}; --inv-accent: {$c['dark']}; }\n";
 }

@@ -55,7 +55,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
 
 ?>
 <!doctype html>
-<html lang="<?= $lang ?>" dir="<?= $dir ?>"<?= $themeSettings['theme_mode'] !== 'system' ? ' data-theme="' . $themeSettings['theme_mode'] . '"' : '' ?> data-motion="<?= $themeSettings['theme_motion'] ?>">
+<html lang="<?= $lang ?>" dir="<?= $dir ?>"<?= $themeSettings['theme_mode'] !== 'system' ? ' data-theme="' . $themeSettings['theme_mode'] . '"' : '' ?> data-motion="<?= $themeSettings['theme_motion'] ?>" data-glass="<?= $themeSettings['theme_glass'] ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
