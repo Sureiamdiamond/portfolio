@@ -4,6 +4,7 @@ declare(strict_types=1);
 session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', 'httponly' => true, 'samesite' => 'Strict']);
 session_start();
 require __DIR__ . '/../db.php';
+require __DIR__ . '/../theme.php';
 
 if (!is_file(__DIR__ . '/../config.php')) {
     exit('Create config.php from config.sample.php on the server first.');
@@ -147,6 +148,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 login_succeeded($ip);
                 session_regenerate_id(true);
                 header('Location: index.php?t=password&changed=1');
+                exit;
+            }
+
+            if ($action === 'theme_draft' || $action === 'theme_publish') {
+                $settings = theme_clean($_POST);
+                if ($action === 'theme_draft') {
+                    // The preview reads the draft through a random token; nothing changes on the public site yet
+                    $token = bin2hex(random_bytes(16));
+                    $body = json_encode(['token' => $token, 'created' => time(), 'settings' => $settings], JSON_UNESCAPED_UNICODE);
+                    if (file_put_contents(THEME_DRAFT_FILE . '.tmp', $body, LOCK_EX) === false || !rename(THEME_DRAFT_FILE . '.tmp', THEME_DRAFT_FILE)) {
+                        throw new RuntimeException('The draft could not be saved. Check that the data folder is writable.');
+                    }
+                    header('Content-Type: application/json; charset=utf-8');
+                    echo json_encode(['token' => $token, 'warnings' => theme_warnings($settings)], JSON_UNESCAPED_UNICODE);
+                    exit;
+                }
+                foreach ($settings as $key => $value) {
+                    $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)')->execute([$key, $value]);
+                }
+                @unlink(THEME_DRAFT_FILE);
+                header('Location: index.php?t=theme&published=1');
+                exit;
+            }
+
+            if ($action === 'theme_reset') {
+                $pdo->exec("DELETE FROM profile WHERE k LIKE 'theme_%'");
+                @unlink(THEME_DRAFT_FILE);
+                header('Location: index.php?t=theme&reset=1');
                 exit;
             }
 
@@ -417,6 +446,9 @@ if ($loggedIn) {
   .msg { padding: 10px; border-radius: 8px; margin-bottom: 12px; background: #e3f4ea; }
   .err { background: #fbe4e4; }
   .muted { color: #5b7385; font-size: 13px; }
+  .swatches { display: flex; gap: 6px; margin: 8px 0; }
+  .swatches span { width: 28px; height: 28px; border-radius: 8px; }
+  .frame-wrap { max-width: 100%; overflow: auto; }
   .split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; align-items: start; }
   .preview { position: sticky; top: 8px; background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 2px 10px rgba(15,42,61,.08); }
   .pv-card { border: 1px solid #d6e4ec; border-radius: 12px; padding: 14px; margin-bottom: 12px; background: #0f1a2e; color: #e8f1f7; }
@@ -454,6 +486,7 @@ if ($loggedIn) {
     <?php foreach (TYPES as $key => $spec): ?>
       <a href="index.php?t=<?= $key ?>" class="<?= $tab === $key ? 'on' : '' ?>"><?= e($spec['label']) ?></a>
     <?php endforeach; ?>
+    <a href="index.php?t=theme" class="<?= $tab === 'theme' ? 'on' : '' ?>">Theme</a>
     <a href="index.php?t=password" class="<?= $tab === 'password' ? 'on' : '' ?>">Password</a>
     <a href="../index.php" target="_blank">View site</a>
     <form method="post" style="margin:0;padding:0;background:none;box-shadow:none;margin-left:auto">
@@ -465,7 +498,97 @@ if ($loggedIn) {
   <?php if ($error): ?><div class="msg err"><?= e($error) ?></div><?php endif; ?>
   <?php if ($notice || isset($_GET['saved'])): ?><div class="msg">Saved.</div><?php endif; ?>
 
-  <?php if ($tab === 'password'): ?>
+  <?php if ($tab === 'theme'): ?>
+    <?php $current = theme_published($pdo); ?>
+    <?php if (isset($_GET['published'])): ?><div class="msg">Theme published.</div><?php endif; ?>
+    <?php if (isset($_GET['reset'])): ?><div class="msg">Theme reset to the default.</div><?php endif; ?>
+    <div class="split">
+    <form id="theme-form" method="post" autocomplete="off">
+      <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+      <input type="hidden" name="action" value="theme_publish">
+      <h2>Theme</h2>
+      <label for="t-preset">Colour preset</label>
+      <select id="t-preset" name="theme_preset">
+        <?php foreach (THEME_PRESETS as $key => $preset): ?>
+          <option value="<?= e($key) ?>" <?= $current['theme_preset'] === $key ? 'selected' : '' ?>><?= e($preset['label']) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <div class="swatches" aria-hidden="true">
+        <?php foreach (THEME_PRESETS as $key => $preset): if ($key === 'custom') continue; ?>
+          <span title="<?= e($preset['label']) ?>" style="background:linear-gradient(135deg,<?= e($preset['light']) ?>,<?= e($preset['accent']) ?>)"></span>
+        <?php endforeach; ?>
+      </div>
+      <label for="t-primary">Custom primary colour (used with "Custom colours")</label>
+      <input id="t-primary" type="color" name="theme_primary" value="<?= e(strtolower($current['theme_primary'])) ?>">
+      <label for="t-accent">Custom accent colour</label>
+      <input id="t-accent" type="color" name="theme_accent" value="<?= e(strtolower($current['theme_accent'])) ?>">
+      <label for="t-radius">Corner radius</label>
+      <select id="t-radius" name="theme_radius">
+        <?php foreach (['sharp' => 'Sharp', 'soft' => 'Soft (current)', 'round' => 'Round'] as $key => $label): ?>
+          <option value="<?= $key ?>" <?= $current['theme_radius'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <label for="t-density">Spacing between sections</label>
+      <select id="t-density" name="theme_density">
+        <?php foreach (['compact' => 'Compact', 'comfortable' => 'Comfortable (current)', 'airy' => 'Airy'] as $key => $label): ?>
+          <option value="<?= $key ?>" <?= $current['theme_density'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <label for="t-mode">Default mode for new visitors</label>
+      <select id="t-mode" name="theme_mode">
+        <?php foreach (['system' => 'Follow the visitor\'s system', 'light' => 'Light', 'dark' => 'Dark'] as $key => $label): ?>
+          <option value="<?= $key ?>" <?= $current['theme_mode'] === $key ? 'selected' : '' ?>><?= e($label) ?></option>
+        <?php endforeach; ?>
+      </select>
+      <label class="check"><input type="checkbox" name="theme_motion" value="on" <?= $current['theme_motion'] === 'on' ? 'checked' : '' ?>> Animations on</label>
+      <div id="t-warnings" class="msg err" hidden></div>
+      <p><button type="submit">Publish theme</button></p>
+    </form>
+    <aside class="preview">
+      <h3>Live preview</h3>
+      <p>
+        <button type="button" data-width="100%">Desktop</button>
+        <button type="button" data-width="390px">390px phone</button>
+        <a class="button" id="t-open" href="../index.php" target="_blank">Open preview in a new tab</a>
+      </p>
+      <div class="frame-wrap"><iframe id="t-frame" title="Site preview" src="../index.php?preview=none" style="width:100%;height:560px;border:1px solid #d6e4ec;border-radius:10px;background:#fff"></iframe></div>
+      <p class="muted">The preview shows your changes before they are published. Publish only when you are happy with it.</p>
+      <form method="post" onsubmit="return confirm('Reset the theme to the default? Your draft is discarded.')">
+        <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+        <input type="hidden" name="action" value="theme_reset">
+        <button class="danger" type="submit">Reset to default</button>
+      </form>
+    </aside>
+    </div>
+    <script>
+      // Each change saves a draft and reloads the preview with it (the public page only shows drafts through a random token)
+      (function () {
+        const form = document.getElementById('theme-form');
+        const frame = document.getElementById('t-frame');
+        const open = document.getElementById('t-open');
+        const warnings = document.getElementById('t-warnings');
+        let timer = null;
+        const update = () => {
+          const body = new FormData(form);
+          body.set('action', 'theme_draft');
+          body.set('theme_motion', form.theme_motion.checked ? 'on' : 'off');
+          fetch('index.php?t=theme', { method: 'POST', body, headers: { 'X-Requested-With': 'fetch' }, credentials: 'same-origin' })
+            .then((r) => r.json())
+            .then((data) => {
+              frame.src = '../index.php?preview=' + data.token;
+              open.href = '../index.php?preview=' + data.token;
+              warnings.hidden = data.warnings.length === 0;
+              warnings.textContent = data.warnings.join(' ');
+            })
+            .catch(() => { warnings.hidden = false; warnings.textContent = 'The preview could not be updated. Try again.'; });
+        };
+        form.addEventListener('input', () => { clearTimeout(timer); timer = setTimeout(update, 350); });
+        form.addEventListener('change', () => { clearTimeout(timer); timer = setTimeout(update, 0); });
+        document.querySelectorAll('[data-width]').forEach((btn) => btn.addEventListener('click', () => { frame.style.width = btn.dataset.width; }));
+        update();
+      })();
+    </script>
+  <?php elseif ($tab === 'password'): ?>
     <?php if (isset($_GET['changed'])): ?><div class="msg">Password changed. Use the new password next time you log in.</div><?php endif; ?>
     <form method="post" autocomplete="off">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">

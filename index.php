@@ -11,6 +11,15 @@ $profile = [];
 foreach ($pdo->query('SELECT k, v FROM profile') as $row) {
     $profile[$row['k']] = $row['v'];
 }
+// Theme: the published settings, or the draft when the admin's preview link is used
+require_once __DIR__ . '/theme.php';
+$themeSettings = theme_published($pdo);
+$isPreview = false;
+$previewToken = (string) ($_GET['preview'] ?? '');
+if ($previewToken !== '' && ($draftSettings = theme_draft_for($previewToken)) !== null) {
+    $themeSettings = $draftSettings;
+    $isPreview = true;
+}
 $projects = $pdo->query('SELECT * FROM projects ORDER BY sort, id DESC')->fetchAll();
 $projectShots = [];
 foreach ($pdo->query('SELECT project_id, path FROM project_media ORDER BY sort, id') as $shot) {
@@ -46,7 +55,7 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
 
 ?>
 <!doctype html>
-<html lang="<?= $lang ?>" dir="<?= $dir ?>">
+<html lang="<?= $lang ?>" dir="<?= $dir ?>"<?= $themeSettings['theme_mode'] !== 'system' ? ' data-theme="' . $themeSettings['theme_mode'] . '"' : '' ?> data-motion="<?= $themeSettings['theme_motion'] ?>">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -77,7 +86,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 ?>
 <title><?= e($name) ?> · <?= e($headline !== '' ? $headline : t('default_title', $lang)) ?></title>
 <meta name="description" content="<?= e($description) ?>">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="<?= $isPreview ? 'noindex, nofollow' : 'index, follow' ?>">
 <link rel="canonical" href="<?= e($pageUrl) ?>">
 <link rel="alternate" hreflang="en" href="<?= e($siteUrl . '/') ?>">
 <link rel="alternate" hreflang="fa" href="<?= e($siteUrl . '/?lang=fa') ?>">
@@ -106,6 +115,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
   } catch (e) { document.documentElement.dataset.projectsView = 'normal'; }
 </script>
 <link rel="stylesheet" href="assets/style.css?v=<?= $assetVersion ?>">
+<style id="theme"><?= theme_css($themeSettings) ?></style>
 </head>
 <body>
 

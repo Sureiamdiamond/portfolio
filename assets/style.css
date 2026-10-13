@@ -96,7 +96,7 @@ h3 { font-size: 1.12rem; font-weight: 600; }
 .btn-outline { color: var(--fg); border: 1px solid var(--border); background: var(--surface); }
 
 main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
-.block { padding: 88px 0; border-top: 1px solid var(--border); }
+.block { padding: var(--block-pad, 88px) 0; border-top: 1px solid var(--border); }
 .block:first-of-type { border-top: 0; }
 
 /* Hero */
@@ -515,3 +515,9 @@ body { overflow-x: clip; }
 .pcard > .ptile { margin-bottom: 12px; }
 .ptile.sm { width: 18px; height: 18px; border-radius: 5px; font-size: 8px; box-shadow: none; vertical-align: middle; }
 .it .ptile.sm { margin-inline-end: 4px; }
+
+/* Motion off (from the admin theme): no animation, and sections are visible at once */
+html[data-motion="off"] *, html[data-motion="off"] *::before, html[data-motion="off"] *::after {
+  animation: none !important; transition: none !important; scroll-behavior: auto !important;
+}
+html[data-motion="off"] .reveal { opacity: 1 !important; transform: none !important; }
