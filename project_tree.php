@@ -292,7 +292,8 @@ function render_dir_level(array $dirs, array $files, string $parent, array $proj
     usort($childDirs, 'strcasecmp');
     foreach ($childDirs as $dir) {
         $isProject = isset($projectKinds[$dir]);
-        $html .= '<li' . ($isProject ? ' class="it-project" data-kind="' . e($projectKinds[$dir]) . '"' : '') . '><details open><summary class="it dir"><span class="chev" aria-hidden="true"></span>' . ($isProject && isset($projectTiles[$dir]) ? $projectTiles[$dir] : ICON_FOLDER)
+        // Only lib is open on first load; every other folder starts collapsed.
+        $html .= '<li' . ($isProject ? ' class="it-project" data-kind="' . e($projectKinds[$dir]) . '"' : '') . '><details' . ($dir === 'lib' ? ' open' : '') . '><summary class="it dir"><span class="chev" aria-hidden="true"></span>' . ($isProject && isset($projectTiles[$dir]) ? $projectTiles[$dir] : ICON_FOLDER)
             . '<span class="nm">' . e(basename($dir)) . '</span></summary><ul class="kids">'
             . render_dir_level($dirs, $files, $dir, $projectKinds, $projectTiles) . '</ul></details></li>';
     }
