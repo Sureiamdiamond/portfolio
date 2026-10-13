@@ -211,7 +211,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       <?php endforeach; ?>
     </div>
     <?php
-      $skills = skill_items((string) ($profile['skills'] ?? ''));
+      $skills = skill_items(loc($profile, 'skills', $lang));
       $skillGroups = skill_groups($skills);
       $languages = language_items(loc($profile, 'languages', $lang));
       $location = loc($profile, 'location', $lang);

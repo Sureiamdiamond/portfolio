@@ -359,7 +359,32 @@ Bloc | bloc | parent:Flutter
 SDUI | | parent:Flutter
 Stac | | parent:Flutter
 Riverpod | | parent:Flutter
-Python | python
+AI |
+Claude | | parent:AI
+Codex | | parent:AI
+Antigravity | | parent:AI
+Grok | | parent:AI
+Git | git
+Http / Dio | | more
+GitHub | github | more
+GitLab | gitlab | more
+Figma | figma | more
+Jira | jira | more
+Firebase | firebase | more";
+
+// Same list for the Persian page: only the AI group name differs.
+const SKILLS_FA_LIST = "Dart | dart
+Flutter | flutter
+GetX | getx | parent:Flutter
+Bloc | bloc | parent:Flutter
+SDUI | | parent:Flutter
+Stac | | parent:Flutter
+Riverpod | | parent:Flutter
+هوش مصنوعی |
+Claude | | parent:هوش مصنوعی
+Codex | | parent:هوش مصنوعی
+Antigravity | | parent:هوش مصنوعی
+Grok | | parent:هوش مصنوعی
 Git | git
 Http / Dio | | more
 GitHub | github | more
@@ -391,6 +416,21 @@ function run_skills_v2_migration(PDO $pdo): void {
     $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
     $stmt->execute(['skills', SKILLS_LIST]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_V2_MIGRATION . "', '1')");
+}
+
+// AI group added, Python removed, and a Persian skills list. The previous skills value is logged, so Python can be restored from there.
+const SKILLS_AI_MIGRATION = 'migration_skills_v3';
+
+function run_skills_v3_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_AI_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('skills', 'skills_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('skills v3: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['skills', SKILLS_LIST]);
+    $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_AI_MIGRATION . "', '1')");
 }
 
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
