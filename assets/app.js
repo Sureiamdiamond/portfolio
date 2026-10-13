@@ -283,3 +283,34 @@
   window.addEventListener('scroll', update, { passive: true });
   update();
 })();
+
+// Skill groups (Flutter, AI): each card's own panel slides out beside it. Only that card changes; the others keep their size.
+(function () {
+  const root = document.documentElement;
+  document.querySelectorAll('.skill-parent').forEach((card) => {
+    const head = card.querySelector('.skill-head');
+    const panel = card.querySelector('.skill-panel');
+    if (!head || !panel) return;
+
+    function setOpen(open) {
+      if (open) {
+        // Open on the other side when the panel would run past the page edge.
+        card.classList.remove('is-flip');
+        const r = card.getBoundingClientRect();
+        const w = panel.offsetWidth;
+        const fits = root.dir === 'rtl' ? r.left - w - 8 >= 0 : r.right + w + 8 <= root.clientWidth;
+        card.classList.toggle('is-flip', !fits);
+      }
+      card.classList.toggle('is-open', open);
+      head.setAttribute('aria-expanded', String(open));
+    }
+
+    head.addEventListener('click', () => setOpen(!card.classList.contains('is-open')));
+    card.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape' && card.classList.contains('is-open')) {
+        setOpen(false);
+        head.focus();
+      }
+    });
+  });
+})();

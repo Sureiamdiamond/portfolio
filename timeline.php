@@ -93,11 +93,17 @@ function skill_card_html(array $group): string {
     if (!$group['children']) {
         return '<li class="skill">' . $head . '</li>';
     }
+    $panelId = 'skill-panel-' . substr(md5($item['name']), 0, 8);
     $list = '';
-    foreach ($group['children'] as $child) {
-        $list .= '<li class="skill-child">' . e($child['name']) . '</li>';
+    foreach ($group['children'] as $index => $child) {
+        $childSvg = skill_icon_svg($child['icon']);
+        $childIcon = $childSvg !== null
+            ? '<span class="skill-icon skill-icon-sm">' . $childSvg . '</span>'
+            : '<span class="skill-icon skill-icon-sm skill-initials" aria-hidden="true">' . e(mb_strtoupper(mb_substr($child['name'], 0, 2))) . '</span>';
+        $list .= '<li class="skill-child" style="--i:' . $index . '">' . $childIcon . '<span>' . e($child['name']) . '</span></li>';
     }
-    return '<li class="skill skill-parent"><details><summary class="skill-head">' . $head . '</summary><ul class="skill-children">' . $list . '</ul></details></li>';
+    return '<li class="skill skill-parent"><button type="button" class="skill-head" aria-expanded="false" aria-controls="' . $panelId . '">' . $head . '</button>'
+        . '<ul class="skill-panel" id="' . $panelId . '">' . $list . '</ul></li>';
 }
 
 /** Languages as "language | level" lines. */

@@ -71,6 +71,7 @@ function db(): PDO {
     run_location_languages_migration($pdo);
     run_skills_v2_migration($pdo);
     run_skills_v3_migration($pdo);
+    run_skills_v4_migration($pdo);
     return $pdo;
 }
 

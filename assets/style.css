@@ -607,16 +607,31 @@ html[lang="fa"] .skills-label { font-family: Vazirmatn, system-ui, sans-serif; l
 .skill-icon { width: 30px; height: 30px; flex: none; display: grid; place-items: center; color: var(--fg); }
 .skill-svg { width: 24px; height: 24px; }
 .skill-initials { border-radius: 8px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font: 700 .72rem var(--sans); }
-.skill-parent { display: block; padding: 0; }
-.skill-parent > details { width: 100%; }
-.skill-head { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 12px; cursor: pointer; list-style: none; border-radius: 12px; }
-.skill-head::-webkit-details-marker { display: none; }
-.skill-head::after { content: ""; margin-inline-start: auto; width: 7px; height: 7px; flex: none; border-inline-end: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .2s ease; }
-.skill-parent > details[open] > .skill-head::after { transform: rotate(-135deg); }
+.skill-parent { display: block; padding: 0; position: relative; }
+.skill-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 12px; margin: 0; background: none; border: 0; border-radius: 12px; color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.skill-head::after { content: ""; margin-inline-start: auto; width: 7px; height: 7px; flex: none; border-inline-end: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+.skill-head[aria-expanded="true"]::after { transform: rotate(-135deg); }
 .skill-head:focus-visible, .skills-more > summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
-.skill-children { list-style: none; margin: 0; padding: 0 12px 10px 52px; display: grid; gap: 4px; }
-html[dir="rtl"] .skill-children { padding: 0 52px 10px 12px; }
-.skill-child { color: var(--muted); font-size: .92rem; }
+/* Beside the card on the reading-direction end (inline-start is the right in RTL). Flipped: the other end. Reveal grows from the card side. */
+.skill-panel { position: absolute; top: -1px; z-index: 20; inset-inline-start: calc(100% + 8px); inset-inline-end: auto; min-width: 180px; margin: 0; padding: 10px; list-style: none; display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 14px 34px rgba(0, 0, 0, .14); visibility: hidden; opacity: 0; clip-path: inset(0 100% 0 0 round 14px); transition: clip-path .36s cubic-bezier(.2,.7,.2,1), opacity .24s ease, visibility 0s linear .36s; }
+html[dir="rtl"] .skill-panel { clip-path: inset(0 0 0 100% round 14px); }
+.skill-parent.is-flip .skill-panel { inset-inline-start: auto; inset-inline-end: calc(100% + 8px); clip-path: inset(0 0 0 100% round 14px); }
+html[dir="rtl"] .skill-parent.is-flip .skill-panel { clip-path: inset(0 100% 0 0 round 14px); }
+html[dir] .skill-parent.is-open .skill-panel { visibility: visible; opacity: 1; clip-path: inset(0 0 0 0 round 14px); transition: clip-path .36s cubic-bezier(.2,.7,.2,1), opacity .24s ease, visibility 0s; }
+.skill-child { display: flex; align-items: center; gap: 8px; min-height: 36px; padding: 4px 6px; border-radius: 8px; font-size: .92rem; white-space: nowrap; opacity: 0; transform: translateX(-6px); transition: opacity .16s ease, transform .16s ease; }
+html[dir="rtl"] .skill-child { transform: translateX(6px); }
+.skill-parent.is-open .skill-child { opacity: 1; transform: none; transition: opacity .3s ease, transform .3s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 45ms + 140ms); }
+.skill-child .skill-icon-sm { width: 22px; height: 22px; }
+.skill-child .skill-icon-sm .skill-svg { width: 18px; height: 18px; }
+.skill-child .skill-initials { font-size: .62rem; }
+/* Narrow screens have no room beside the card: the panel reveals downwards inside the card. */
+@media (max-width: 560px) {
+  .skill-panel { position: static; min-width: 0; padding: 0 12px; border: 0; border-radius: 0 0 12px 12px; background: none; box-shadow: none; max-height: 0; overflow: hidden; clip-path: none !important; transition: max-height .36s ease, opacity .24s ease, visibility 0s linear .36s; }
+  html[dir] .skill-parent.is-open .skill-panel { max-height: 520px; padding: 0 12px 10px; clip-path: none !important; transition: max-height .36s ease, opacity .24s ease, visibility 0s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .skill-panel, .skill-child, .skill-head::after { transition: none !important; }
+}
 .skills-more { margin-top: 12px; }
 .skills-more > summary { display: inline-block; padding: 6px 0; cursor: pointer; color: var(--accent); font-weight: 600; list-style: none; }
 .skills-more > summary::-webkit-details-marker { display: none; }

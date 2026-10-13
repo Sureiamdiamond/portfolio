@@ -359,8 +359,8 @@ Bloc | bloc | parent:Flutter
 SDUI | | parent:Flutter
 Stac | | parent:Flutter
 Riverpod | | parent:Flutter
-AI |
-Claude | | parent:AI
+AI | ai
+Claude | claude | parent:AI
 Codex | | parent:AI
 Antigravity | | parent:AI
 Grok | | parent:AI
@@ -380,8 +380,8 @@ Bloc | bloc | parent:Flutter
 SDUI | | parent:Flutter
 Stac | | parent:Flutter
 Riverpod | | parent:Flutter
-هوش مصنوعی |
-Claude | | parent:هوش مصنوعی
+هوش مصنوعی | ai
+Claude | claude | parent:هوش مصنوعی
 Codex | | parent:هوش مصنوعی
 Antigravity | | parent:هوش مصنوعی
 Grok | | parent:هوش مصنوعی
@@ -431,6 +431,21 @@ function run_skills_v3_migration(PDO $pdo): void {
     $stmt->execute(['skills', SKILLS_LIST]);
     $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_AI_MIGRATION . "', '1')");
+}
+
+// Icons for the AI group and Claude. Rewrites both skills lists; the previous values are logged.
+const SKILLS_ICONS_MIGRATION = 'migration_skills_v4';
+
+function run_skills_v4_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_ICONS_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('skills', 'skills_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('skills v4: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['skills', SKILLS_LIST]);
+    $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_ICONS_MIGRATION . "', '1')");
 }
 
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
