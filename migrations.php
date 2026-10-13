@@ -359,17 +359,17 @@ Bloc | bloc | parent:Flutter
 SDUI | sdui | parent:Flutter
 Stac | | parent:Flutter
 Riverpod | | parent:Flutter
-AI | ai
-Claude | claude | parent:AI
-Codex | codex | parent:AI
-Antigravity | antigravity | parent:AI
-Grok | grok | parent:AI
 Git | git
 GitHub | github
 GitLab | gitlab
 Figma | figma
 Jira | jira
-Firebase | firebase";
+Firebase | firebase
+AI | ai
+Claude | claude | parent:AI
+Codex | codex | parent:AI
+Antigravity | antigravity | parent:AI
+Grok | grok | parent:AI";
 
 // Same list for the Persian page: only the AI group name differs.
 const SKILLS_FA_LIST = "Dart | dart
@@ -379,17 +379,17 @@ Bloc | bloc | parent:Flutter
 SDUI | sdui | parent:Flutter
 Stac | | parent:Flutter
 Riverpod | | parent:Flutter
-هوش مصنوعی | ai
-Claude | claude | parent:هوش مصنوعی
-Codex | codex | parent:هوش مصنوعی
-Antigravity | antigravity | parent:هوش مصنوعی
-Grok | grok | parent:هوش مصنوعی
 Git | git
 GitHub | github
 GitLab | gitlab
 Figma | figma
 Jira | jira
-Firebase | firebase";
+Firebase | firebase
+هوش مصنوعی | ai
+Claude | claude | parent:هوش مصنوعی
+Codex | codex | parent:هوش مصنوعی
+Antigravity | antigravity | parent:هوش مصنوعی
+Grok | grok | parent:هوش مصنوعی";
 
 function run_skills_migration(PDO $pdo): void {
     if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_MIGRATION . "'")->fetchColumn()) {
@@ -502,6 +502,21 @@ function run_skills_v6_migration(PDO $pdo): void {
     $stmt->execute(['skills', SKILLS_LIST]);
     $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_ICONS_FLUTTER_MIGRATION . "', '1')");
+}
+
+// AI moved to the end of the skills list. Rewrites both skills lists; the previous values are logged.
+const SKILLS_ORDER_MIGRATION = 'migration_skills_v7';
+
+function run_skills_v7_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILLS_ORDER_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('skills', 'skills_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('skills v7: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['skills', SKILLS_LIST]);
+    $stmt->execute(['skills_fa', SKILLS_FA_LIST]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_ORDER_MIGRATION . "', '1')");
 }
 
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
