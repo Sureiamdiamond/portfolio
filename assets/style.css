@@ -496,8 +496,12 @@ html[dir="rtl"] .arr { display: inline-block; transform: scaleX(-1); }
 .hero-text h1 { margin-top: 22px; }
 
 /* Email and other contact values stay on one line */
-.contact-cards .cc-value { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.contact-cards .cc-value { white-space: nowrap; }
 .contact-cards .cc-text { min-width: 0; flex: 1; }
+@media (max-width: 400px) {
+  .contact-cards .cc { gap: 10px; padding: 14px 12px; }
+  .contact-cards .cc-value { font-size: .84rem; }
+}
 
 /* Phone-safe page: no text size adjust on rotation or zoom, and no sideways overflow */
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
