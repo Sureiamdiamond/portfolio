@@ -77,6 +77,7 @@ function db(): PDO {
     run_skills_v7_migration($pdo);
     run_languages_panel_migration($pdo);
     run_skills_v8_migration($pdo);
+    run_skills_v9_migration($pdo);
     run_project_icons_migration($pdo);
     return $pdo;
 }
