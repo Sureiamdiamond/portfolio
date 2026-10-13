@@ -448,6 +448,34 @@ function run_skills_v4_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILLS_ICONS_MIGRATION . "', '1')");
 }
 
+// Project icons supplied by the owner, matched by folder name. Both Tobank projects share one icon. Previous icon values are logged.
+const PROJECT_ICONS_MIGRATION = 'migration_project_icons_v1';
+const PROJECT_ICONS = [
+    'classyar_app' => 'assets/img/projects/classyar.webp',
+    'tobank' => 'assets/img/projects/tobank.webp',
+    'tobank_sdui' => 'assets/img/projects/tobank.webp',
+    'weather_app' => 'assets/img/projects/weather.jpg',
+    'techblog' => 'assets/img/projects/techblog.png',
+];
+
+function run_project_icons_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . PROJECT_ICONS_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $projects = $pdo->query('SELECT * FROM projects ORDER BY sort, id DESC')->fetchAll();
+    $names = folder_names($projects);
+    $update = $pdo->prepare('UPDATE projects SET icon = ? WHERE id = ?');
+    foreach ($names as $id => $slug) {
+        if (!isset(PROJECT_ICONS[$slug])) {
+            continue;
+        }
+        $previous = $pdo->query('SELECT icon FROM projects WHERE id = ' . (int) $id)->fetchColumn();
+        migration_log("project icon $slug (id $id): previous icon " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+        $update->execute([PROJECT_ICONS[$slug], $id]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . PROJECT_ICONS_MIGRATION . "', '1')");
+}
+
 // English level shown as "Advanced (C1) · CAE · TTC", no native language, and the location. Previous values are logged.
 const LOCATION_LANGUAGES_MIGRATION = 'migration_location_langs_v1';
 

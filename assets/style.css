@@ -510,7 +510,7 @@ body { overflow-x: clip; }
   background: linear-gradient(135deg, hsl(var(--hue) 88% 60%), hsl(calc(var(--hue) + 28) 82% 42%));
   box-shadow: 0 8px 18px -10px hsl(var(--hue) 85% 45% / .9);
 }
-.ptile-img { object-fit: cover; background: var(--surface); }
+.ptile-img { object-fit: contain; background: var(--surface); }
 .pcard > .ptile { margin-bottom: 12px; }
 .ptile.sm { width: 18px; height: 18px; border-radius: 5px; font-size: 8px; box-shadow: none; vertical-align: middle; }
 .it .ptile.sm { margin-inline-end: 4px; }
