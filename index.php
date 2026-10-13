@@ -366,11 +366,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 <?php endif; ?>
 
   <section id="contact" class="inverted reveal">
-    <dl class="stats">
-      <div><dt><?= count($projects) ?></dt><dd><?= e(t('stat_projects', $lang)) ?></dd></div>
-      <div><dt><?= count($papers) ?></dt><dd><?= e(t('stat_papers', $lang)) ?></dd></div>
-      <div><dt><?= count($slides) ?></dt><dd><?= e(t('stat_presentations', $lang)) ?></dd></div>
-    </dl>
     <div class="contact-grid">
       <div>
         <h2><?= e(t('contact_me', $lang)) ?></h2>
