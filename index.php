@@ -174,7 +174,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 
 <?php if (($profile['show_journey'] ?? '1') !== '0'): ?>
   <section id="journey" class="block reveal">
-    <p class="label"><?= e(t('journey', $lang)) ?></p>
     <h2><?= e(t('journey', $lang)) ?></h2>
     <div class="timeline">
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
@@ -246,7 +245,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 
 <?php if (($profile['show_projects'] ?? '1') !== '0'): ?>
   <section id="projects" class="block reveal">
-    <p class="label"><?= e(t('projects', $lang)) ?></p>
     <h2><?= e(t('projects', $lang)) ?></h2>
     <div class="view-switch" id="view-switch" role="radiogroup" aria-label="<?= e(t('view_label', $lang)) ?>">
       <button type="button" role="radio" class="on" data-view="normal" aria-checked="true" tabindex="0">
@@ -329,7 +327,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 
 <?php if (($profile['show_research'] ?? '1') !== '0'): ?>
   <section id="research" class="block reveal">
-    <p class="label"><?= e(t('papers', $lang)) ?></p>
     <h2><?= e(t('papers', $lang)) ?></h2>
     <?php foreach ($papers as $paper): ?>
       <article class="row">
@@ -349,7 +346,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 
 <?php if (($profile['show_slides'] ?? '1') !== '0'): ?>
   <section id="slides" class="block reveal">
-    <p class="label"><?= e(t('presentations', $lang)) ?></p>
     <h2><?= e(t('presentations', $lang)) ?></h2>
     <?php foreach ($slides as $s): ?>
       <details class="slide">
@@ -378,7 +374,6 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
     </dl>
     <div class="contact-grid">
       <div>
-        <p class="label"><?= e(t('contact_me', $lang)) ?></p>
         <h2><?= e(t('contact_me', $lang)) ?></h2>
       </div>
       <div class="contact-cards">
