@@ -647,7 +647,9 @@ html[data-theme="dark"] .tl-initials { background: hsl(var(--hue) 45% 22%); colo
 @media (max-width: 520px) { .tl-card { grid-template-columns: 64px minmax(0, 1fr); gap: 14px; padding: 14px; } .tl-slot { width: 64px; height: 64px; } .tl-logo.tl-initials { width: 44px; height: 44px; border-radius: 12px; } }
 
 /* Skills and languages */
-.skills-langs { margin-top: 36px; }
+.skills-langs { margin-top: 0; }
+.skills-langs > h3.sub { margin-top: 88px; }
+@media (max-width: 560px) { .skills-langs > h3.sub { margin-top: 110px; } }
 .skills-label { margin: 16px 0 8px; font: 500 .8rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 html[lang="fa"] .skills-label { font-family: Vazirmatn, system-ui, sans-serif; letter-spacing: 0; text-transform: none; font-size: .9rem; }
 .skill-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; align-items: start; }
