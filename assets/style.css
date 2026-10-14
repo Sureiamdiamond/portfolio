@@ -743,7 +743,8 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 .loc { display: flex; align-items: center; gap: 6px; margin: 14px 0 0; color: var(--muted); font-size: .95rem; }
 .lang-card .skill-head, .lang-card { min-height: 48px; }
 /* The C1 badge sits beside the level in its own colours; its white centre keeps it readable on dark. */
-.lang-badge { display: inline-block; width: 28px; height: 28px; margin-inline-end: 6px; vertical-align: middle; object-fit: contain; }
+.lang-badge { display: inline-block; flex: none; width: 52px; height: 52px; margin-inline-end: 10px; vertical-align: middle; object-fit: contain; }
+.lang-level { display: flex; align-items: center; }
 .lang-text { display: flex; flex-direction: column; gap: 2px; text-align: start; }
 .lang-name { font-weight: 600; }
 .lang-level { font-size: .85rem; color: var(--muted); }

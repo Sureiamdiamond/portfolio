@@ -847,6 +847,21 @@ function run_techblog_codeyad_only_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_CODEYAD_ONLY_MIGRATION . "', '1')");
 }
 
+// FCE (B2) is added to the English certificates, in order FCE, CAE, TTC. Previous values are logged.
+const LANGUAGES_FCE_MIGRATION = 'migration_languages_fce_v1';
+
+function run_languages_fce_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . LANGUAGES_FCE_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('languages', 'languages_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('languages fce: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['languages', "English | Advanced (C1)\nFCE | | parent:English\nCAE | | parent:English\nTTC | | parent:English"]);
+    $stmt->execute(['languages_fa', "انگلیسی | پیشرفته (C1)\nFCE | | parent:انگلیسی\nCAE | | parent:انگلیسی\nTTC | | parent:انگلیسی"]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LANGUAGES_FCE_MIGRATION . "', '1')");
+}
+
 // Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.
 const INTERN_SPELLING_MIGRATION = 'migration_intern_spelling_v1';
 
