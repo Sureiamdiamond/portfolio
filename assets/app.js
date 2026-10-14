@@ -504,13 +504,103 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       h1.appendChild(cloud);
     }
     document.querySelector('.pane[data-pane="en"]').after(pane);
+    pane.querySelectorAll('.lang-label').forEach((el) => { el.textContent = 'Language'; });
     binaryPane = pane;
     initPane(pane, '-bin');
     return pane;
   };
 
+  // Binary mode extras: a terminal error window now and then, short glitch bursts, and a heavier wheel.
+  // Nothing blocks the page: the window closes with OK, the close button, Enter or Escape, and everything stops when another language is shown.
+  const binaryFun = (() => {
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let timers = [];
+    let running = false;
+    let win = null;
+    let target = null;
+    let raf = 0;
+    const later = (fn, ms) => {
+      const id = setTimeout(() => { timers = timers.filter((t) => t !== id); fn(); }, ms);
+      timers.push(id);
+    };
+    const glitch = () => {
+      document.body.classList.add('bin-glitch');
+      later(() => document.body.classList.remove('bin-glitch'), 420);
+    };
+    const closeWin = () => { if (win) { win.remove(); win = null; } };
+    const openWin = () => {
+      if (win || !running) return;
+      win = document.createElement('div');
+      win.className = 'bin-error';
+      win.setAttribute('role', 'alertdialog');
+      win.setAttribute('aria-label', 'ERROR.EXE');
+      win.innerHTML = '<div class="bin-error-bar"><span>ERROR.EXE</span><button type="button" class="bin-error-x" aria-label="Close">×</button></div>'
+        + '<pre class="bin-error-body">FATAL: unexpected 0 and 1 in the layout buffer\n> scroll buffer overflow at 0x7F3A\n> reading the page again...\n\n[ OK ]  press Enter to continue</pre>'
+        + '<button type="button" class="bin-error-ok">OK</button>';
+      document.body.appendChild(win);
+    };
+    const onWheel = (ev) => {
+      if (ev.ctrlKey || ev.metaKey || ev.defaultPrevented) return;
+      if (ev.target.closest && ev.target.closest('.pt-window, .lang-list, textarea')) return;
+      ev.preventDefault();
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      if (target === null) target = window.scrollY;
+      target = Math.min(max, Math.max(0, target + ev.deltaY * 0.45));
+      if (!raf) raf = requestAnimationFrame(step);
+    };
+    const step = () => {
+      const cur = window.scrollY;
+      const next = cur + (target - cur) * 0.16;
+      if (Math.abs(target - next) < 0.5) {
+        window.scrollTo({ top: target, behavior: 'instant' });
+        raf = 0;
+        target = null;
+        return;
+      }
+      window.scrollTo({ top: next, behavior: 'instant' });
+      raf = requestAnimationFrame(step);
+    };
+    const start = () => {
+      stop();
+      running = true;
+      const burst = () => {
+        if (!running) return;
+        if (!reduce.matches) glitch();
+        later(burst, 4000 + Math.random() * 6000);
+      };
+      const popup = () => {
+        if (!running) return;
+        openWin();
+        later(popup, 20000 + Math.random() * 15000);
+      };
+      later(burst, 2500);
+      later(popup, 7000);
+      if (!reduce.matches) window.addEventListener('wheel', onWheel, { passive: false });
+    };
+    const stop = () => {
+      running = false;
+      timers.forEach((id) => clearTimeout(id));
+      timers = [];
+      closeWin();
+      document.body.classList.remove('bin-glitch');
+      window.removeEventListener('wheel', onWheel);
+      if (raf) cancelAnimationFrame(raf);
+      raf = 0;
+      target = null;
+    };
+    document.addEventListener('click', (ev) => {
+      if (win && ev.target.closest('.bin-error-ok, .bin-error-x')) closeWin();
+    });
+    document.addEventListener('keydown', (ev) => {
+      if (win && (ev.key === 'Enter' || ev.key === 'Escape')) closeWin();
+    });
+    return { start, stop };
+  })();
+
   const showLang = (lang) => {
     if (lang === 'bin') buildBinaryPane();
+    if (lang === 'bin') binaryFun.start();
+    else binaryFun.stop();
     panes().forEach((p) => { p.hidden = p.dataset.pane !== lang; });
     html.lang = lang === 'fa' ? 'fa' : 'en';
     html.dir = lang === 'fa' ? 'rtl' : 'ltr';
