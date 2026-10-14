@@ -1091,3 +1091,25 @@ function run_role_headline_fa_v4_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ROLE_HEADLINE_FA_V4_MIGRATION . "', '1')");
 }
+
+// Classyar's store links: a store address filed as the website is cleared, the Bazaar link is filled in when it is missing, and the Myket item uses its PNG icon. Each change logs the previous row.
+const CLASSYAR_STORES_V3_MIGRATION = 'migration_classyar_stores_v3';
+const CLASSYAR_BAZAAR_URL = 'https://cafebazaar.ir/app/com.classyar.app';
+function run_classyar_stores_v3_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CLASSYAR_STORES_V3_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $row = $pdo->query("SELECT * FROM projects WHERE LOWER(TRIM(title)) = 'classyar app' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        $url = (string) ($row['url'] ?? '');
+        $bazaar = trim((string) ($row['bazaar_url'] ?? '')) !== '' ? (string) $row['bazaar_url'] : CLASSYAR_BAZAAR_URL;
+        $newUrl = preg_match('#(cafebazaar\.ir|myket\.ir)#i', $url) ? '' : $url;
+        $list = [['label' => 'Myket', 'label_fa' => 'مایکت', 'url' => 'https://myket.ir/app/com.classyar.app', 'icon' => 'assets/img/stores/myket.png']];
+        $newList = json_encode($list, JSON_UNESCAPED_UNICODE);
+        if ($newUrl !== $url || $bazaar !== (string) ($row['bazaar_url'] ?? '') || $newList !== (string) ($row['extra_links'] ?? '')) {
+            migration_log("classyar stores v3: project {$row['id']} previous " . json_encode(['url' => $url, 'bazaar_url' => $row['bazaar_url'], 'extra_links' => $row['extra_links']], JSON_UNESCAPED_UNICODE));
+            $pdo->prepare('UPDATE projects SET url = ?, bazaar_url = ?, extra_links = ? WHERE id = ?')->execute([$newUrl, $bazaar, $newList, $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_STORES_V3_MIGRATION . "', '1')");
+}

@@ -202,9 +202,7 @@ html[data-projects-view="normal"] .pt-window { display: none !important; }
 .pcard-menu.is-open .pcard-menu-list { opacity: 1; visibility: visible; transform: none; transition: opacity .18s ease-out, transform .18s ease-out, visibility 0s; }
 .pcard-menu-btn .arr { display: inline-block; transition: transform .18s ease-out; }
 .pcard-menu.is-open .pcard-menu-btn .arr { transform: rotate(180deg); }
-.pmenu-icon { width: 18px; height: 18px; object-fit: contain; flex: none; }
-html:not([data-theme="light"]) .pmenu-icon { filter: invert(1); }
-html[data-theme="dark"] .pmenu-icon { filter: invert(1); }
+.pmenu-icon { width: 20px; height: 20px; object-fit: contain; flex: none; }
 .pcard-menu-list a { display: flex; align-items: center; gap: 10px; }
 @media (prefers-reduced-motion: reduce) {
   .pcard-menu-list, .pcard-menu-btn .arr { transition: none; transform: none; }

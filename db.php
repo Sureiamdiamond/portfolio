@@ -101,6 +101,7 @@ function db(): PDO {
     run_classyar_stores_v2_migration($pdo);
     run_role_headline_fa_v3_migration($pdo);
     run_role_headline_fa_v4_migration($pdo);
+    run_classyar_stores_v3_migration($pdo);
     return $pdo;
 }
 
@@ -228,17 +229,29 @@ function loc(array $row, string $field, string $lang): string {
 
 /** Every external link a project card offers, as [label, url]: the fixed links first, then the extra links (a JSON list of {label, label_fa, url}) from the admin. One entry means a direct link; more open a small list. */
 function project_options(array $p, string $lang): array {
+    // Store links are recognised by their host, so a store address filed under any field is labelled as that store.
+    $stores = [
+        'cafebazaar.ir' => ['Bazaar', 'بازار', 'assets/img/stores/bazaar.png'],
+        'myket.ir' => ['Myket', 'مایکت', 'assets/img/stores/myket.png'],
+    ];
     $fixed = [
         'github_url' => ['GitHub', 'گیت‌هاب'], 'url' => ['Website', 'وب‌سایت'], 'playstore_url' => ['Google Play', 'گوگل‌پلی'],
         'appstore_url' => ['App Store', 'اپ‌استور'], 'bazaar_url' => ['Bazaar', 'بازار'],
     ];
-    $fixedIcons = ['bazaar_url' => 'assets/img/stores/bazaar.svg'];
     $options = [];
     foreach ($fixed as $key => [$en, $faLabel]) {
         $url = trim((string) ($p[$key] ?? ''));
-        if (preg_match('#^https?://#i', $url)) {
-            $options[] = [$lang === 'fa' ? $faLabel : $en, $url, $fixedIcons[$key] ?? ''];
+        if (!preg_match('#^https?://#i', $url)) {
+            continue;
         }
+        $host = strtolower((string) parse_url($url, PHP_URL_HOST));
+        $host = preg_replace('/^www\./', '', $host);
+        if (isset($stores[$host])) {
+            [$en, $faLabel, $icon] = $stores[$host];
+            $options[] = [$lang === 'fa' ? $faLabel : $en, $url, $icon];
+            continue;
+        }
+        $options[] = [$lang === 'fa' ? $faLabel : $en, $url, ''];
     }
     $extra = json_decode((string) ($p['extra_links'] ?? ''), true);
     foreach (is_array($extra) ? $extra : [] as $link) {
