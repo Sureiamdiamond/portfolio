@@ -425,7 +425,8 @@ $siteUrl = 'https://parsabanitaba.ir';
 $pageUrl = $lang === 'fa' ? $siteUrl . '/?lang=fa' : $siteUrl . '/';
 $summary = trim(preg_replace('/\s+/u', ' ', strip_tags($about)));
 $description = $descs[$lang];
-$shareImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait-cutout.png');
+$photoImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait-cutout.png');
+$shareImage = $siteUrl . '/assets/img/app-icon-512.png?v=' . $assetVersion;
 $personData = [
     '@context' => 'https://schema.org',
     '@type' => 'Person',
@@ -434,7 +435,7 @@ $personData = [
     'jobTitle' => $headline,
     'description' => $summary !== '' ? mb_substr($summary, 0, 300) : null,
     'url' => $siteUrl . '/',
-    'image' => $shareImage,
+    'image' => $photoImage,
     'email' => !empty($profile['email']) ? 'mailto:' . $profile['email'] : null,
     'knowsAbout' => ['Flutter', 'Dart'],
     'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Tehran', 'addressCountry' => 'IR'],
