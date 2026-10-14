@@ -248,11 +248,6 @@ guest is not in the sudoers file.
 You do not have admin access.
 guest@parsa:~$ <span class="bin-caret">▌</span></pre>
     </div>
-    <div class="rotate-hint" role="dialog" aria-modal="false" aria-label="<?= $lang === 'fa' ? 'چرخش گوشی' : 'Rotate your phone' ?>">
-      <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M12 18h.01"/><path d="M20 8v-2a2 2 0 0 0-2-2h-1"/><path d="M4 16v2a2 2 0 0 0 2 2h1"/></svg>
-      <p><?= $lang === 'fa' ? 'برای تجربهٔ بهتر گوشی را بچرخانید' : 'Rotate your phone for the best experience' ?></p>
-      <button type="button" class="btn btn-outline rotate-hint-close" data-rotate-dismiss><?= $lang === 'fa' ? 'متوجه شدم' : 'Got it' ?></button>
-    </div>
     <div class="pt-window" data-pt dir="ltr">
       <div class="pt-titlebar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="pt-title">ParsaBanitaba.ir — <?= e(t('projects', $lang)) ?></span></div>
       <div class="pt-main">

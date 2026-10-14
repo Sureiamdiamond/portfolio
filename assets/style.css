@@ -491,8 +491,8 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
 .pt-status-right { display: inline-flex; gap: 14px; }
 .pt-toggle { display: none; }
 
-/* Narrow portrait screens: the tree becomes a drawer above the editor. Landscape keeps the tree and editor side by side. */
-@media (max-width: 760px) and (orientation: portrait) {
+/* Narrow screens: the tree becomes a drawer above the editor */
+@media (max-width: 760px) {
   .pt-main { flex-direction: column; min-height: 0; }
   .pt-split { display: none; }
   .pt-tool {
@@ -962,26 +962,6 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
   .cv-fab, html[data-glass="on"] .cv-fab, .cv-hero-choices .btn-primary, html[data-glass="on"] .cv-hero-choices .btn-primary {
     background: #0052FF; backdrop-filter: none; -webkit-backdrop-filter: none;
   }
-}
-
-/* Phone IDE: in portrait the view asks for a turn to landscape. The prompt is solid, dismissible, and only on phone-sized portrait screens. */
-.rotate-hint { display: none; }
-@media (max-width: 760px) and (orientation: portrait) {
-  html[data-projects-view="ide"] .rotate-hint:not([data-dismissed]) {
-    position: fixed; inset: 0; z-index: 90; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px;
-    padding: 24px; text-align: center; background: var(--bg); color: var(--fg);
-  }
-  .rotate-hint svg { color: var(--accent); }
-  .rotate-hint p { margin: 0; font: 600 1.05rem/1.6 var(--sans); max-width: 26ch; }
-  .rotate-hint-close { min-height: 44px; background: var(--surface); }
-}
-/* Phone landscape: the IDE fits the screen height, with the tree and the editor side by side */
-@media (orientation: landscape) and (max-height: 520px) {
-  html[data-projects-view="ide"] .pt-window { height: calc(100svh - 24px); display: flex; flex-direction: column; }
-  html[data-projects-view="ide"] .pt-main { flex: 1; min-height: 0; height: auto; }
-  html[data-projects-view="ide"] .pt-tool { --tool-w: 200px; }
-  html[data-projects-view="ide"] .pt-view { max-height: none; min-height: 0; flex: 1; }
-  html[data-projects-view="ide"] .pt-tree-wrap { max-height: none; }
 }
 
 /* Phones: the personal mark sits in the top row, beside the language button, and not in the menu row. Desktop keeps it in the menu. */
