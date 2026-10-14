@@ -43,7 +43,9 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; background: var(--bg); color-scheme: light; }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) { color-scheme: dark; } }
+html[data-theme="dark"] { color-scheme: dark; }
 body {
   margin: 0; min-height: 100vh; background: var(--bg); color: var(--fg);
   font: 16px/1.65 var(--sans); overflow-x: hidden;
@@ -597,8 +599,9 @@ html[data-motion="off"][data-glass="on"] .btn:hover, html[data-motion="off"][dat
 .tl-slot { display: flex; align-items: center; justify-content: center; width: 80px; height: 80px; }
 img.tl-logo { display: block; width: auto; height: auto; max-width: 100%; max-height: 100%; object-fit: contain; }
 .tl-slot img[src*="codeyad"] { width: 85%; }
-@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.tl-logo { filter: drop-shadow(0 0 0.6px rgba(255, 255, 255, .85)) drop-shadow(0 0 3px rgba(255, 255, 255, .35)); } }
-html[data-theme="dark"] img.tl-logo { filter: drop-shadow(0 0 0.6px rgba(255, 255, 255, .85)) drop-shadow(0 0 3px rgba(255, 255, 255, .35)); }
+/* Logos keep their own colours in both themes; no glow or outline is added. Only the Baqer emblem is drawn in black ink, so it is inverted (and its hue turned back) on dark. */
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.tl-logo[src*="baqer"] { filter: invert(1) hue-rotate(180deg); } }
+html[data-theme="dark"] img.tl-logo[src*="baqer"] { filter: invert(1) hue-rotate(180deg); }
 .tl-logo.tl-initials { width: 56px; height: 56px; border-radius: 14px; border: 1px solid var(--border); box-sizing: border-box; }
 .tl-initials {
   display: grid; place-items: center; padding: 0; background: hsl(var(--hue) 70% 92%); color: hsl(var(--hue) 60% 28%);

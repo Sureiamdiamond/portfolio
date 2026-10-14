@@ -15,10 +15,19 @@
   // Theme toggle: remembers the choice, otherwise follows the system preference
   const toggle = document.getElementById('theme-toggle');
   const effectiveTheme = () => root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
+  // Browser chrome colour: one tag for the chosen theme, replacing the per-scheme pair from the page head
+  const setChromeColor = (theme) => {
+    document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.remove());
+    const meta = document.createElement('meta');
+    meta.name = 'theme-color';
+    meta.content = theme === 'dark' ? '#0B1222' : '#FAFAFA';
+    document.head.appendChild(meta);
+  };
   if (toggle) {
     toggle.addEventListener('click', () => {
       const next = effectiveTheme() === 'dark' ? 'light' : 'dark';
       root.dataset.theme = next;
+      setChromeColor(next);
       try { localStorage.setItem('theme', next); } catch (e) { /* storage blocked: applies to this page only */ }
     });
   }

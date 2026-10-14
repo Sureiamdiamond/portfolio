@@ -90,6 +90,7 @@ function db(): PDO {
     run_azad_website_migration($pdo);
     run_edu_order_migration($pdo);
     run_sdui_links_migration($pdo);
+    run_classyar_name_fa_migration($pdo);
     return $pdo;
 }
 
@@ -123,7 +124,7 @@ const RESUME_PROJECTS = [
         'summary' => "Group project for Prof. Safari, built with Flutter. Period: Tir 1401.",
         'summary_fa' => "پروژه گروهی استاد صفری با فلاتر. بازه: تیر ۱۴۰۱.",
         'tags' => 'flutter, dart', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/Techblog-Fork', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 3],
-    ['title' => 'Classyar App', 'title_fa' => 'اپلیکیشن کلاسیار', 'kind' => 'work',
+    ['title' => 'Classyar App', 'title_fa' => 'کلاسیار', 'kind' => 'work',
         'summary' => "Flutter app for Classyar, built for Azad Islamic University (Tehran West). Dynamic UI, state management with GetX and Bloc, data from an API and Firebase, published on Cafebazaar. Period: Mehr 1404.",
         'summary_fa' => "اپلیکیشن کلاسیار با فلاتر برای دانشگاه آزاد اسلامی تهران غرب: صفحات پویا، مدیریت وضعیت با GetX و Bloc، داده از API و Firebase، منتشر شده در کافه‌بازار. بازه: مهر ۱۴۰۴.",
         'tags' => 'flutter, dart, getx, bloc, firebase', 'url' => '', 'github_url' => '', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => 'https://cafebazaar.ir/app/com.classyar.app', 'sort' => 4],

@@ -861,3 +861,19 @@ function run_name_fa_migration(PDO $pdo): void {
         ->execute(['name_fa', NAME_FA_VALUE]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . NAME_FA_MIGRATION . "', '1')");
 }
+
+// Persian name of the Classyar project: the UI and IDE show «کلاسیار» instead of «اپلیکیشن کلاسیار». Only that exact old value changes.
+const CLASSYAR_NAME_FA_MIGRATION = 'migration_classyar_name_fa_v1';
+function run_classyar_name_fa_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CLASSYAR_NAME_FA_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $stmt = $pdo->prepare("UPDATE projects SET title_fa = 'کلاسیار' WHERE title = 'Classyar App' AND title_fa = 'اپلیکیشن کلاسیار'");
+    $select = $pdo->prepare("SELECT * FROM projects WHERE title = 'Classyar App' AND title_fa = 'اپلیکیشن کلاسیار'");
+    $select->execute();
+    foreach ($select->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        migration_log("classyar name fa: project {$row['id']} previous row " . json_encode($row, JSON_UNESCAPED_UNICODE));
+    }
+    $stmt->execute();
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_NAME_FA_MIGRATION . "', '1')");
+}

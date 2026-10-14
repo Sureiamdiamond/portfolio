@@ -62,6 +62,18 @@ $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.c
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <?php
+// Browser chrome colour (status bar, address bar, overscroll) follows the theme: the forced theme gets one tag, system gets one per scheme.
+$chromeColors = ['light' => '#FAFAFA', 'dark' => '#0B1222'];
+$chromeMode = $themeSettings['theme_mode'];
+if (isset($chromeColors[$chromeMode])) {
+    echo '<meta name="theme-color" content="' . $chromeColors[$chromeMode] . '">' . "\n";
+} else {
+    echo '<meta name="theme-color" content="' . $chromeColors['light'] . '" media="(prefers-color-scheme: light)">' . "\n";
+    echo '<meta name="theme-color" content="' . $chromeColors['dark'] . '" media="(prefers-color-scheme: dark)">' . "\n";
+}
+?>
+<meta name="color-scheme" content="light dark">
+<?php
 // Search and sharing metadata. The site lives at the domain; each language has its own address.
 $siteUrl = 'https://parsabanitaba.ir';
 $pageUrl = $lang === 'fa' ? $siteUrl . '/?lang=fa' : $siteUrl . '/';
