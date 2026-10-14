@@ -667,7 +667,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     };
     const score = () => Math.floor(frame / 6);
     const jump = () => {
-      if (joke) { closeJoke(); return; }
+      if (joke) { closePanel(); return; }
       if (state === 'ready') { state = 'run'; return; }
       if (state === 'over') { reset(); state = 'run'; return; }
       if (y >= STAND) vy = JUMP;
@@ -696,10 +696,17 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       joke = document.createElement('div');
       joke.className = 'bin-joke';
       joke.setAttribute('role', 'alert');
-      joke.innerHTML = '<p class="bin-joke-fa" dir="rtl">بهتره ادامه ندی. زندگی خودش سخت‌ترین بازیه</p>'
-        + '<p class="bin-joke-en">Maybe stop here. Life is the hardest game.</p>'
+      joke.innerHTML = '<p class="bin-joke-en">Better not to continue. Life itself is the hardest game.</p>'
         + '<button type="button" class="bin-joke-ok">OK</button>';
-      joke.querySelector('.bin-joke-ok').addEventListener('click', closeJoke);
+      joke.querySelector('.bin-joke-ok').addEventListener('click', () => {
+        // OK closes the whole game, and the language button gets a short attention effect
+        closePanel();
+        const btn = document.querySelector('.pane:not([hidden]) .lang-btn');
+        if (btn) {
+          btn.classList.add('bin-attn');
+          setTimeout(() => btn.classList.remove('bin-attn'), 3600);
+        }
+      });
       panel.appendChild(joke);
     };
     const update = (k) => {
@@ -801,7 +808,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       raf = requestAnimationFrame(loop);
     };
     const onKey = (ev) => {
-      if (joke && ev.key === 'Escape') { closeJoke(); return; }
+      if (joke && ev.key === 'Escape') { closePanel(); return; }
       if (ev.key === 'Escape') { close(); return; }
       if (ev.key === ' ' || ev.key === 'ArrowUp') {
         ev.preventDefault();
