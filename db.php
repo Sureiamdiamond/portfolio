@@ -87,6 +87,7 @@ function db(): PDO {
     run_intern_spelling_migration($pdo);
     run_techblog_single_link_migration($pdo);
     run_techblog_two_lines_migration($pdo);
+    run_techblog_codeyad_only_migration($pdo);
     run_codeyad_period_migration($pdo);
     run_ipam_fa_spelling_migration($pdo);
     run_techblog_github_migration($pdo);
@@ -137,8 +138,8 @@ const RESUME_PROJECTS = [
         'summary_fa' => "اپلیکیشن آب و هوا با Bloc و Clean Architecture. پروژه دانشگاه. بازه: فروردین ۱۴۰۴.",
         'tags' => 'flutter, dart, bloc, clean architecture', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/weather_app', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 2],
     ['title' => 'TechBlog', 'title_fa' => 'تک‌بلاگ', 'kind' => 'academic',
-        'summary' => "Group project for Professor Safari (Azad University): a podcast and tech-news application built with Flutter.",
-        'summary_fa' => "پروژه گروهی برای استاد صفری (دانشگاه آزاد): اپلیکیشن پادکست و اخبار در حوزه تکنولوژی با فلاتر",
+        'summary' => "Group project by Sasan Safari, Flutter instructor (Codeyad): a podcast and tech-news application built with Flutter.",
+        'summary_fa' => "پروژه گروهی ساسان صفری مدرس فلاتر (کدیاد): اپلیکیشن پادکست و اخبار در حوزه تکنولوژی با فلاتر",
         'tags' => 'flutter, dart', 'url' => '', 'github_url' => 'https://github.com/sasansafari/techblog', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 3],
     ['title' => 'Classyar App', 'title_fa' => 'کلاسیار', 'kind' => 'work',
         'summary' => "Flutter app for Classyar, built for Azad Islamic University (Tehran West). Dynamic UI, state management with GetX and Bloc, data from an API and Firebase, published on Cafebazaar. Period: Mehr 1404.",

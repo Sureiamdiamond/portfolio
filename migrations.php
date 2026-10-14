@@ -825,6 +825,28 @@ function run_techblog_two_lines_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_TWO_LINES_MIGRATION . "', '1')");
 }
 
+// The single TechBlog card keeps the Codeyad group project description only, in its grid position. Any other TechBlog row is removed. Previous values are logged.
+const TECHBLOG_CODEYAD_ONLY_MIGRATION = 'migration_techblog_codeyad_only_v1';
+const TECHBLOG_CODEYAD_EN = 'Group project by Sasan Safari, Flutter instructor (Codeyad): a podcast and tech-news application built with Flutter.';
+const TECHBLOG_CODEYAD_FA = 'پروژه گروهی ساسان صفری مدرس فلاتر (کدیاد): اپلیکیشن پادکست و اخبار در حوزه تکنولوژی با فلاتر';
+
+function run_techblog_codeyad_only_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TECHBLOG_CODEYAD_ONLY_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $rows = $pdo->query("SELECT id, title, summary, summary_fa, tags FROM projects WHERE LOWER(TRIM(title)) = 'techblog' OR title = 'TechBlog (Codeyad)' ORDER BY id")->fetchAll(PDO::FETCH_ASSOC);
+    $keep = array_shift($rows);
+    foreach ($rows as $row) {
+        migration_log("techblog codeyad only: removed duplicate {$row['id']} previous " . json_encode($row, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('DELETE FROM projects WHERE id = ?')->execute([$row['id']]);
+    }
+    if ($keep && ($keep['summary'] !== TECHBLOG_CODEYAD_EN || $keep['summary_fa'] !== TECHBLOG_CODEYAD_FA || $keep['tags'] !== 'flutter, dart')) {
+        migration_log("techblog codeyad only: project {$keep['id']} previous " . json_encode(['summary' => $keep['summary'], 'summary_fa' => $keep['summary_fa'], 'tags' => $keep['tags']], JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE projects SET summary = ?, summary_fa = ?, tags = ? WHERE id = ?')->execute([TECHBLOG_CODEYAD_EN, TECHBLOG_CODEYAD_FA, 'flutter, dart', $keep['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_CODEYAD_ONLY_MIGRATION . "', '1')");
+}
+
 // Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.
 const INTERN_SPELLING_MIGRATION = 'migration_intern_spelling_v1';
 
