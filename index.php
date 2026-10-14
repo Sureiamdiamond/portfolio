@@ -85,7 +85,13 @@ function render_pane(string $lang, array $shared): array {
       <h1><?= e($firstWords) ?><?php if ($lastWord !== ''): ?> <span class="grad"><?= e($lastWord) ?></span><?php endif; ?></h1>
       <?php if ($about !== ''): ?><p class="lead"><?= nl2br(str_replace('Tobank', '<a href="#projects" class="tobank-link" data-project-link="Tobank">Tobank</a>', e($about))) ?></p><?php endif; ?>
       <div class="actions">
-        <?php if (!empty($profile['cv'])): ?><a class="btn btn-primary" href="<?= e($profile['cv']) ?>" download><?= e(t('download_cv', $lang)) ?></a><?php endif; ?>
+        <div class="cv-hero">
+          <button type="button" class="btn btn-primary cv-hero-btn" aria-expanded="false"><?= e(t('download_cv', $lang)) ?></button>
+          <div class="cv-hero-choices" hidden>
+            <a class="btn btn-outline" href="assets/cv/resume-fa.pdf" download="Parsa-Banitaba-Resume-fa.pdf" hreflang="fa">فارسی</a>
+            <a class="btn btn-outline" href="assets/cv/resume-en.pdf" download="Parsa-Banitaba-Resume-en.pdf" hreflang="en">English</a>
+          </div>
+        </div>
         <?php if (!empty($profile['email'])): ?><a class="btn btn-outline" href="mailto:<?= e($profile['email']) ?>"><?= e(t('email_me', $lang)) ?></a><?php endif; ?>
       </div>
       <?php $heroLocation = loc($profile, 'location', $lang); if ($heroLocation !== ''): ?>

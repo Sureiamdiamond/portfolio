@@ -170,6 +170,10 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 /* Floating CV button: appears after the hero, bottom-right; visible without JS */
 .cv-choices { position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: 84px; z-index: 21; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 .cv-choices[hidden] { display: none; }
+.cv-hero { position: relative; display: inline-flex; }
+.cv-hero-choices { position: absolute; top: calc(100% + 8px); inset-inline-start: 0; z-index: 5; display: flex; flex-direction: column; gap: 8px; min-width: 100%; }
+.cv-hero-choices[hidden] { display: none; }
+.cv-hero-choices .btn { min-height: 44px; background: var(--surface); }
 .cv-choices .btn { min-height: 44px; background: var(--surface); }
 .cv-fab {
   position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 20;

@@ -318,6 +318,16 @@ function initPane(scope, sfx) {
   });
 })();
 
+// Binary mode has no real CV: the CV buttons download a binary PDF with the contact details instead
+function downloadBinaryCv() {
+  const link = document.createElement('a');
+  link.href = 'assets/cv/binary-cv.pdf';
+  link.download = 'binary-cv.pdf';
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
 // Floating CV button opens a small chooser: Persian or English PDF
 (function () {
   // Each language pane has its own copy of the button, so the lookup starts from this pane
@@ -330,20 +340,32 @@ function initPane(scope, sfx) {
   };
   fab.addEventListener('click', (ev) => {
     ev.stopPropagation();
-    // Binary mode has no real CV: the button downloads a binary PDF with the contact details instead
-    if (document.documentElement.dataset.mode === 'binary') {
-      const link = document.createElement('a');
-      link.href = 'assets/cv/binary-cv.pdf';
-      link.download = 'binary-cv.pdf';
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-      return;
-    }
+    if (document.documentElement.dataset.mode === 'binary') return downloadBinaryCv();
     setOpen(list.hidden);
   });
   document.addEventListener('click', (ev) => {
     if (!list.hidden && !ev.target.closest('.cv-dock')) setOpen(false);
+  });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') setOpen(false); });
+})();
+
+// Hero CV button: same chooser as the floating button, opened under the button
+(function () {
+  const hero = scope.querySelector('.cv-hero');
+  if (!hero) return;
+  const btn = hero.querySelector('.cv-hero-btn');
+  const list = hero.querySelector('.cv-hero-choices');
+  const setOpen = (open) => {
+    list.hidden = !open;
+    btn.setAttribute('aria-expanded', String(open));
+  };
+  btn.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    if (document.documentElement.dataset.mode === 'binary') return downloadBinaryCv();
+    setOpen(list.hidden);
+  });
+  document.addEventListener('click', (ev) => {
+    if (!list.hidden && !ev.target.closest('.cv-hero')) setOpen(false);
   });
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') setOpen(false); });
 })();
