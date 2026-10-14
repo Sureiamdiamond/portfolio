@@ -1427,3 +1427,57 @@ function run_experience_title_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . EXPERIENCE_TITLE_MIGRATION . "', '1')");
 }
+
+const MEDIA_MIGRATION = 'migration_slides_research_v1';
+
+/** Adds covers and file lists, and the first slides and research works. Files live under assets/slides and assets/research. */
+function run_media_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . MEDIA_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    foreach (['presentations' => 'cover', 'papers' => 'cover', 'papers_files' => null] as $table => $col) {
+        if ($col === null) continue;
+        $cols = array_column($pdo->query("PRAGMA table_info($table)")->fetchAll(PDO::FETCH_ASSOC), 'name');
+        if (!in_array($col, $cols, true)) {
+            $pdo->exec("ALTER TABLE $table ADD COLUMN $col TEXT");
+        }
+    }
+    $papersCols = array_column($pdo->query("PRAGMA table_info(papers)")->fetchAll(PDO::FETCH_ASSOC), 'name');
+    if (!in_array('files', $papersCols, true)) {
+        $pdo->exec("ALTER TABLE papers ADD COLUMN files TEXT");
+    }
+    migration_log('slides and research: schema ready');
+
+    $slides = [
+        ['Claude Presentation', 'ارائه Claude', 'claude-presentation', 'pptx'],
+        ['DHCP', 'DHCP', 'dhcp', 'pptx'],
+        ['Final Presentation: FDE-LLM', 'ارائه نهایی FDE-LLM', 'final-fde-llm', 'pptx'],
+        ['Modiriat Hafeze', 'مدیریت حافظه', 'modiriat-hafeze', 'pptx'],
+        ['Suggestion System', 'سیستم پیشنهاددهنده', 'suggestion-system', 'pptx'],
+        ['Kernel Hardening', 'مقاوم‌سازی هسته', 'kernel-hardening', 'pptx'],
+        ['Software Engineering', 'مهندسی نرم‌افزار', 'software-engineering', 'pptx'],
+        ['Shojaieekian', 'شجاعی‌ئیکیان', 'shojaieekian', 'pdf'],
+    ];
+    $insert = $pdo->prepare('INSERT INTO presentations (title, title_fa, event, year, pptx, pdf, sort, cover) VALUES (?, ?, ?, NULL, ?, ?, ?, ?)');
+    foreach ($slides as $i => [$en, $fa, $slug, $kind]) {
+        $file = "assets/slides/$slug.$kind";
+        $insert->execute([$en, $fa, '', $kind === 'pptx' ? $file : null, $kind === 'pdf' ? $file : null, $i + 1, "assets/slides/covers/$slug.jpg"]);
+    }
+
+    $works = [
+        ['Linux Kernel Security and Isolation', 'امنیت و جداسازی کرنل لینوکس', 'research-1', 'assets/research/1', ['2024-acsac-rfl.pdf', '3576915.3623220.pdf', 'islab.asiaccs24.pdf', 'safeslab.ccs24.pdf', 'uswitch_sp23.pdf']],
+        ['Social Opinion Prediction with LLM Agents', 'پیش‌بینی نظرات اجتماعی با عامل‌های LLM', 'research-2', 'assets/research/2', ['Yao2025_FDE-LLM_ScientificReports.pdf']],
+        ['Distributed Petri Nets for ROS Robotics', 'شبکه‌های پتری توزیع‌شده برای رباتیک ROS', 'research-3', 'assets/research/3', ['s11334-024-00570-5.pdf']],
+        ['IoT Security with Blockchain', 'امنیت اینترنت اشیا با بلاک‌چین', 'research-4', 'assets/research/4', ['1-s2.0-S1110016825000298-main.pdf', '1-s2.0-S1319157824000284-main.pdf', '1-s2.0-S2542660524002981-main.pdf', 'A_Promising_Integration_of_SDN_and_Blockchain_for_IoT_Networks_A.pdf', 'A_Survey_on_Addressing_IoT_Security_Issues_by_Embedding_Blockchain.pdf', 'agriculture-13-00274-v2.pdf', 'Gill Blockchain Empowered Secure 2024 Accepted.pdf', 'hari-mohan-rai-enhancing-data-security-and-privacy-in.pdf', 'Optimizing_Security_in_IoT_Ecosystems_Using_Hybrid_Artificial_Intelligence.pdf', 'vinay-gugueoth-a-review-of-iot-security-and-privacy.pdf']],
+    ];
+    $insertPaper = $pdo->prepare('INSERT INTO papers (title, title_fa, venue, year, doi, pdf, sort, cover, files) VALUES (?, ?, ?, NULL, NULL, NULL, ?, ?, ?)');
+    foreach ($works as $i => [$en, $fa, $slug, $dir, $names]) {
+        $files = [];
+        foreach ($names as $j => $name) {
+            $files[] = ['path' => "$dir/" . ($j + 1) . '.pdf', 'label' => count($names) > 1 ? 'PDF ' . ($j + 1) : 'PDF'];
+        }
+        $insertPaper->execute([$en, $fa, '', $i + 1, "assets/research/" . ($i + 1) . "/cover.jpg", json_encode($files, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)]);
+    }
+    migration_log('slides and research: added ' . count($slides) . ' slides and ' . count($works) . ' research works');
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . MEDIA_MIGRATION . "', '1')");
+}

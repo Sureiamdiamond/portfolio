@@ -286,18 +286,22 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
 <?php if (($profile['show_research'] ?? '1') !== '0'): ?>
   <section id="research" class="block reveal">
     <h2><?= e(t('papers', $lang)) ?></h2>
-    <?php foreach ($papers as $paper): ?>
-      <article class="row">
-        <div>
+    <div class="media-grid">
+    <?php foreach ($papers as $paper): $files = json_decode((string) ($paper['files'] ?? ''), true) ?: []; ?>
+      <article class="media-card">
+        <?php if (!empty($paper['cover'])): ?><img class="media-cover" src="<?= e($paper['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?>
+        <div class="media-body">
           <h3><?= e(loc($paper, 'title', $lang)) ?></h3>
-          <p class="muted"><?= e(trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? ''))) ?></p>
-        </div>
-        <div class="links">
-          <?php if ($paper['pdf']): ?><a href="<?= e($paper['pdf']) ?>" target="_blank" rel="noopener">PDF</a><?php endif; ?>
-          <?php if ($paper['doi']): ?><a href="https://doi.org/<?= e($paper['doi']) ?>" target="_blank" rel="noopener">DOI</a><?php endif; ?>
+          <?php if (trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? '')) !== ''): ?><p class="muted"><?= e(trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? ''))) ?></p><?php endif; ?>
+          <div class="links media-files">
+            <?php if ($paper['pdf']): ?><a href="<?= e($paper['pdf']) ?>" target="_blank" rel="noopener">PDF</a><?php endif; ?>
+            <?php foreach ($files as $file): ?><a href="<?= e($file['path']) ?>" download><?= e($file['label']) ?></a><?php endforeach; ?>
+            <?php if ($paper['doi']): ?><a href="https://doi.org/<?= e($paper['doi']) ?>" target="_blank" rel="noopener">DOI</a><?php endif; ?>
+          </div>
         </div>
       </article>
     <?php endforeach; ?>
+    </div>
     <?php if (!$papers): ?><p class="muted"><?= e(t('empty_papers', $lang)) ?></p><?php endif; ?>
   </section>
 <?php endif; ?>
@@ -305,21 +309,21 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
 <?php if (($profile['show_slides'] ?? '1') !== '0'): ?>
   <section id="slides" class="block reveal">
     <h2><?= e(t('presentations', $lang)) ?></h2>
+    <div class="media-grid">
     <?php foreach ($slides as $s): ?>
-      <details class="slide">
-        <summary>
-          <strong><?= e(loc($s, 'title', $lang)) ?></strong>
-          <span class="muted"><?= e(trim(($s['event'] ?? '') . ' ' . ($s['year'] ?? ''))) ?></span>
-        </summary>
-        <?php if ($s['pdf']): ?>
-          <iframe src="<?= e($s['pdf']) ?>#view=FitH" title="<?= e(loc($s, 'title', $lang)) ?>" loading="lazy"></iframe>
-        <?php endif; ?>
-        <div class="links">
-          <?php if ($s['pdf']): ?><a href="<?= e($s['pdf']) ?>" target="_blank" rel="noopener"><?= e(t('open_pdf', $lang)) ?></a><?php endif; ?>
-          <?php if ($s['pptx']): ?><a href="<?= e($s['pptx']) ?>" download><?= e(t('download_pptx', $lang)) ?></a><?php endif; ?>
+      <article class="media-card">
+        <?php if (!empty($s['cover'])): ?><img class="media-cover" src="<?= e($s['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?>
+        <div class="media-body">
+          <h3><?= e(loc($s, 'title', $lang)) ?></h3>
+          <?php if (trim(($s['event'] ?? '') . ' ' . ($s['year'] ?? '')) !== ''): ?><p class="muted"><?= e(trim(($s['event'] ?? '') . ' ' . ($s['year'] ?? ''))) ?></p><?php endif; ?>
+          <div class="links">
+            <?php if ($s['pptx']): ?><a href="<?= e($s['pptx']) ?>" download><?= e(t('download_pptx', $lang)) ?></a><?php endif; ?>
+            <?php if ($s['pdf']): ?><a href="<?= e($s['pdf']) ?>" target="_blank" rel="noopener"><?= e(t('open_pdf', $lang)) ?></a><?php endif; ?>
+          </div>
         </div>
-      </details>
+      </article>
     <?php endforeach; ?>
+    </div>
     <?php if (!$slides): ?><p class="muted"><?= e(t('empty_slides', $lang)) ?></p><?php endif; ?>
   </section>
 <?php endif; ?>
