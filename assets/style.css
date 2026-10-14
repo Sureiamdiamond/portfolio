@@ -834,19 +834,16 @@ body.bin-glitch .bin-eyes { animation: bin-jitter .42s steps(2, end) 1; }
 .bin-joke p { margin: 0; }
 .bin-joke-en { font: 600 1rem/1.6 var(--mono); }
 .bin-joke-ok { justify-self: center; padding: 4px 16px; background: #000; color: #39ff7a; border: 1px solid #39ff7a; font: inherit; cursor: pointer; }
-/* Binary mode: the "do you really want to leave" check before switching to another language */
+/* Binary mode: the terminal style "leave us alone? [y/n]" prompt */
 .bin-leave { top: 50%; }
-.bin-leave-body { padding: 12px; text-align: center; }
-.bin-leave-body p { margin: 0; }
-.bin-leave-body p[dir="rtl"] { font: 600 1rem/1.7 var(--sans); }
-.bin-leave-en { margin-top: 6px !important; font-size: .8rem; opacity: .8; }
-.bin-leave-actions { display: flex; gap: 8px; justify-content: center; padding: 0 12px 12px; }
-.bin-leave-actions button { padding: 6px 12px; background: #000; color: #39ff7a; border: 1px solid #39ff7a; font: inherit; cursor: pointer; }
-.bin-leave-actions span { display: block; font-size: .7rem; opacity: .75; }
-/* Language button attention effect after the game is closed with OK */
-.lang-btn.bin-attn { animation: bin-attn .5s steps(2, end) 7; box-shadow: 0 0 0 2px #39ff7a, 0 0 22px rgba(57, 255, 122, .6); }
-@keyframes bin-attn { 0% { transform: translate(0, 0); } 50% { transform: translate(-3px, 1px); } 100% { transform: translate(3px, -1px); } }
-@media (prefers-reduced-motion: reduce) { .lang-btn.bin-attn { animation: none; } }
+.bin-leave-body { padding: 14px 12px; }
+.bin-leave-q { margin: 0 0 10px; font-weight: 600; }
+.bin-leave-line { margin: 0; min-height: 1.4em; }
+.bin-caret { animation: bin-blink 1s steps(2, start) infinite; margin-inline-start: 2px; }
+.bin-leave-keys { display: none; gap: 10px; justify-content: center; padding: 0 12px 12px; }
+.bin-key { min-width: 44px; min-height: 44px; background: #000; color: #39ff7a; border: 1px solid #39ff7a; font: inherit; cursor: pointer; }
+@media (any-hover: none), (max-width: 520px) { .bin-leave-keys { display: flex; } }
+@media (prefers-reduced-motion: reduce) { .bin-caret { animation: none; } }
 .tobank-link { color: var(--accent); font-weight: 600; text-decoration: underline dotted; text-underline-offset: .2em; }
 .tobank-link:hover, .tobank-link:focus-visible { text-decoration-style: solid; }
 .pcard.is-focus { outline: 2px solid var(--accent); outline-offset: 4px; transition: outline-color .6s ease; }
