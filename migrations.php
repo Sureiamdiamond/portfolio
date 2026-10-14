@@ -862,6 +862,21 @@ function run_languages_fce_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LANGUAGES_FCE_MIGRATION . "', '1')");
 }
 
+// Certificate pictures: CAE carries the C1 Advanced badge; FCE and TTC have none yet (monogram tiles). The C1 badge leaves the English level line. Previous values are logged.
+const LANGUAGES_ICONS_MIGRATION = 'migration_languages_icons_v1';
+
+function run_languages_icons_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . LANGUAGES_ICONS_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('languages', 'languages_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('languages icons: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['languages', "English | Advanced (C1)\nFCE | | parent:English\nCAE | | parent:English | icon:assets/img/lang/c1-advanced.webp\nTTC | | parent:English"]);
+    $stmt->execute(['languages_fa', "انگلیسی | پیشرفته (C1)\nFCE | | parent:انگلیسی\nCAE | | parent:انگلیسی | icon:assets/img/lang/c1-advanced.webp\nTTC | | parent:انگلیسی"]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LANGUAGES_ICONS_MIGRATION . "', '1')");
+}
+
 // Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.
 const INTERN_SPELLING_MIGRATION = 'migration_intern_spelling_v1';
 

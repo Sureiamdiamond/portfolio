@@ -142,6 +142,8 @@ function language_items(string $text): array {
         foreach (array_slice($parts, 1) as $part) {
             if (stripos($part, 'parent:') === 0) {
                 $item['parent'] = trim(substr($part, 7));
+            } elseif (stripos($part, 'icon:') === 0) {
+                $item['icon'] = trim(substr($part, 5));
             } elseif ($part !== '' && $item['level'] === '') {
                 $item['level'] = $part;
             }
@@ -151,20 +153,26 @@ function language_items(string $text): array {
     return $items;
 }
 
+/** The picture beside a certificate: its own image when one is set (icon:path in the data), otherwise a neutral monogram tile. */
+function language_slot_html(array $item): string {
+    if ($item['icon'] !== '') {
+        return '<span class="lc-slot"><img class="lc-img" src="' . e($item['icon']) . '" alt="" width="40" height="40" loading="lazy"></span>';
+    }
+    return '<span class="lc-slot"><span class="lc-mono" aria-hidden="true">' . e(mb_strtoupper(mb_substr($item['name'], 0, 4))) . '</span></span>';
+}
+
 /** One language card. A language with sub-items opens a panel with them, the same way as a skill group. */
 function language_card_html(array $group, string $lang = 'en'): string {
     $item = $group['item'];
-    // The Cambridge C1 Advanced badge shows beside every C1 level, in both languages.
-    $badge = stripos($item['level'], 'C1') !== false ? '<img class="lang-badge" src="assets/img/lang/c1-advanced.webp" alt="" width="52" height="52" loading="lazy">' : '';
     $text = '<span class="lang-text"><span class="lang-name">' . e($item['name']) . '</span>'
-        . ($item['level'] !== '' ? '<span class="lang-level">' . $badge . e($item['level']) . '</span>' : '') . '</span>';
+        . ($item['level'] !== '' ? '<span class="lang-level">' . e($item['level']) . '</span>' : '') . '</span>';
     if (!$group['children']) {
         return '<li class="skill lang-card">' . $text . '</li>';
     }
     $panelId = 'lang-panel-' . substr(md5($item['name']), 0, 8);
     $list = '';
     foreach ($group['children'] as $index => $child) {
-        $list .= '<li class="skill-child" style="--i:' . $index . '"><span>' . e($child['name']) . '</span></li>';
+        $list .= '<li class="skill-child" style="--i:' . $index . '">' . language_slot_html($child) . '<span>' . e($child['name']) . '</span></li>';
     }
     return '<li class="skill skill-parent lang-card"><button type="button" class="skill-head" aria-expanded="false" aria-controls="' . $panelId . '">' . $text . '</button>'
         . '<ul class="skill-panel" id="' . $panelId . '">' . $list . '</ul></li>';
