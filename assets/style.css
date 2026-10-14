@@ -533,6 +533,8 @@ body { overflow-x: clip; }
   box-shadow: 0 8px 18px -10px hsl(var(--hue) 85% 45% / .9);
 }
 .ptile-img { object-fit: contain; background: var(--surface); }
+/* TechBlog's mark is drawn 11% larger; the scale leaves the tile box and the card layout unchanged, and grows from the left so the icon stays on the shared left edge. */
+img.ptile-img[src*="techblog"] { transform: scale(1.11); transform-origin: left center; }
 /* TechBlog's mark is drawn on a transparent background. On dark it is a white silhouette: the filter also covers the element's own background, so that is cleared here, otherwise it turns into a white box. */
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); } }
 html[data-theme="dark"] img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); }
