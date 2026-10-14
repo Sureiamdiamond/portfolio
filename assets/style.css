@@ -823,8 +823,12 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 @media (prefers-reduced-motion: reduce) { .bin-static.on { animation: none; } }
 /* Binary mode: the skull drawing sits over the photo eyes, green like the rest of the photo, and jitters with the glitches */
 .bin-eyes { display: none; }
-:root[data-mode="binary"] .bin-eyes { display: block; position: absolute; z-index: 3; left: 33%; top: 16%; width: 34%; height: auto; pointer-events: none; filter: grayscale(1) sepia(1) hue-rotate(60deg) saturate(3) brightness(1.1); }
+:root[data-mode="binary"] .bin-eyes { display: block; position: absolute; z-index: 3; left: 37.25%; top: 19.2%; width: 25.5%; height: auto; pointer-events: none; filter: grayscale(1) sepia(1) hue-rotate(60deg) saturate(3) brightness(1.1); }
 body.bin-glitch .bin-eyes { animation: bin-jitter .42s steps(2, end) 1; }
+/* Binary mode: the one-off 404 screen shown after six seconds */
+.bin-404 { position: fixed; inset: 0; z-index: 960; background: #000; color: #39ff7a; display: grid; place-items: center; cursor: pointer; }
+.bin-404-text { margin: 0; font: 600 clamp(.9rem, 3vw, 1.3rem)/1.7 var(--mono); white-space: pre; padding: 24px; animation: bin-jitter .42s steps(2, end) infinite; text-shadow: 3px 0 rgba(0, 255, 255, .5), -3px 0 rgba(255, 0, 255, .35); }
+@media (prefers-reduced-motion: reduce) { .bin-404-text { animation: none; } }
 .tobank-link { color: var(--accent); font-weight: 600; text-decoration: underline dotted; text-underline-offset: .2em; }
 .tobank-link:hover, .tobank-link:focus-visible { text-decoration-style: solid; }
 .pcard.is-focus { outline: 2px solid var(--accent); outline-offset: 4px; transition: outline-color .6s ease; }

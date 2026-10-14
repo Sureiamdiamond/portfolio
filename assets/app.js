@@ -533,6 +533,19 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       }, 260);
     };
     const closeWin = () => { if (win) { win.remove(); win = null; } };
+    let screen404 = null;
+    const close404 = () => { if (screen404) { screen404.remove(); screen404 = null; } };
+    // A full-screen "404" that looks like the site crashed. It shows once per visit to binary mode, for about a second, and can be skipped.
+    const show404 = () => {
+      if (!running || screen404) return;
+      screen404 = document.createElement('div');
+      screen404.className = 'bin-404';
+      screen404.setAttribute('role', 'status');
+      screen404.innerHTML = '<pre class="bin-404-text">SEGMENTATION FAULT\n0x7F3A  layout.bin corrupted\n\n404  PAGE NOT FOUND\n\nrebooting display...</pre>';
+      document.body.appendChild(screen404);
+      screen404.addEventListener('click', close404);
+      later(close404, 1000);
+    };
     const openWin = () => {
       if (win || !running) return;
       win = document.createElement('div');
@@ -587,6 +600,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       };
       later(burst, 2500);
       later(popup, 7000);
+      later(show404, 6000);
       if (!reduce.matches) window.addEventListener('wheel', onWheel, { passive: false });
     };
     const stop = () => {
@@ -594,6 +608,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       timers.forEach((id) => clearTimeout(id));
       timers = [];
       closeWin();
+      close404();
       document.body.classList.remove('bin-glitch');
       if (staticEl) { staticEl.remove(); staticEl = null; }
       window.removeEventListener('wheel', onWheel);
