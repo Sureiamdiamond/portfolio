@@ -122,7 +122,7 @@ function render_pane(string $lang, array $shared): array {
 
 <?php if (($profile['show_journey'] ?? '1') !== '0'): ?>
   <section id="journey" class="block reveal">
-    <h2><?= e(t('journey', $lang)) ?></h2>
+    <h2><span class="p-mark" aria-hidden="true"></span><?= e(t('journey', $lang)) ?></h2>
     <div class="timeline">
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
         <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
@@ -368,7 +368,7 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
 <a class="to-top" href="#top" aria-label="<?= e(t('back_to_top', $lang)) ?>" title="<?= e(t('back_to_top', $lang)) ?>"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 14l6-6 6 6"/></svg></a>
 
 <footer class="muted">
-  <span class="foot-mark" aria-hidden="true"></span><?= trim((string) ($profile['footer_text'] ?? '')) !== '' ? e($profile['footer_text']) : '© ' . date('Y') . ' ' . e($name) ?>
+  <span class="p-mark" aria-hidden="true"></span><?= trim((string) ($profile['footer_text'] ?? '')) !== '' ? e($profile['footer_text']) : '© ' . date('Y') . ' ' . e($name) ?>
 </footer>
 <?php
     $html = ob_get_clean();
