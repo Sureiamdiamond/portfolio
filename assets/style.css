@@ -95,6 +95,12 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 
 /* Hero */
 .hero { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; padding: 88px 0 72px; }
+/* The hero text shares one centre line: role pill, name, lead, buttons and location. */
+.hero-text { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.hero-text > * { max-width: 100%; }
+.hero-text .lead { max-width: 48ch; }
+.hero-text .actions { justify-content: center; }
+.hero-text .loc { justify-content: center; }
 .pill {
   display: inline-flex; align-items: center; gap: 8px; max-width: 100%; padding: 7px 14px; border-radius: 999px; line-height: 1.4; text-align: start;
   font-size: .88rem; font-weight: 500; color: var(--fg); background: var(--surface); border: 1px solid var(--border);

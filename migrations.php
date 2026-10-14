@@ -1059,3 +1059,19 @@ function run_classyar_stores_v2_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_STORES_V2_MIGRATION . "', '1')");
 }
+
+// The Persian hero pill: a missing or non-Persian headline_fa falls back to the English headline, so it is set to «مهندس نرمافزار / توسعهدهنده فلاتر». Anything already in Persian is kept. Logged with the previous value.
+const ROLE_HEADLINE_FA_V3_MIGRATION = 'migration_role_headline_fa_v3';
+function run_role_headline_fa_v3_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . ROLE_HEADLINE_FA_V3_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $target = 'مهندس نرمافزار / توسعهدهنده فلاتر';
+    $stored = $pdo->query("SELECT v FROM profile WHERE k = 'headline_fa'")->fetchColumn();
+    $stored = $stored === false ? '' : (string) $stored;
+    if (!preg_match('/\p{Arabic}/u', $stored)) {
+        migration_log('role headline fa v3: profile headline_fa previous value ' . json_encode($stored, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare("INSERT INTO profile (k, v) VALUES ('headline_fa', ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v")->execute([$target]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ROLE_HEADLINE_FA_V3_MIGRATION . "', '1')");
+}

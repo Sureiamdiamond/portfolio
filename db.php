@@ -99,6 +99,7 @@ function db(): PDO {
     run_role_headline_v2_migration($pdo);
     run_techblog_group_line_migration($pdo);
     run_classyar_stores_v2_migration($pdo);
+    run_role_headline_fa_v3_migration($pdo);
     return $pdo;
 }
 

@@ -155,7 +155,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 <main id="main">
   <section id="top" class="hero">
     <div class="hero-text">
-      <span class="pill"><span class="dot" aria-hidden="true"></span><?= e($headline) ?></span>
+      <span class="pill"><span class="dot" aria-hidden="true"></span><bdi><?= e($headline) ?></bdi></span>
       <h1><?= e($firstWords) ?><?php if ($lastWord !== ''): ?> <span class="grad"><?= e($lastWord) ?></span><?php endif; ?></h1>
       <?php if ($about !== ''): ?><p class="lead"><?= nl2br(e($about)) ?></p><?php endif; ?>
       <div class="actions">
