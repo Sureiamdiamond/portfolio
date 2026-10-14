@@ -949,3 +949,16 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
 
 /* Personal mark (footer and section heading): the ink of p-mark.png is painted with the text colour, so it follows light and dark mode */
 .p-mark { display: inline-block; width: .95em; height: 1.3em; vertical-align: -0.25em; margin-inline-end: .4em; background: var(--fg); -webkit-mask: url("img/p-mark.png") center / contain no-repeat; mask: url("img/p-mark.png") center / contain no-repeat; }
+
+/* Phones: the floating buttons and their dropdown and chooser panels are solid. Content behind them no longer shows through the text, in light and dark mode. */
+@media (max-width: 760px) {
+  .to-top, html[data-glass="on"] .to-top,
+  .lang-list, .lang-btn, html[data-glass="on"] .lang-btn,
+  .cv-hero-choices .btn, .cv-hero-choices .btn-outline,
+  html[data-glass="on"] .cv-hero-choices .btn, html[data-glass="on"] .cv-hero-choices .btn-outline {
+    background: var(--surface); backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+  .cv-fab, html[data-glass="on"] .cv-fab, .cv-hero-choices .btn-primary, html[data-glass="on"] .cv-hero-choices .btn-primary {
+    background: #0052FF; backdrop-filter: none; -webkit-backdrop-filter: none;
+  }
+}
