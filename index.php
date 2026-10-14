@@ -64,6 +64,7 @@ function render_pane(string $lang, array $shared): array {
       <?php if (($profile['show_slides'] ?? '1') !== '0'): ?><a href="#slides"><?= e(t('presentations', $lang)) ?></a><?php endif; ?>
     </nav>
     <div class="nav-actions">
+      <span class="p-mark p-mark-top" aria-hidden="true"></span>
       <div class="lang-menu" data-lang-menu>
         <button type="button" class="tool lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-list"><span class="lang-label"><?= e(t('language', $lang)) ?></span> <span class="arr" aria-hidden="true">▾</span></button>
         <ul class="lang-list" id="lang-list" hidden>
