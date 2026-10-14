@@ -755,6 +755,21 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 
 /* Language menu: Persian, English, Binary */
 .lang-menu { position: relative; }
+/* After the binary game's OK: a pulsing ring on the language button and a hint that stays until it is clicked or hovered */
+.lang-btn.bin-attn { color: #39ff7a; border-color: #39ff7a; animation: bin-ring 1.1s ease-in-out infinite; }
+@keyframes bin-ring {
+  50% { box-shadow: 0 0 0 5px rgba(57, 255, 122, .18), 0 0 24px rgba(57, 255, 122, .85); }
+}
+.bin-hint {
+  position: absolute; top: calc(100% + 10px); inset-inline-end: 0; z-index: 40; pointer-events: none;
+  padding: 6px 10px; border: 1px solid #39ff7a; border-radius: 6px; background: #000; color: #39ff7a;
+  font: 600 .8rem var(--mono); white-space: nowrap; box-shadow: 0 0 14px rgba(57, 255, 122, .45);
+  animation: bin-hint-bob 1s ease-in-out infinite;
+}
+@keyframes bin-hint-bob { 50% { transform: translateY(-4px); } }
+/* On phones the language button is at the left edge, so the hint grows to the right instead */
+@media (max-width: 520px) { .bin-hint { inset-inline-start: 0; inset-inline-end: auto; } }
+@media (prefers-reduced-motion: reduce) { .lang-btn.bin-attn, .bin-hint { animation: none; } }
 .lang-btn { display: inline-flex; align-items: center; gap: 6px; }
 .lang-list { position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 60; min-width: 170px; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
 .lang-list[hidden] { display: none; }
