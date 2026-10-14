@@ -877,7 +877,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     const meta = document.querySelector('meta[name="description"]');
     if (meta && html.dataset['desc' + cap]) meta.setAttribute('content', html.dataset['desc' + cap]);
     try { document.cookie = 'lang=' + lang + '; path=/; max-age=31536000; samesite=lax'; } catch (e) { /* cookies blocked: the choice applies to this page */ }
-    try { history.replaceState(null, '', '?lang=' + lang + location.hash); } catch (e) { /* history blocked: the URL keeps its old language */ }
+    try { history.replaceState(null, '', '?lang=' + lang + (lang === 'bin' ? '' : location.hash)); } catch (e) { /* history blocked: the URL keeps its old language */ }
     document.querySelectorAll('[data-lang-choice]').forEach((a) => {
       if (a.dataset.langChoice === lang) a.setAttribute('aria-current', 'true');
       else a.removeAttribute('aria-current');
@@ -908,6 +908,8 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     const apply = () => {
       showLang(lang);
       carried();
+      // Entering binary mode always starts at the top of the page, and the 404 timer starts from this moment
+      if (lang === 'bin') { window.scrollTo({ top: 0, behavior: 'instant' }); return; }
       const target = base ? document.querySelector('.pane[data-pane="' + lang + '"] #' + CSS.escape(base + suffixFor(lang))) : null;
       if (target) window.scrollTo({ top: target.offsetTop + share * target.offsetHeight, behavior: 'instant' });
     };
