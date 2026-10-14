@@ -101,6 +101,11 @@ function project_links(array $p): array {
         ['Cafebazaar', $p['bazaar_url'] ?? ''],
         ['Website', $p['url'] ?? ''],
     ];
+    foreach (json_decode((string) ($p['extra_links'] ?? ''), true) ?: [] as $link) {
+        if (is_array($link)) {
+            $pairs[] = [trim((string) ($link['label'] ?? 'Link')), trim((string) ($link['url'] ?? ''))];
+        }
+    }
     return array_values(array_filter($pairs, fn($l) => trim((string) $l[1]) !== ''));
 }
 

@@ -265,17 +265,9 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       <div class="grid">
         <?php foreach ($projects as $p): $shots = $projectShots[$p['id']] ?? []; ?>
           <?php
-            // The card's link: GitHub first, then the website or store. A card with no external link has none.
-            $primary = '';
-            $primaryName = ['', ''];
-            $primaryNames = [
-                'github_url' => ['GitHub', 'گیت‌هاب'], 'url' => ['Website', 'وب‌سایت'], 'playstore_url' => ['Google Play', 'گوگل‌پلی'],
-                'appstore_url' => ['App Store', 'اپ‌استور'], 'bazaar_url' => ['Bazaar', 'بازار'],
-            ];
-            foreach (array_keys($primaryNames) as $key) {
-                $candidate = trim((string) ($p[$key] ?? ''));
-                if (preg_match('#^https?://#i', $candidate)) { $primary = $candidate; $primaryName = $primaryNames[$key]; break; }
-            }
+            // The card's links: one direct link, or a small list when the project has several (see project_options).
+            $options = project_options($p, $lang);
+            $primary = $options[0][1] ?? '';
           ?>
           <article class="card pcard" data-kind="<?= e($p['kind']) ?>">
             <?php if ($shots): ?>
@@ -291,8 +283,17 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
             <?php if (count($shots) > 1): ?>
               <ul class="pcard-shots"><?php foreach (array_slice($shots, 1) as $more): ?><li><img src="<?= e($more) ?>" alt="" loading="lazy"></li><?php endforeach; ?></ul>
             <?php endif; ?>
-            <?php if ($primary !== ''): ?>
-              <a class="pcard-ext" href="<?= e($primary) ?>" target="_blank" rel="noopener"><?= e($primaryName[$lang === 'fa' ? 1 : 0]) ?> <span class="arr" aria-hidden="true">→</span></a>
+            <?php if (count($options) === 1): ?>
+              <a class="pcard-ext" href="<?= e($options[0][1]) ?>" target="_blank" rel="noopener"><?= e($options[0][0]) ?> <span class="arr" aria-hidden="true">→</span></a>
+            <?php elseif (count($options) > 1): ?>
+              <div class="pcard-menu">
+                <button type="button" class="pcard-ext pcard-menu-btn" aria-haspopup="menu" aria-expanded="false"><?= $lang === 'fa' ? 'لینک‌ها' : 'Links' ?> <span class="arr" aria-hidden="true">▾</span></button>
+                <ul class="pcard-menu-list" role="menu" hidden>
+                  <?php foreach ($options as [$optionLabel, $optionUrl]): ?>
+                    <li role="none"><a role="menuitem" href="<?= e($optionUrl) ?>" target="_blank" rel="noopener"><?= e($optionLabel) ?></a></li>
+                  <?php endforeach; ?>
+                </ul>
+              </div>
             <?php endif; ?>
           </article>
         <?php endforeach; ?>

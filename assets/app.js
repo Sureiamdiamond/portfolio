@@ -331,3 +331,35 @@
     });
   });
 })();
+
+// Project link lists: a card with several links opens a small list. Esc, a click outside, or focus leaving the list closes it.
+(function () {
+  const setOpen = (menu, open) => {
+    menu.classList.toggle('is-open', open);
+    menu.querySelector('.pcard-menu-btn').setAttribute('aria-expanded', String(open));
+    menu.querySelector('.pcard-menu-list').hidden = !open;
+    const card = menu.closest('.pcard');
+    if (card) card.classList.toggle('menu-open', open);
+  };
+  const closeAll = (except) => document.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (m !== except) setOpen(m, false); });
+
+  document.querySelectorAll('.pcard-menu').forEach((menu) => {
+    const btn = menu.querySelector('.pcard-menu-btn');
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const open = !menu.classList.contains('is-open');
+      closeAll(menu);
+      setOpen(menu, open);
+      if (open) menu.querySelector('.pcard-menu-list a').focus();
+    });
+    menu.addEventListener('keydown', (ev) => {
+      if (ev.key === 'Escape') { setOpen(menu, false); btn.focus(); }
+    });
+    menu.addEventListener('focusout', (ev) => {
+      if (!menu.contains(ev.relatedTarget)) setOpen(menu, false);
+    });
+  });
+  document.addEventListener('click', (ev) => {
+    document.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (!m.contains(ev.target)) setOpen(m, false); });
+  });
+})();

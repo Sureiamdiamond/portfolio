@@ -78,7 +78,7 @@ function login_succeeded(string $ip): void {
 }
 
 const TYPES = [
-    'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'sort'], 'long' => ['summary', 'summary_fa'], 'files' => []],
+    'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'extra_links', 'sort'], 'long' => ['summary', 'summary_fa', 'extra_links'], 'files' => []],
     'papers' => ['label' => 'Research', 'fields' => ['title', 'title_fa', 'venue', 'year', 'doi', 'sort'], 'long' => [], 'files' => ['pdf']],
     'presentations' => ['label' => 'Slides', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
     'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'city', 'city_fa', 'period', 'period_fa', 'website', 'bullets', 'bullets_fa', 'details', 'details_fa', 'sort'], 'long' => ['bullets', 'bullets_fa', 'details', 'details_fa'], 'files' => []],

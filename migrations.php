@@ -986,3 +986,19 @@ function run_techblog_podcast_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_V4_MIGRATION . "', '1')");
 }
+
+// Classyar's card opens a list of stores: Cafe Bazaar (bazaar_url) and Myket (extra link). Written only when no extra links are stored yet.
+const CLASSYAR_STORES_MIGRATION = 'migration_classyar_stores_v1';
+const CLASSYAR_EXTRA_LINKS = [['label' => 'Myket', 'label_fa' => 'مایکت', 'url' => 'https://myket.ir/app/com.classyar.app']];
+function run_classyar_stores_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CLASSYAR_STORES_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $row = $pdo->query("SELECT * FROM projects WHERE LOWER(TRIM(title)) = 'classyar app' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($row && trim((string) ($row['extra_links'] ?? '')) === '') {
+        migration_log("classyar stores: project {$row['id']} previous extra_links " . json_encode($row['extra_links'] ?? null, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE projects SET extra_links = ? WHERE id = ?')
+            ->execute([json_encode(CLASSYAR_EXTRA_LINKS, JSON_UNESCAPED_UNICODE), $row['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_STORES_MIGRATION . "', '1')");
+}

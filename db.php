@@ -44,7 +44,7 @@ function db(): PDO {
         SQL);
     // Backward-compatible migration: add Persian columns to existing databases.
     $persianColumns = [
-        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'icon'],
+        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'icon', 'extra_links'],
         'papers' => ['title_fa'],
         'presentations' => ['title_fa'],
         'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa', 'city', 'city_fa', 'website', 'logo', 'bullets', 'bullets_fa'],
@@ -95,6 +95,7 @@ function db(): PDO {
     run_project_fa_names_migration($pdo);
     run_techblog_name_disclaimer_migration($pdo);
     run_techblog_podcast_migration($pdo);
+    run_classyar_stores_migration($pdo);
     return $pdo;
 }
 
@@ -218,6 +219,41 @@ function upload_in_use(PDO $pdo, string $path): bool {
 function loc(array $row, string $field, string $lang): string {
     $fa = trim((string) ($row[$field . '_fa'] ?? ''));
     return ($lang === 'fa' && $fa !== '') ? $fa : (string) ($row[$field] ?? '');
+}
+
+/** Every external link a project card offers, as [label, url]: the fixed links first, then the extra links (a JSON list of {label, label_fa, url}) from the admin. One entry means a direct link; more open a small list. */
+function project_options(array $p, string $lang): array {
+    $fixed = [
+        'github_url' => ['GitHub', 'گیت‌هاب'], 'url' => ['Website', 'وب‌سایت'], 'playstore_url' => ['Google Play', 'گوگل‌پلی'],
+        'appstore_url' => ['App Store', 'اپ‌استور'], 'bazaar_url' => ['Cafe Bazaar', 'کافهبازار'],
+    ];
+    $options = [];
+    foreach ($fixed as $key => [$en, $faLabel]) {
+        $url = trim((string) ($p[$key] ?? ''));
+        if (preg_match('#^https?://#i', $url)) {
+            $options[] = [$lang === 'fa' ? $faLabel : $en, $url];
+        }
+    }
+    $extra = json_decode((string) ($p['extra_links'] ?? ''), true);
+    foreach (is_array($extra) ? $extra : [] as $link) {
+        $url = trim((string) ($link['url'] ?? ''));
+        if (!preg_match('#^https?://#i', $url)) {
+            continue;
+        }
+        $label = trim((string) ($lang === 'fa' ? ($link['label_fa'] ?? '') : ($link['label'] ?? '')));
+        if ($label === '') {
+            $label = trim((string) ($link['label'] ?? '')) !== '' ? trim((string) $link['label']) : $url;
+        }
+        $options[] = [$label, $url];
+    }
+    $seen = [];
+    return array_values(array_filter($options, function (array $option) use (&$seen): bool {
+        if (isset($seen[$option[1]])) {
+            return false;
+        }
+        $seen[$option[1]] = true;
+        return true;
+    }));
 }
 
 function e(?string $value): string {
