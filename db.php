@@ -98,6 +98,7 @@ function db(): PDO {
     run_classyar_stores_migration($pdo);
     run_role_headline_v2_migration($pdo);
     run_techblog_group_line_migration($pdo);
+    run_classyar_stores_v2_migration($pdo);
     return $pdo;
 }
 
@@ -227,13 +228,14 @@ function loc(array $row, string $field, string $lang): string {
 function project_options(array $p, string $lang): array {
     $fixed = [
         'github_url' => ['GitHub', 'گیت‌هاب'], 'url' => ['Website', 'وب‌سایت'], 'playstore_url' => ['Google Play', 'گوگل‌پلی'],
-        'appstore_url' => ['App Store', 'اپ‌استور'], 'bazaar_url' => ['Cafe Bazaar', 'کافهبازار'],
+        'appstore_url' => ['App Store', 'اپ‌استور'], 'bazaar_url' => ['Bazaar', 'بازار'],
     ];
+    $fixedIcons = ['bazaar_url' => 'assets/img/stores/bazaar.svg'];
     $options = [];
     foreach ($fixed as $key => [$en, $faLabel]) {
         $url = trim((string) ($p[$key] ?? ''));
         if (preg_match('#^https?://#i', $url)) {
-            $options[] = [$lang === 'fa' ? $faLabel : $en, $url];
+            $options[] = [$lang === 'fa' ? $faLabel : $en, $url, $fixedIcons[$key] ?? ''];
         }
     }
     $extra = json_decode((string) ($p['extra_links'] ?? ''), true);
@@ -246,7 +248,7 @@ function project_options(array $p, string $lang): array {
         if ($label === '') {
             $label = trim((string) ($link['label'] ?? '')) !== '' ? trim((string) $link['label']) : $url;
         }
-        $options[] = [$label, $url];
+        $options[] = [$label, $url, trim((string) ($link['icon'] ?? ''))];
     }
     $seen = [];
     return array_values(array_filter($options, function (array $option) use (&$seen): bool {

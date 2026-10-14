@@ -192,9 +192,19 @@ html[data-projects-view="normal"] .pt-window { display: none !important; }
 .pcard-menu { position: relative; z-index: 2; display: inline-block; }
 .pcard-menu-btn { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
 .pcard-menu-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
-.pcard-menu-list { position: absolute; z-index: 20; top: calc(100% + 6px); inset-inline-start: 0; min-width: 190px; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); }
-.pcard-menu-list[hidden] { display: none; }
-.pcard-menu-list a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--fg); text-decoration: none; font-size: .92rem; }
+.pcard-menu-list { position: absolute; z-index: 20; top: calc(100% + 6px); inset-inline-start: 0; min-width: 190px; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: 12px; box-shadow: var(--shadow); transform-origin: top center; opacity: 0; visibility: hidden; transform: translateY(-6px) scale(.97); transition: opacity .18s ease-out, transform .18s ease-out, visibility 0s linear .18s; }
+.pcard-menu.is-open .pcard-menu-list { opacity: 1; visibility: visible; transform: none; transition: opacity .18s ease-out, transform .18s ease-out, visibility 0s; }
+.pcard-menu-btn .arr { display: inline-block; transition: transform .18s ease-out; }
+.pcard-menu.is-open .pcard-menu-btn .arr { transform: rotate(180deg); }
+.pmenu-icon { width: 18px; height: 18px; object-fit: contain; flex: none; }
+html:not([data-theme="light"]) .pmenu-icon { filter: invert(1); }
+html[data-theme="dark"] .pmenu-icon { filter: invert(1); }
+.pcard-menu-list a { display: flex; align-items: center; gap: 10px; }
+@media (prefers-reduced-motion: reduce) {
+  .pcard-menu-list, .pcard-menu-btn .arr { transition: none; transform: none; }
+  .pcard-menu-list { transform: none; }
+}
+.pcard-menu-list a { padding: 8px 10px; border-radius: 8px; color: var(--fg); text-decoration: none; font-size: .92rem; }
 .pcard-menu-list a:hover, .pcard-menu-list a:focus-visible { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent); outline: none; }
 .pcard.menu-open { z-index: 30; }
 .pcard-ext { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-size: .9rem; }

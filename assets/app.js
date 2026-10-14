@@ -337,7 +337,6 @@
   const setOpen = (menu, open) => {
     menu.classList.toggle('is-open', open);
     menu.querySelector('.pcard-menu-btn').setAttribute('aria-expanded', String(open));
-    menu.querySelector('.pcard-menu-list').hidden = !open;
     const card = menu.closest('.pcard');
     if (card) card.classList.toggle('menu-open', open);
   };

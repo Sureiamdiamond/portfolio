@@ -1044,3 +1044,18 @@ function run_techblog_group_line_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_V5_MIGRATION . "', '1')");
 }
+
+// Classyar's store list: Bazaar (the bazaar link, labelled «بازار») first, then Myket, each with its icon. Only the stored Myket list is replaced, and the previous value is logged.
+const CLASSYAR_STORES_V2_MIGRATION = 'migration_classyar_stores_v2';
+function run_classyar_stores_v2_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CLASSYAR_STORES_V2_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $row = $pdo->query("SELECT * FROM projects WHERE LOWER(TRIM(title)) = 'classyar app' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    $list = [['label' => 'Myket', 'label_fa' => 'مایکت', 'url' => 'https://myket.ir/app/com.classyar.app', 'icon' => 'assets/img/stores/myket.svg']];
+    if ($row && (string) ($row['extra_links'] ?? '') !== json_encode($list, JSON_UNESCAPED_UNICODE)) {
+        migration_log("classyar stores v2: project {$row['id']} previous extra_links " . json_encode($row['extra_links'] ?? null, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE projects SET extra_links = ? WHERE id = ?')->execute([json_encode($list, JSON_UNESCAPED_UNICODE), $row['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_STORES_V2_MIGRATION . "', '1')");
+}

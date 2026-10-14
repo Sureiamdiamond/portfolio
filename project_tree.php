@@ -98,7 +98,7 @@ function project_links(array $p): array {
         ['GitHub', $p['github_url'] ?? ''],
         ['App Store', $p['appstore_url'] ?? ''],
         ['Google Play', $p['playstore_url'] ?? ''],
-        ['Cafebazaar', $p['bazaar_url'] ?? ''],
+        ['Bazaar', $p['bazaar_url'] ?? ''],
         ['Website', $p['url'] ?? ''],
     ];
     foreach (json_decode((string) ($p['extra_links'] ?? ''), true) ?: [] as $link) {
