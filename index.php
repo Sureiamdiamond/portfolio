@@ -427,7 +427,7 @@ $pageUrl = $lang === 'fa' ? $siteUrl . '/?lang=fa' : $siteUrl . '/';
 $summary = trim(preg_replace('/\s+/u', ' ', strip_tags($about)));
 $description = $descs[$lang];
 $photoImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait-cutout.png');
-$shareImage = $siteUrl . '/assets/img/app-icon-512.png?v=' . $assetVersion;
+$shareImage = $siteUrl . '/assets/img/share-1200x630.png?v=' . $assetVersion;
 $personData = [
     '@context' => 'https://schema.org',
     '@type' => 'Person',
@@ -457,12 +457,18 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 <meta property="og:description" content="<?= e($description) ?>">
 <meta property="og:url" content="<?= e($pageUrl) ?>">
 <meta property="og:image" content="<?= e($shareImage) ?>">
+<meta property="og:image:secure_url" content="<?= e($shareImage) ?>">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="<?= e($name) ?>">
 <meta property="og:locale" content="<?= $lang === 'fa' ? 'fa_IR' : 'en_US' ?>">
 <meta property="og:locale:alternate" content="<?= $lang === 'fa' ? 'en_US' : 'fa_IR' ?>">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="<?= e($name) ?> · <?= e($headline) ?>">
 <meta name="twitter:description" content="<?= e($description) ?>">
 <meta name="twitter:image" content="<?= e($shareImage) ?>">
+<meta name="twitter:image:alt" content="<?= e($name) ?>">
 <link rel="icon" href="assets/img/favicon-32.png?v=<?= $assetVersion ?>" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=<?= $assetVersion ?>">
 <script type="application/ld+json"><?= json_encode($personData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
