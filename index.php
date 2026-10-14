@@ -58,7 +58,7 @@ function render_pane(string $lang, array $shared): array {
 <header class="topbar">
   <div class="topbar-inner">
     <nav class="nav-links" aria-label="<?= e(t('projects', $lang)) ?>">
-      <?php if (($profile['show_journey'] ?? '1') !== '0'): ?><a href="#journey"><?= e(t('journey', $lang)) ?></a><?php endif; ?>
+      <?php if (($profile['show_journey'] ?? '1') !== '0'): ?><a href="#journey"><span class="p-mark" aria-hidden="true"></span><?= e(t('journey', $lang)) ?></a><?php endif; ?>
       <?php if (($profile['show_projects'] ?? '1') !== '0'): ?><a href="#projects"><?= e(t('projects', $lang)) ?></a><?php endif; ?>
       <?php if (($profile['show_research'] ?? '1') !== '0'): ?><a href="#research"><?= e(t('papers', $lang)) ?></a><?php endif; ?>
       <?php if (($profile['show_slides'] ?? '1') !== '0'): ?><a href="#slides"><?= e(t('presentations', $lang)) ?></a><?php endif; ?>
@@ -122,7 +122,7 @@ function render_pane(string $lang, array $shared): array {
 
 <?php if (($profile['show_journey'] ?? '1') !== '0'): ?>
   <section id="journey" class="block reveal">
-    <h2><span class="p-mark" aria-hidden="true"></span><?= e(t('journey', $lang)) ?></h2>
+    <h2><?= e(t('journey', $lang)) ?></h2>
     <div class="timeline">
       <?php foreach ([['education', $education], ['experience', $experience]] as [$label, $items]): ?>
         <h3 class="sub"><?= e(t($label, $lang)) ?></h3>
