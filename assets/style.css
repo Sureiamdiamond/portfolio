@@ -966,7 +966,7 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
 /* Phones: the personal mark sits at the right edge of the top row, 10% of the screen width in from the edge, and not in the menu row. Desktop keeps it in the menu. */
 .p-mark-top { display: none; }
 @media (max-width: 760px) {
-  .p-mark-top { display: block; position: absolute; top: 19px; right: 10vw; width: 1.225em; height: 1.725em; font-size: .92rem; background: var(--fg); -webkit-mask: url("img/p-mark.png") center / contain no-repeat; mask: url("img/p-mark.png") center / contain no-repeat; }
+  .p-mark-top { display: block; position: absolute; top: 18px; right: 10vw; width: 1.3475em; height: 1.8975em; font-size: .92rem; background: var(--fg); -webkit-mask: url("img/p-mark.png") center / contain no-repeat; mask: url("img/p-mark.png") center / contain no-repeat; }
   .nav-links .p-mark { display: none; }
 }
 
