@@ -466,7 +466,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
   };
 
   // Binary pane: a copy of the English pane. Each piece of text is written as the UTF-8 bytes of the words, 8 bits per byte, so it decodes back to the same text. The IDE window, the menus and the form controls keep their English text.
-  const BINARY_SKIP = '.pt-window, .lang-menu, script, style, noscript, svg, textarea, input, select, option';
+  const BINARY_SKIP = '.pt-window, .lang-menu, .tobank-link, script, style, noscript, svg, textarea, input, select, option';
   const encodeBinary = (text) => Array.from(new TextEncoder().encode(text), (b) => b.toString(2).padStart(8, '0')).join(' ');
   const suffixIds = (root, sfx) => {
     root.querySelectorAll('[id]').forEach((el) => { el.id = el.id + sfx; });
@@ -586,6 +586,23 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       closeMenus(menu);
       list.hidden = !open;
       btn.setAttribute('aria-expanded', String(open));
+      return;
+    }
+    const projectLink = ev.target.closest('[data-project-link]');
+    if (projectLink) {
+      // Jump to the projects section in the visible language pane and highlight that project's card
+      ev.preventDefault();
+      const pane = projectLink.closest('.pane') || document;
+      const found = pane.querySelector(`.pcard[data-project="${projectLink.dataset.projectLink}"]`);
+      const card = found && !found.hidden ? found : null;
+      const target = card || pane.querySelector('#projects');
+      if (!target) return;
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      target.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+      if (card) {
+        card.classList.add('is-focus');
+        setTimeout(() => card.classList.remove('is-focus'), 1800);
+      }
       return;
     }
     const choice = ev.target.closest('[data-lang-choice]');

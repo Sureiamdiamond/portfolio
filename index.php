@@ -83,7 +83,7 @@ function render_pane(string $lang, array $shared): array {
     <div class="hero-text">
       <span class="pill"><span class="dot" aria-hidden="true"></span><bdi><?= e($headline) ?></bdi></span>
       <h1><?= e($firstWords) ?><?php if ($lastWord !== ''): ?> <span class="grad"><?= e($lastWord) ?></span><?php endif; ?></h1>
-      <?php if ($about !== ''): ?><p class="lead"><?= nl2br(e($about)) ?></p><?php endif; ?>
+      <?php if ($about !== ''): ?><p class="lead"><?= nl2br(str_replace('Tobank', '<a href="#projects" class="tobank-link" data-project-link="Tobank">Tobank</a>', e($about))) ?></p><?php endif; ?>
       <div class="actions">
         <?php if (!empty($profile['cv'])): ?><a class="btn btn-primary" href="<?= e($profile['cv']) ?>" download><?= e(t('download_cv', $lang)) ?></a><?php endif; ?>
         <?php if (!empty($profile['email'])): ?><a class="btn btn-outline" href="mailto:<?= e($profile['email']) ?>"><?= e(t('email_me', $lang)) ?></a><?php endif; ?>
@@ -96,6 +96,7 @@ function render_pane(string $lang, array $shared): array {
       <span class="ring"></span>
       <div class="portrait">
         <img class="portrait-img" src="<?= e($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png?v=' . $assetVersion) ?>" alt="<?= e($name) ?>" width="380" height="541" decoding="async">
+        <img class="portrait-bin" src="assets/img/portrait-binary.png?v=<?= $assetVersion ?>" alt="" width="358" height="512" decoding="async">
         <svg class="dash" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
           <path class="dash-tail" d="M12 40 L3 33 L5 42 L1 47 L14 46 Z" fill="#029EFD"/>
           <path class="dash-body" d="M10 42 C16 28 34 22 48 27 C55 29 58 34 56 38 C53 44 36 48 22 49 C16 50 11 47 10 42 Z" fill="#54C5F8"/>
@@ -194,7 +195,7 @@ function render_pane(string $lang, array $shared): array {
             $options = project_options($p, $lang);
             $primary = $options[0][1] ?? '';
           ?>
-          <article class="card pcard" data-kind="<?= e($p['kind']) ?>">
+          <article class="card pcard" data-kind="<?= e($p['kind']) ?>" data-project="<?= e($p['title']) ?>">
             <?php if ($shots): ?>
               <figure class="pcard-shot"><img src="<?= e($shots[0]) ?>" alt="" loading="lazy"></figure>
             <?php endif; ?>

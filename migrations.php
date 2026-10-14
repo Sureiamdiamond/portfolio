@@ -1377,3 +1377,19 @@ function run_classyar_stores_v3_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_STORES_V3_MIGRATION . "', '1')");
 }
+
+const TOBANK_LEAD_MIGRATION = 'migration_tobank_lead_v1';
+
+/** The Persian intro names the app as "Tobank" in English only, without the Persian bank name in brackets. Previous text is logged. */
+function run_tobank_lead_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TOBANK_LEAD_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $current = (string) $pdo->query("SELECT v FROM profile WHERE k = 'about_fa'")->fetchColumn();
+    if (str_contains($current, 'توبانک (بانک گردشگری)')) {
+        migration_log('tobank lead: previous about_fa ' . json_encode($current, JSON_UNESCAPED_UNICODE));
+        $stmt = $pdo->prepare('UPDATE profile SET v = ? WHERE k = ?');
+        $stmt->execute([str_replace('توبانک (بانک گردشگری)', 'Tobank', $current), 'about_fa']);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TOBANK_LEAD_MIGRATION . "', '1')");
+}

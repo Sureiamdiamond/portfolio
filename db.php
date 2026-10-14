@@ -115,6 +115,7 @@ function db(): PDO {
     run_role_headline_fa_v3_migration($pdo);
     run_role_headline_fa_v4_migration($pdo);
     run_classyar_stores_v3_migration($pdo);
+    run_tobank_lead_migration($pdo);
     return $pdo;
 }
 
