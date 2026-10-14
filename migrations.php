@@ -936,3 +936,27 @@ function run_project_fa_names_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . PROJECT_FA_NAMES_MIGRATION . "', '1')");
 }
+
+// TechBlog: the Persian name takes a half-space (تک‌بلاگ), and the instructor disclaimer is added as a new paragraph in both descriptions. Each step runs only when its text is not already there, and the previous values are logged.
+const TECHBLOG_V3_MIGRATION = 'migration_techblog_name_disclaimer_v3';
+const TECHBLOG_DISCLAIMER_EN = "⚠ This repository is part of my educational activities as an instructor. It was created solely for learning purposes and is not intended to reflect production-level code or professional portfolio projects.";
+const TECHBLOG_DISCLAIMER_FA = "⚠ این مخزن بخشی از فعالیت‌های آموزشی من به‌عنوان مدرس است. این پروژه صرفاً برای اهداف آموزشی ساخته شده و قرار نیست نمایانگر کد در سطح محصول واقعی یا پروژه‌های حرفه‌ای نمونه‌کار باشد.";
+function run_techblog_name_disclaimer_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TECHBLOG_V3_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $row = $pdo->query("SELECT * FROM projects WHERE LOWER(TRIM(title)) = 'techblog' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        $titleFa = (string) $row['title_fa'];
+        $newTitle = in_array(trim($titleFa), ['تکبلاگ', 'تک بلاگ', "تک\u{200C}بلاگ"], true) ? "تک\u{200C}بلاگ" : $titleFa;
+        $en = (string) $row['summary'];
+        $fa = (string) $row['summary_fa'];
+        $newEn = str_contains($en, TECHBLOG_DISCLAIMER_EN) ? $en : rtrim($en) . "\n\n" . TECHBLOG_DISCLAIMER_EN;
+        $newFa = str_contains($fa, TECHBLOG_DISCLAIMER_FA) ? $fa : rtrim($fa) . "\n\n" . TECHBLOG_DISCLAIMER_FA;
+        if ($newTitle !== $titleFa || $newEn !== $en || $newFa !== $fa) {
+            migration_log("techblog name/disclaimer: project {$row['id']} previous " . json_encode([$titleFa, $en, $fa], JSON_UNESCAPED_UNICODE));
+            $pdo->prepare('UPDATE projects SET title_fa = ?, summary = ?, summary_fa = ? WHERE id = ?')->execute([$newTitle, $newEn, $newFa, $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_V3_MIGRATION . "', '1')");
+}
