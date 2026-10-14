@@ -877,3 +877,23 @@ function run_classyar_name_fa_migration(PDO $pdo): void {
     $stmt->execute();
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_NAME_FA_MIGRATION . "', '1')");
 }
+
+// The hero line under the name: English «Software Engineer / Flutter developer», Persian «مهندس نرمافزار / توسعهدهنده فلاتر». Only empty headlines and the old default wording are replaced; a custom headline set in /admin is kept.
+const ROLE_HEADLINE_MIGRATION = 'migration_role_headline_v1';
+function run_role_headline_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . ROLE_HEADLINE_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $defaults = ['headline' => ['', 'Software engineer'], 'headline_fa' => ['', 'مهندس نرم‌افزار']];
+    $targets = ['headline' => 'Software Engineer / Flutter developer', 'headline_fa' => 'مهندس نرمافزار / توسعهدهنده فلاتر'];
+    $current = $pdo->query("SELECT k, v FROM profile WHERE k IN ('headline', 'headline_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $update = $pdo->prepare('UPDATE profile SET v = ? WHERE k = ?');
+    foreach ($targets as $k => $new) {
+        $old = (string) ($current[$k] ?? '');
+        if (in_array(trim($old), $defaults[$k], true)) {
+            migration_log("role headline: profile $k previous value " . json_encode($old, JSON_UNESCAPED_UNICODE));
+            $update->execute([$new, $k]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ROLE_HEADLINE_MIGRATION . "', '1')");
+}

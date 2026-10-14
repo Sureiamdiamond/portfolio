@@ -91,6 +91,7 @@ function db(): PDO {
     run_edu_order_migration($pdo);
     run_sdui_links_migration($pdo);
     run_classyar_name_fa_migration($pdo);
+    run_role_headline_migration($pdo);
     return $pdo;
 }
 
