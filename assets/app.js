@@ -896,9 +896,31 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     };
   };
 
-  const switchTo = (lang) => {
+  // Leaving binary mode asks first. Yes changes the language, No stays in binary mode. Escape counts as No.
+  let leaveAsk = null;
+  const leaveKey = (ev) => { if (ev.key === 'Escape') closeLeave(); };
+  const closeLeave = () => {
+    if (leaveAsk) { leaveAsk.remove(); leaveAsk = null; }
+    document.removeEventListener('keydown', leaveKey);
+  };
+  const askLeave = (lang) => {
+    closeLeave();
+    leaveAsk = document.createElement('div');
+    leaveAsk.className = 'bin-error bin-leave';
+    leaveAsk.setAttribute('role', 'alertdialog');
+    leaveAsk.setAttribute('aria-label', 'CONFIRM.EXE');
+    leaveAsk.innerHTML = '<div class="bin-error-bar"><span>CONFIRM.EXE</span></div>'
+      + '<div class="bin-leave-body"><p dir="rtl">واقعاً میخوای تنهامون بذاری؟</p><p class="bin-leave-en">Do you really want to leave us?</p></div>'
+      + '<div class="bin-leave-actions"><button type="button" class="bin-leave-yes">آره، برم<span>Yes, leave</span></button><button type="button" class="bin-leave-no">نه، میمونم<span>No, stay</span></button></div>';
+    leaveAsk.querySelector('.bin-leave-yes').addEventListener('click', () => { const next = lang; closeLeave(); switchTo(next, true); });
+    leaveAsk.querySelector('.bin-leave-no').addEventListener('click', closeLeave);
+    document.body.appendChild(leaveAsk);
+    document.addEventListener('keydown', leaveKey);
+  };
+  const switchTo = (lang, confirmed = false) => {
     const from = activePane();
     if (from.dataset.pane === lang) return;
+    if (from.dataset.pane === 'bin' && lang !== 'bin' && !confirmed) { askLeave(lang); return; }
     if (lang === 'bin') buildBinaryPane();
     const sec = sectionInView(from);
     const base = sec ? sec.id.replace(/-(fa|bin)$/, '') : null;
