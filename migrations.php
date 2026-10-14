@@ -1552,3 +1552,29 @@ function run_slide_rename_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SLIDE_RENAME_MIGRATION . "', '1')");
 }
+
+const RESEARCH_REVERT_MIGRATION = 'migration_research_revert_v4';
+
+/** Reverts the site's research cards to the date line and inline PDF links; only the rows layout stays (a CSS change). Previous values are logged. */
+function run_research_revert_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . RESEARCH_REVERT_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query('SELECT title, venue, year, files FROM papers')->fetchAll(PDO::FETCH_ASSOC);
+    migration_log('research revert: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $update = $pdo->prepare('UPDATE papers SET files = ?, year = ? WHERE title = ?');
+    $works = [
+        ['Linux Kernel Security and Isolation', 'assets/research/1', 5, null],
+        ['Social Opinion Prediction with LLM Agents', 'assets/research/2', 1, null],
+        ['Distributed Petri Nets for ROS Robotics', 'assets/research/3', 1, null],
+        ['IoT Security with Blockchain', 'assets/research/4', 10, 'فروردین ۱۴۰۴'],
+    ];
+    foreach ($works as [$title, $dir, $count, $year]) {
+        $files = [];
+        for ($j = 1; $j <= $count; $j++) {
+            $files[] = ['path' => $dir . '/' . $j . '.pdf', 'label' => $count > 1 ? 'PDF ' . $j : 'PDF'];
+        }
+        $update->execute([json_encode($files, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), $year, $title]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . RESEARCH_REVERT_MIGRATION . "', '1')");
+}

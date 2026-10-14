@@ -292,11 +292,12 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
         <?php if (!empty($paper['cover'])): ?><img class="media-cover" src="<?= e($paper['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?>
         <div class="media-body">
           <h3><?= e(loc($paper, 'title', $lang)) ?></h3>
-          <ul class="media-bullets">
-            <?php if ($paper['pdf']): ?><li><a href="<?= e($paper['pdf']) ?>" target="_blank" rel="noopener">PDF</a></li><?php endif; ?>
-            <?php foreach ($files as $file): ?><li><a href="<?= e($file['path']) ?>" download><?= e($file['label']) ?></a></li><?php endforeach; ?>
-            <?php if ($paper['doi']): ?><li><a href="https://doi.org/<?= e($paper['doi']) ?>" target="_blank" rel="noopener">DOI</a></li><?php endif; ?>
-          </ul>
+          <?php if (trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? '')) !== ''): ?><p class="muted"><?= e(trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? ''))) ?></p><?php endif; ?>
+          <div class="links media-files">
+            <?php if ($paper['pdf']): ?><a href="<?= e($paper['pdf']) ?>" target="_blank" rel="noopener">PDF</a><?php endif; ?>
+            <?php foreach ($files as $file): ?><a href="<?= e($file['path']) ?>" download><?= e($file['label']) ?></a><?php endforeach; ?>
+            <?php if ($paper['doi']): ?><a href="https://doi.org/<?= e($paper['doi']) ?>" target="_blank" rel="noopener">DOI</a><?php endif; ?>
+          </div>
         </div>
       </article>
     <?php endforeach; ?>
