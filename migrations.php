@@ -788,6 +788,21 @@ function run_tobank_stack_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TOBANK_STACK_MIGRATION . "', '1')");
 }
 
+// TechBlog has one direct link, GitHub: the website and any extra links are cleared so its card does not show a dropdown. Previous values are logged.
+const TECHBLOG_SINGLE_LINK_MIGRATION = 'migration_techblog_single_link_v1';
+
+function run_techblog_single_link_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TECHBLOG_SINGLE_LINK_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $row = $pdo->query("SELECT id, url, extra_links FROM projects WHERE LOWER(TRIM(title)) = 'techblog' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($row && (trim((string) $row['url']) !== '' || trim((string) $row['extra_links']) !== '')) {
+        migration_log("techblog single link: project {$row['id']} previous " . json_encode(['url' => $row['url'], 'extra_links' => $row['extra_links']], JSON_UNESCAPED_UNICODE));
+        $pdo->prepare("UPDATE projects SET url = '', extra_links = '' WHERE id = ?")->execute([$row['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_SINGLE_LINK_MIGRATION . "', '1')");
+}
+
 // Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.
 const INTERN_SPELLING_MIGRATION = 'migration_intern_spelling_v1';
 
