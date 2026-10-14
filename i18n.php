@@ -129,11 +129,14 @@ const STRINGS = [
 function current_lang(): string {
     $requested = $_GET['lang'] ?? null;
     if ($requested !== null && in_array($requested, [...LANGUAGES, 'bin'], true)) {
-        setcookie('lang', $requested, [
-            'expires' => time() + 31536000,
-            'path' => '/',
-            'samesite' => 'Lax',
-        ]);
+        // Binary mode is never saved: only a normal language goes into the cookie
+        if ($requested !== 'bin') {
+            setcookie('lang', $requested, [
+                'expires' => time() + 31536000,
+                'path' => '/',
+                'samesite' => 'Lax',
+            ]);
+        }
         return $requested === 'bin' ? 'en' : $requested;
     }
     $cookie = $_COOKIE['lang'] ?? 'en';

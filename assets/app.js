@@ -883,8 +883,11 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     if (html.dataset['title' + cap]) document.title = html.dataset['title' + cap];
     const meta = document.querySelector('meta[name="description"]');
     if (meta && html.dataset['desc' + cap]) meta.setAttribute('content', html.dataset['desc' + cap]);
-    try { document.cookie = 'lang=' + lang + '; path=/; max-age=31536000; samesite=lax'; } catch (e) { /* cookies blocked: the choice applies to this page */ }
-    try { history.replaceState(null, '', '?lang=' + lang + (lang === 'bin' ? '' : location.hash)); } catch (e) { /* history blocked: the URL keeps its old language */ }
+    // Binary mode is never saved: the cookie keeps the last normal language, and the URL drops ?lang=bin so a reload does not restore it
+    if (lang !== 'bin') {
+      try { document.cookie = 'lang=' + lang + '; path=/; max-age=31536000; samesite=lax'; } catch (e) { /* cookies blocked: the choice applies to this page */ }
+    }
+    try { history.replaceState(null, '', lang === 'bin' ? location.pathname : '?lang=' + lang + location.hash); } catch (e) { /* history blocked: the URL keeps its old language */ }
     document.querySelectorAll('[data-lang-choice]').forEach((a) => {
       if (a.dataset.langChoice === lang) a.setAttribute('aria-current', 'true');
       else a.removeAttribute('aria-current');
@@ -1032,6 +1035,5 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeMenus(); });
 
   // The choice is kept in the cookie: binary comes back on the next visit
-  const saved = (document.cookie.match(/(?:^|; )lang=([^;]+)/) || [])[1];
-  if (saved === 'bin') showLang('bin');
+  // Binary mode is not restored on load; a reload shows the last normal language
 })();
