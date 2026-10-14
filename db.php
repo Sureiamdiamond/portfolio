@@ -91,6 +91,7 @@ function db(): PDO {
     run_languages_fce_migration($pdo);
     run_languages_icons_migration($pdo);
     run_languages_plain_migration($pdo);
+    run_about_middle_migration($pdo);
     run_codeyad_period_migration($pdo);
     run_ipam_fa_spelling_migration($pdo);
     run_techblog_github_migration($pdo);

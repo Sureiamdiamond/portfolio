@@ -892,6 +892,27 @@ function run_languages_plain_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LANGUAGES_PLAIN_MIGRATION . "', '1')");
 }
 
+// About text: the middle-tone version, approved by the owner, in both languages. Previous values are logged.
+const ABOUT_MIDDLE_MIGRATION = 'migration_about_middle_v1';
+const ABOUT_MIDDLE_EN = <<<'TXT'
+Hi, I'm Parsa Banitaba, a software engineer and Flutter developer. I'm on the mobile app team at IPAAM, working on the Tobank app for Tourism Bank, and I'm a Master's student in Software Engineering. I care about clean architecture and solid state management (Bloc, GetX), and I like shipping apps that feel smooth and are easy to maintain. If you have a project in mind, I'd love to talk.
+TXT;
+const ABOUT_MIDDLE_FA = <<<'TXT'
+سلام، من پارسا بنیطبا هستم، مهندس نرمافزار و توسعهدهندهی فلاتر. در تیم اپلیکیشن موبایل شرکت ایپام روی اپلیکیشن توبانک (بانک گردشگری) کار میکنم و دانشجوی ارشد نرمافزار هستم. به معماری تمیز و مدیریت وضعیت (مثل Bloc و GetX) اهمیت میدم و دوست دارم اپهایی بسازم که هم روان باشن و هم نگهداریشون راحت. اگه پروژهای در ذهن داری، خوشحال میشم صحبت کنیم.
+TXT;
+
+function run_about_middle_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . ABOUT_MIDDLE_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('about', 'about_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('about middle: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['about', ABOUT_MIDDLE_EN]);
+    $stmt->execute(['about_fa', ABOUT_MIDDLE_FA]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ABOUT_MIDDLE_MIGRATION . "', '1')");
+}
+
 // Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.
 const INTERN_SPELLING_MIGRATION = 'migration_intern_spelling_v1';
 
