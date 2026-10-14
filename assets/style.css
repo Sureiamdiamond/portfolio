@@ -575,6 +575,15 @@ html[dir="rtl"] .arr { display: inline-block; transform: scaleX(-1); }
 /* Phone-safe page: no text size adjust on rotation or zoom, and no sideways overflow */
 html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 body { overflow-x: clip; }
+/* Binary mode on phones: the contact values and skill labels are long binary-style strings. They wrap inside their cards instead of pushing the page wider than the screen. */
+@media (max-width: 560px) {
+  .contact-grid > *, .contact-cards .cc, .contact-cards .cc-text { min-width: 0; max-width: 100%; }
+  .contact-cards .cc-value { white-space: normal; overflow-wrap: anywhere; }
+  .skill-grid > *, .skill-parent, .skill-head { min-width: 0; max-width: 100%; }
+  .skill-head, .skill-child, .skill-name { white-space: normal; overflow-wrap: anywhere; }
+  .skill-child { overflow: hidden; }
+  .lang-text { white-space: normal; overflow-wrap: anywhere; min-width: 0; }
+}
 
 /* Project icons: the uploaded icon, or a generated tile with the project's initials */
 .ptile {
