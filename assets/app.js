@@ -362,3 +362,44 @@
     document.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (!m.contains(ev.target)) setOpen(m, false); });
   });
 })();
+
+// Language switch keeps the place: the section in view and the offset inside it are saved before the page reloads, and restored instantly (no smooth scroll) on the new page. A first visit still starts at the top.
+(function () {
+  const KEY = 'lang-switch-position';
+  const current = () => {
+    const list = Array.from(document.querySelectorAll('main > section[id]'));
+    const line = window.scrollY + 1;
+    let found = list[0];
+    list.forEach((sec) => { if (sec.offsetTop <= line) found = sec; });
+    return found;
+  };
+
+  document.querySelectorAll('[data-lang-switch]').forEach((link) => {
+    link.addEventListener('click', () => {
+      const sec = current();
+      if (!sec) return;
+      try {
+        sessionStorage.setItem(KEY, JSON.stringify({ id: sec.id, offset: Math.max(0, window.scrollY - sec.offsetTop) }));
+      } catch (e) { /* storage blocked: the switch still works, it starts at the top */ }
+    });
+  });
+
+  let saved = null;
+  try {
+    saved = JSON.parse(sessionStorage.getItem(KEY) || 'null');
+    sessionStorage.removeItem(KEY);
+  } catch (e) { saved = null; }
+  if (!saved || !saved.id) return;
+
+  const restore = () => {
+    const target = document.getElementById(saved.id);
+    if (!target) return;
+    const root = document.documentElement;
+    const previous = root.style.scrollBehavior;
+    root.style.scrollBehavior = 'auto';
+    window.scrollTo(0, target.offsetTop + (saved.offset || 0));
+    root.style.scrollBehavior = previous;
+  };
+  restore();
+  window.addEventListener('load', restore, { once: true });
+})();

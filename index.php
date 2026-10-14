@@ -145,7 +145,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       <?php if (($profile['show_slides'] ?? '1') !== '0'): ?><a href="#slides"><?= e(t('presentations', $lang)) ?></a><?php endif; ?>
     </nav>
     <div class="nav-actions">
-      <a class="tool" href="?lang=<?= $switchLang ?>" hreflang="<?= $switchLang ?>"><?= e(t('lang_switch', $lang)) ?></a>
+      <a class="tool" href="?lang=<?= $switchLang ?>" hreflang="<?= $switchLang ?>" data-lang-switch><?= e(t('lang_switch', $lang)) ?></a>
       <button type="button" class="tool" id="theme-toggle" aria-label="<?= e(t('toggle_theme', $lang)) ?>"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
       <a class="btn btn-primary" href="#contact"><?= e(t('contact_me', $lang)) ?></a>
     </div>
