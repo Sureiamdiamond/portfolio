@@ -1075,3 +1075,19 @@ function run_role_headline_fa_v3_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ROLE_HEADLINE_FA_V3_MIGRATION . "', '1')");
 }
+
+// The Persian role title is written with plain spaces: «مهندس نرم افزار / توسعه دهنده فلاتر». It overrides any other stored Persian value, and the previous value is logged.
+const ROLE_HEADLINE_FA_V4_MIGRATION = 'migration_role_headline_fa_v4';
+function run_role_headline_fa_v4_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . ROLE_HEADLINE_FA_V4_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $target = 'مهندس نرم افزار / توسعه دهنده فلاتر';
+    $stored = $pdo->query("SELECT v FROM profile WHERE k = 'headline_fa'")->fetchColumn();
+    $stored = $stored === false ? null : (string) $stored;
+    if ($stored !== $target) {
+        migration_log('role headline fa v4: profile headline_fa previous value ' . json_encode($stored, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare("INSERT INTO profile (k, v) VALUES ('headline_fa', ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v")->execute([$target]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ROLE_HEADLINE_FA_V4_MIGRATION . "', '1')");
+}

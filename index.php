@@ -88,7 +88,7 @@ $personData = [
     '@type' => 'Person',
     'name' => 'Parsa Banitaba',
     'alternateName' => 'پارسا بنی‌طبا',
-    'jobTitle' => 'Software Engineer / Flutter Developer',
+    'jobTitle' => $headline,
     'description' => $summary !== '' ? mb_substr($summary, 0, 300) : null,
     'url' => $siteUrl . '/',
     'image' => $shareImage,
