@@ -94,6 +94,7 @@ function db(): PDO {
     run_about_middle_migration($pdo);
     run_about_final_migration($pdo);
     run_about_owner_migration($pdo);
+    run_about_zwnj_migration($pdo);
     run_codeyad_period_migration($pdo);
     run_ipam_fa_spelling_migration($pdo);
     run_techblog_github_migration($pdo);
