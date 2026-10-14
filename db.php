@@ -96,6 +96,7 @@ function db(): PDO {
     run_techblog_name_disclaimer_migration($pdo);
     run_techblog_podcast_migration($pdo);
     run_classyar_stores_migration($pdo);
+    run_role_headline_v2_migration($pdo);
     return $pdo;
 }
 

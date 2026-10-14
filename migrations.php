@@ -1002,3 +1002,29 @@ function run_classyar_stores_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLASSYAR_STORES_MIGRATION . "', '1')");
 }
+
+// The hero pill shows the headline: English «Software Engineer / Flutter Developer» and Persian «مهندس نرمافزار / توسعهدهنده فلاتر». Stored headlines that still hold an earlier default (any casing or spelling of it) are replaced; anything else set in /admin is kept. Logged with the previous values.
+const ROLE_HEADLINE_V2_MIGRATION = 'migration_role_headline_v2';
+function run_role_headline_v2_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . ROLE_HEADLINE_V2_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $old = [
+        'headline' => ['Flutter Developer', 'Flutter developer', 'Software engineer', 'Software Engineer / Flutter developer', ''],
+        'headline_fa' => ['', 'مهندس نرم‌افزار', 'توسعه‌دهنده فلاتر', 'توسعه دهنده فلاتر', 'توسعهدهنده فلاتر', 'برنامه‌نویس فلاتر', 'مهندس نرم‌افزار / توسعه‌دهنده فلاتر', 'مهندس نرمافزار / توسعه‌دهنده فلاتر'],
+    ];
+    $new = ['headline' => 'Software Engineer / Flutter Developer', 'headline_fa' => 'مهندس نرمافزار / توسعهدهنده فلاتر'];
+    $current = $pdo->query("SELECT k, v FROM profile WHERE k IN ('headline', 'headline_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    $update = $pdo->prepare('UPDATE profile SET v = ? WHERE k = ?');
+    foreach ($new as $k => $value) {
+        if (!array_key_exists($k, $current)) {
+            continue;
+        }
+        $stored = (string) $current[$k];
+        if (in_array(trim($stored), $old[$k], true) && $stored !== $value) {
+            migration_log("role headline v2: profile $k previous value " . json_encode($stored, JSON_UNESCAPED_UNICODE));
+            $update->execute([$value, $k]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ROLE_HEADLINE_V2_MIGRATION . "', '1')");
+}
