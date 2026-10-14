@@ -960,3 +960,29 @@ function run_techblog_name_disclaimer_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_V3_MIGRATION . "', '1')");
 }
+
+// TechBlog now links to the course repository and has one short description line in each language. The previous description, including the disclaimer paragraph, is replaced in full. The previous values are logged.
+const TECHBLOG_V4_MIGRATION = 'migration_techblog_podcast_v4';
+const TECHBLOG_V4_URL = 'https://github.com/sasansafari/techblog';
+const TECHBLOG_V4_EN = 'A podcast and tech-news application.';
+const TECHBLOG_V4_FA = 'اپلیکیشن پادکست و اخبار در حوزه تکنولوژی';
+function run_techblog_podcast_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TECHBLOG_V4_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $row = $pdo->query("SELECT * FROM projects WHERE LOWER(TRIM(title)) = 'techblog' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        $changed = [
+            'github_url' => TECHBLOG_V4_URL,
+            'summary' => TECHBLOG_V4_EN,
+            'summary_fa' => TECHBLOG_V4_FA,
+        ];
+        $previous = array_intersect_key($row, $changed);
+        if (array_diff_assoc($changed, $previous)) {
+            migration_log("techblog podcast: project {$row['id']} previous " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+            $pdo->prepare('UPDATE projects SET github_url = ?, summary = ?, summary_fa = ? WHERE id = ?')
+                ->execute([TECHBLOG_V4_URL, TECHBLOG_V4_EN, TECHBLOG_V4_FA, $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_V4_MIGRATION . "', '1')");
+}
