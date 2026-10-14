@@ -101,7 +101,7 @@ function render_pane(string $lang, array $shared): array {
     <div class="hero-art" aria-hidden="true">
       <span class="ring"></span>
       <div class="portrait">
-        <img class="portrait-img" src="<?= e($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png?v=' . $assetVersion) ?>" alt="<?= e($name) ?>" width="380" height="541" decoding="async">
+        <img class="portrait-img" src="<?= e($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait-cutout.png?v=' . $assetVersion) ?>" alt="<?= e($name) ?>" width="520" height="753" decoding="async">
         <img class="portrait-bin" src="assets/img/portrait-binary.png?v=<?= $assetVersion ?>" alt="" width="358" height="512" decoding="async">
         <img class="bin-eyes" src="assets/img/skull-eye.png?v=<?= $assetVersion ?>" alt="" width="340" height="323" decoding="async">
         <svg class="dash" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
@@ -422,7 +422,7 @@ $siteUrl = 'https://parsabanitaba.ir';
 $pageUrl = $lang === 'fa' ? $siteUrl . '/?lang=fa' : $siteUrl . '/';
 $summary = trim(preg_replace('/\s+/u', ' ', strip_tags($about)));
 $description = $descs[$lang];
-$shareImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png');
+$shareImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait-cutout.png');
 $personData = [
     '@context' => 'https://schema.org',
     '@type' => 'Person',

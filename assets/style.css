@@ -141,7 +141,7 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 .chip-icon svg { display: block; }
 /* Flutter-style bird perched on the shoulder; original shapes, idle motion only */
 .dash {
-  position: absolute; z-index: 2; width: 17%; left: 14%; top: 42%; overflow: visible;
+  position: absolute; z-index: 2; width: 17%; left: 17%; top: 45%; overflow: visible;
   animation: dash-bob 3.2s ease-in-out infinite;
 }
 .dash-wing { transform-origin: 24px 34px; animation: dash-wing 1.8s ease-in-out infinite; }
