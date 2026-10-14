@@ -41,6 +41,10 @@ const STRINGS = [
         'default_headline' => 'Software Engineer / Flutter Developer',
         'default_title' => 'Portfolio',
         'lang_switch' => 'فارسی',
+        'language' => 'Language',
+        'lang_fa' => 'فارسی',
+        'lang_en' => 'English',
+        'lang_bin' => 'Binary',
         'lets_chat' => "Let's Chat",
         'stat_projects' => 'Projects',
         'stat_papers' => 'Research',
@@ -96,6 +100,10 @@ const STRINGS = [
         'default_headline' => 'مهندس نرم افزار / توسعه دهنده فلاتر',
         'default_title' => 'پورتفولیو',
         'lang_switch' => 'English',
+        'language' => 'زبان',
+        'lang_fa' => 'فارسی',
+        'lang_en' => 'English',
+        'lang_bin' => 'باینری',
         'lets_chat' => 'گفتگو',
         'stat_projects' => 'پروژه',
         'stat_papers' => 'پژوهش',
@@ -117,17 +125,21 @@ const STRINGS = [
 ];
 
 /** Language from ?lang=, else the saved cookie, else English. Saves the choice for later visits. */
+/** The language the page is rendered in. Binary is an English page in a binary style, drawn by the script; without the script it stays English. */
 function current_lang(): string {
     $requested = $_GET['lang'] ?? null;
-    if ($requested !== null && in_array($requested, LANGUAGES, true)) {
+    if ($requested !== null && in_array($requested, [...LANGUAGES, 'bin'], true)) {
         setcookie('lang', $requested, [
             'expires' => time() + 31536000,
             'path' => '/',
             'samesite' => 'Lax',
         ]);
-        return $requested;
+        return $requested === 'bin' ? 'en' : $requested;
     }
     $cookie = $_COOKIE['lang'] ?? 'en';
+    if ($cookie === 'bin') {
+        return 'en';
+    }
     return in_array($cookie, LANGUAGES, true) ? $cookie : 'en';
 }
 

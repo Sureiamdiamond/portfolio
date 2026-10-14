@@ -745,3 +745,39 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 .lang-text { display: flex; flex-direction: column; gap: 2px; text-align: start; }
 .lang-name { font-weight: 600; }
 .lang-level { font-size: .85rem; color: var(--muted); }
+
+/* Language menu: Persian, English, Binary */
+.lang-menu { position: relative; }
+.lang-btn { display: inline-flex; align-items: center; gap: 6px; }
+.lang-now { font-weight: 600; }
+.lang-list { position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 60; min-width: 170px; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
+.lang-list[hidden] { display: none; }
+.lang-list a { display: block; padding: 8px 12px; border-radius: 9px; color: var(--fg); text-decoration: none; white-space: nowrap; }
+.lang-list a:hover, .lang-list a:focus-visible { background: color-mix(in srgb, var(--accent) 12%, transparent); outline: none; }
+.lang-list a[aria-current="true"] { color: var(--accent); font-weight: 600; }
+@media (max-width: 520px) { .lang-label { display: none; } }
+
+/* Binary mode: black, green text, scanlines, a green portrait, and a cloud of 0 and 1 over the name. It overrides the light and dark theme. */
+:root[data-mode="binary"] {
+  color-scheme: dark;
+  --bg: #000; --surface: #03110a; --fg: #39ff7a; --muted: #2bd65c; --border: #134d26;
+  --accent: #39ff7a; --accent-2: #1ee06a; --shadow: none;
+  --gradient: linear-gradient(90deg, #39ff7a, #b8ffcf);
+  --inv-bg: #000; --inv-fg: #39ff7a; --inv-muted: #2bd65c; --inv-accent: #39ff7a;
+  --hero-bg: radial-gradient(60% 55% at 50% 42%, #1ee06a 0%, #0a5a2a 60%, #010d05 100%);
+  --sans: var(--mono); --display: var(--mono);
+}
+:root[data-mode="binary"] body::after { content: ""; position: fixed; inset: 0; z-index: 900; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 1px, transparent 1px 3px); }
+:root[data-mode="binary"] img:not(.portrait-img):not(.dash-img) { filter: grayscale(1) sepia(1) hue-rotate(60deg) saturate(2.5); }
+:root[data-mode="binary"] .portrait-img { filter: grayscale(1) sepia(1) hue-rotate(60deg) saturate(3) brightness(1.1); }
+:root[data-mode="binary"] .portrait { box-shadow: 0 0 0 1px #39ff7a, 0 0 40px rgba(57, 255, 122, .35); }
+:root[data-mode="binary"] .lead::after { content: "▌"; color: #39ff7a; animation: bin-blink 1s steps(2, start) infinite; }
+:root[data-mode="binary"] h1 { position: relative; font-size: clamp(1.1rem, 2.6vw, 1.9rem); line-height: 1.6; letter-spacing: .08em; }
+:root[data-mode="binary"] .dash path { fill: #39ff7a !important; }
+:root[data-mode="binary"] .hero > .hero-art { align-self: start; }
+:root[data-mode="binary"] .btn-primary { background: #0b3d1c !important; color: #39ff7a !important; border: 1px solid #39ff7a; box-shadow: none !important; }
+.bin-cloud { display: none; position: absolute; inset: -0.2em -0.35em; white-space: pre; overflow: hidden; pointer-events: none; font: 500 .72rem/1.05 var(--mono); letter-spacing: .3em; color: rgba(57, 255, 122, .45); -webkit-mask-image: radial-gradient(closest-side, #000 55%, transparent); mask-image: radial-gradient(closest-side, #000 55%, transparent); animation: bin-drift 7s ease-in-out infinite alternate; }
+:root[data-mode="binary"] .bin-cloud { display: block; }
+@keyframes bin-blink { to { visibility: hidden; } }
+@keyframes bin-drift { from { transform: translateY(-2px); opacity: .7; } to { transform: translateY(2px); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { :root[data-mode="binary"] .lead::after, .bin-cloud { animation: none; } }

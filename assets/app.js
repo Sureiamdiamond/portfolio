@@ -437,7 +437,7 @@ sync.load.skills = (s) => {
     });
   });
   document.addEventListener('click', (ev) => {
-    if (ev.target.closest('[data-lang-switch]')) return;
+    if (ev.target.closest('[data-lang-choice]')) return;
     scope.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (!m.contains(ev.target)) setOpen(m, false); });
   });
   sync.save.menus = () => Array.from(scope.querySelectorAll('.pcard-menu')).map((m) => m.classList.contains('is-open'));
@@ -445,15 +445,17 @@ sync.load.skills = (s) => {
 })();
 }
 
+// A copy of the English pane before any pane script runs: the binary pane is built from it.
+const pristineEn = document.querySelector('.pane[data-pane="en"]').cloneNode(true);
 document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset.pane === 'fa' ? '-fa' : ''));
 
-// Language switch without a reload: both languages are on the page and one pane is shown. The reading position (the section in view and the offset inside it) is kept, and the swap cross-fades when the browser allows it. Reduced motion gets an instant swap.
+// Language switch without a reload: Persian, English and Binary are panes in one page; one is shown. The reading position (the section in view and the offset inside it) is kept, and the swap cross-fades when the browser allows it. Reduced motion gets an instant swap.
 (function () {
   const html = document.documentElement;
   const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const panes = () => Array.from(document.querySelectorAll('.pane'));
   const activePane = () => panes().find((p) => !p.hidden) || panes()[0];
-  const suffixFor = (lang) => (lang === 'fa' ? '-fa' : '');
+  const suffixFor = (lang) => (lang === 'fa' ? '-fa' : lang === 'bin' ? '-bin' : '');
 
   const sectionInView = (pane) => {
     const list = Array.from(pane.querySelectorAll('section[id]'));
@@ -463,16 +465,70 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     return found;
   };
 
+  // Binary pane: a copy of the English pane. Each piece of text is written as the UTF-8 bytes of the words, 8 bits per byte, so it decodes back to the same text. The IDE window, the menus and the form controls keep their English text.
+  const BINARY_SKIP = '.pt-window, .lang-menu, script, style, noscript, svg, textarea, input, select, option';
+  const encodeBinary = (text) => Array.from(new TextEncoder().encode(text), (b) => b.toString(2).padStart(8, '0')).join(' ');
+  const suffixIds = (root, sfx) => {
+    root.querySelectorAll('[id]').forEach((el) => { el.id = el.id + sfx; });
+    ['for', 'aria-controls', 'aria-labelledby', 'aria-describedby', 'data-src'].forEach((attr) => {
+      root.querySelectorAll('[' + attr + ']').forEach((el) => el.setAttribute(attr, el.getAttribute(attr) + sfx));
+    });
+    root.querySelectorAll('[href^="#"]').forEach((el) => el.setAttribute('href', el.getAttribute('href') + sfx));
+  };
+  // The cloud of 0 and 1 over the name: random digits, shown only in binary mode
+  const cloudText = (rows, cols) => Array.from({ length: rows }, () => Array.from({ length: cols }, () => (Math.random() < 0.5 ? '0' : '1')).join('')).join('\n');
+  let binaryPane = null;
+  const buildBinaryPane = () => {
+    if (binaryPane) return binaryPane;
+    const pane = pristineEn.cloneNode(true);
+    pane.dataset.pane = 'bin';
+    pane.lang = 'en';
+    pane.dir = 'ltr';
+    pane.hidden = true;
+    suffixIds(pane, '-bin');
+    const walker = document.createTreeWalker(pane, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach((node) => {
+      if (!node.parentElement || node.parentElement.closest(BINARY_SKIP)) return;
+      // Whitespace-only nodes are layout gaps between tags, not content; encoding them only adds stray 00100000 rows
+      if (!node.nodeValue.trim()) return;
+      node.nodeValue = encodeBinary(node.nodeValue);
+    });
+    const label = pane.querySelector('[data-lang-choice="bin"]');
+    const now = pane.querySelector('.lang-now');
+    if (label && now) now.textContent = label.textContent;
+    const h1 = pane.querySelector('h1');
+    if (h1) {
+      const cloud = document.createElement('span');
+      cloud.className = 'bin-cloud';
+      cloud.setAttribute('aria-hidden', 'true');
+      cloud.textContent = cloudText(5, 56);
+      h1.appendChild(cloud);
+    }
+    document.querySelector('.pane[data-pane="en"]').after(pane);
+    binaryPane = pane;
+    initPane(pane, '-bin');
+    return pane;
+  };
+
   const showLang = (lang) => {
+    if (lang === 'bin') buildBinaryPane();
     panes().forEach((p) => { p.hidden = p.dataset.pane !== lang; });
-    html.lang = lang;
+    html.lang = lang === 'fa' ? 'fa' : 'en';
     html.dir = lang === 'fa' ? 'rtl' : 'ltr';
+    if (lang === 'bin') html.dataset.mode = 'binary';
+    else delete html.dataset.mode;
     const cap = lang === 'fa' ? 'Fa' : 'En';
     if (html.dataset['title' + cap]) document.title = html.dataset['title' + cap];
     const meta = document.querySelector('meta[name="description"]');
     if (meta && html.dataset['desc' + cap]) meta.setAttribute('content', html.dataset['desc' + cap]);
     try { document.cookie = 'lang=' + lang + '; path=/; max-age=31536000; samesite=lax'; } catch (e) { /* cookies blocked: the choice applies to this page */ }
     try { history.replaceState(null, '', '?lang=' + lang + location.hash); } catch (e) { /* history blocked: the URL keeps its old language */ }
+    document.querySelectorAll('[data-lang-choice]').forEach((a) => {
+      if (a.dataset.langChoice === lang) a.setAttribute('aria-current', 'true');
+      else a.removeAttribute('aria-current');
+    });
   };
 
   // Reads the state the hidden pane saves now, and returns a function that applies it to the pane being shown
@@ -487,22 +543,20 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     };
   };
 
-  document.addEventListener('click', (ev) => {
-    const link = ev.target.closest('[data-lang-switch]');
-    if (!link) return;
-    ev.preventDefault();
-    const current = activePane().dataset.pane;
-    const next = current === 'fa' ? 'en' : 'fa';
+  const switchTo = (lang) => {
     const from = activePane();
+    if (from.dataset.pane === lang) return;
+    if (lang === 'bin') buildBinaryPane();
     const sec = sectionInView(from);
-    const base = sec ? sec.id.replace(/-fa$/, '') : null;
-    const offset = sec ? Math.max(0, window.scrollY - sec.offsetTop) : 0;
-    const carried = carry(from, next);
+    const base = sec ? sec.id.replace(/-(fa|bin)$/, '') : null;
+    // The position is kept as a share of the section: the binary text is taller than the others
+    const share = sec ? Math.min(1, Math.max(0, (window.scrollY - sec.offsetTop) / Math.max(1, sec.offsetHeight))) : 0;
+    const carried = carry(from, lang);
     const apply = () => {
-      showLang(next);
+      showLang(lang);
       carried();
-      const target = base ? document.querySelector('.pane[data-pane="' + next + '"] #' + CSS.escape(base + suffixFor(next))) : null;
-      if (target) window.scrollTo({ top: target.offsetTop + offset, behavior: 'instant' });
+      const target = base ? document.querySelector('.pane[data-pane="' + lang + '"] #' + CSS.escape(base + suffixFor(lang))) : null;
+      if (target) window.scrollTo({ top: target.offsetTop + share * target.offsetHeight, behavior: 'instant' });
     };
     if (reduce) { apply(); return; }
     if (document.startViewTransition) { document.startViewTransition(apply); return; }
@@ -513,5 +567,39 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       html.classList.add('lang-arrive');
       setTimeout(() => html.classList.remove('lang-arrive'), 300);
     }, 160);
+  };
+
+  // Language menu: a button that opens the list of three choices. Escape, a click outside, or a choice closes it.
+  const closeMenus = (except) => document.querySelectorAll('.lang-menu').forEach((m) => {
+    if (m === except) return;
+    const list = m.querySelector('.lang-list');
+    const btn = m.querySelector('.lang-btn');
+    if (list) list.hidden = true;
+    if (btn) btn.setAttribute('aria-expanded', 'false');
   });
+  document.addEventListener('click', (ev) => {
+    const btn = ev.target.closest('.lang-btn');
+    if (btn) {
+      const menu = btn.closest('.lang-menu');
+      const list = menu.querySelector('.lang-list');
+      const open = list.hidden;
+      closeMenus(menu);
+      list.hidden = !open;
+      btn.setAttribute('aria-expanded', String(open));
+      return;
+    }
+    const choice = ev.target.closest('[data-lang-choice]');
+    if (choice) {
+      ev.preventDefault();
+      closeMenus();
+      switchTo(choice.dataset.langChoice);
+      return;
+    }
+    if (!ev.target.closest('.lang-menu')) closeMenus();
+  });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeMenus(); });
+
+  // The choice is kept in the cookie: binary comes back on the next visit
+  const saved = (document.cookie.match(/(?:^|; )lang=([^;]+)/) || [])[1];
+  if (saved === 'bin') showLang('bin');
 })();

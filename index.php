@@ -43,7 +43,6 @@ function render_pane(string $lang, array $shared): array {
     $name = loc($profile, 'name', $lang) ?: t('default_name', $lang);
     $headline = loc($profile, 'headline', $lang) ?: t('default_headline', $lang);
     $about = loc($profile, 'about', $lang);
-    $switchLang = $lang === 'fa' ? 'en' : 'fa';
     $words = preg_split('/\s+/u', trim($name)) ?: [];
     // The last word of the name gets the gradient highlight
     $lastWord = count($words) > 1 ? array_pop($words) : '';
@@ -65,7 +64,14 @@ function render_pane(string $lang, array $shared): array {
       <?php if (($profile['show_slides'] ?? '1') !== '0'): ?><a href="#slides"><?= e(t('presentations', $lang)) ?></a><?php endif; ?>
     </nav>
     <div class="nav-actions">
-      <a class="tool" href="?lang=<?= $switchLang ?>" hreflang="<?= $switchLang ?>" data-lang-switch><?= e(t('lang_switch', $lang)) ?></a>
+      <div class="lang-menu" data-lang-menu>
+        <button type="button" class="tool lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="lang-list"><span class="lang-label"><?= e(t('language', $lang)) ?></span> <span class="lang-now"><?= e(t($lang === 'fa' ? 'lang_fa' : 'lang_en', $lang)) ?></span> <span class="arr" aria-hidden="true">▾</span></button>
+        <ul class="lang-list" id="lang-list" hidden>
+          <li><a href="?lang=fa" hreflang="fa" data-lang-choice="fa"<?= $lang === 'fa' ? ' aria-current="true"' : '' ?>><?= e(t('lang_fa', $lang)) ?></a></li>
+          <li><a href="?lang=en" hreflang="en" data-lang-choice="en"<?= $lang === 'en' ? ' aria-current="true"' : '' ?>><?= e(t('lang_en', $lang)) ?></a></li>
+          <li><a href="?lang=bin" data-lang-choice="bin"><?= e(t('lang_bin', $lang)) ?></a></li>
+        </ul>
+      </div>
       <button type="button" class="tool" id="theme-toggle" aria-label="<?= e(t('toggle_theme', $lang)) ?>"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
       <a class="btn btn-primary" href="#contact"><?= e(t('contact_me', $lang)) ?></a>
     </div>
@@ -337,7 +343,7 @@ function render_pane(string $lang, array $shared): array {
 </footer>
 <?php
     $html = ob_get_clean();
-    return compact('html', 'dir', 'name', 'headline', 'about', 'switchLang', 'title');
+    return compact('html', 'dir', 'name', 'headline', 'about', 'title');
 }
 
 /** Meta description for one language: the profile's own text when set, otherwise name, headline and the start of the about text. */
@@ -366,7 +372,6 @@ $dir = $active['dir'];
 $name = $active['name'];
 $headline = $active['headline'];
 $about = $active['about'];
-$switchLang = $active['switchLang'];
 ?>
 <!doctype html>
 <html lang="<?= $lang ?>" dir="<?= $dir ?>" data-title-en="<?= e($titles['en']) ?>" data-title-fa="<?= e($titles['fa']) ?>" data-desc-en="<?= e($descs['en']) ?>" data-desc-fa="<?= e($descs['fa']) ?>"<?= $themeSettings['theme_mode'] !== 'system' ? ' data-theme="' . $themeSettings['theme_mode'] . '"' : '' ?> data-motion="<?= $themeSettings['theme_motion'] ?>" data-glass="<?= $themeSettings['theme_glass'] ?>">
