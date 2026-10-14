@@ -877,6 +877,21 @@ function run_languages_icons_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LANGUAGES_ICONS_MIGRATION . "', '1')");
 }
 
+// The languages panel is plain text again: FCE, CAE and TTC as rows, with no pictures. Previous values are logged.
+const LANGUAGES_PLAIN_MIGRATION = 'migration_languages_plain_v1';
+
+function run_languages_plain_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . LANGUAGES_PLAIN_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('languages', 'languages_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('languages plain: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['languages', "English | Advanced (C1)\nFCE | | parent:English\nCAE | | parent:English\nTTC | | parent:English"]);
+    $stmt->execute(['languages_fa', "انگلیسی | پیشرفته (C1)\nFCE | | parent:انگلیسی\nCAE | | parent:انگلیسی\nTTC | | parent:انگلیسی"]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LANGUAGES_PLAIN_MIGRATION . "', '1')");
+}
+
 // Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.
 const INTERN_SPELLING_MIGRATION = 'migration_intern_spelling_v1';
 
