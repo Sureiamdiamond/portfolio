@@ -1591,3 +1591,33 @@ function run_research_date_migration(PDO $pdo): void {
     $pdo->exec('UPDATE papers SET venue = NULL, year = NULL');
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . RESEARCH_DATE_MIGRATION . "', '1')");
 }
+
+const ENGLISH_TITLES_MIGRATION = 'migration_english_titles_v6';
+
+/** Research and slide titles are English in both UI languages. The Persian title fields take the English titles too. Previous values are logged. */
+function run_english_titles_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . ENGLISH_TITLES_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = [
+        'papers' => $pdo->query('SELECT title, title_fa FROM papers')->fetchAll(PDO::FETCH_ASSOC),
+        'presentations' => $pdo->query('SELECT title, title_fa, pptx, pdf FROM presentations')->fetchAll(PDO::FETCH_ASSOC),
+    ];
+    migration_log('english titles: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $slides = [
+        ['assets/slides/claude.pptx', 'Claude'],
+        ['assets/slides/dhcp.pptx', 'DHCP'],
+        ['assets/slides/social-opinions-prediction-llm-based-agents.pptx', 'Social opinions prediction - LLM base agents'],
+        ['assets/slides/modiriat-hafeze.pptx', 'Memory Management'],
+        ['assets/slides/suggestion-system.pptx', 'Suggestion System'],
+        ['assets/slides/kernel-hardening.pptx', 'Kernel Hardening'],
+        ['assets/slides/use-case-based-project.pptx', 'use case based project'],
+        ['assets/slides/decision-petri-nets.pdf', 'Decision Petri Nets'],
+    ];
+    $updateSlide = $pdo->prepare('UPDATE presentations SET title = ?, title_fa = ? WHERE pptx = ? OR pdf = ?');
+    foreach ($slides as [$file, $title]) {
+        $updateSlide->execute([$title, $title, $file, $file]);
+    }
+    $pdo->exec('UPDATE papers SET title_fa = title');
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ENGLISH_TITLES_MIGRATION . "', '1')");
+}
