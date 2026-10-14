@@ -208,6 +208,18 @@ html[data-projects-view="normal"] .pt-window { display: none !important; }
   .pcard-menu-list, .pcard-menu-btn .arr { transition: none; transform: none; }
   .pcard-menu-list { transform: none; }
 }
+/* Language switch: browsers with cross-page view transitions cross-fade the whole page (the old page fades out, the new one in). Elsewhere app.js fades the page out before the switch and in after it. Reduced motion gets an instant swap. */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: 160ms ease-in both lang-fade-out; }
+::view-transition-new(root) { animation: 260ms ease-out both lang-fade-in; }
+@keyframes lang-fade-out { to { opacity: 0; } }
+@keyframes lang-fade-in { from { opacity: 0; } }
+html.lang-leaving main, html.lang-leaving header.topbar { opacity: 0; transition: opacity .16s ease-in; }
+html.lang-arrive main, html.lang-arrive header.topbar { animation: lang-fade-in .26s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root), html.lang-arrive main, html.lang-arrive header.topbar { animation: none; }
+  html.lang-leaving main, html.lang-leaving header.topbar { opacity: 1; transition: none; }
+}
 .pcard-menu-list a { padding: 8px 10px; border-radius: 8px; color: var(--fg); text-decoration: none; font-size: .92rem; }
 .pcard-menu-list a:hover, .pcard-menu-list a:focus-visible { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent); outline: none; }
 .pcard.menu-open { z-index: 30; }

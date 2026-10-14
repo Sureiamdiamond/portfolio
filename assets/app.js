@@ -374,13 +374,21 @@
     return found;
   };
 
+  // Browsers with cross-page view transitions cross-fade on their own (see the CSS); elsewhere the page fades out here first.
+  const crossPageFade = 'CSSViewTransitionRule' in window;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   document.querySelectorAll('[data-lang-switch]').forEach((link) => {
-    link.addEventListener('click', () => {
+    link.addEventListener('click', (ev) => {
       const sec = current();
       if (!sec) return;
       try {
-        sessionStorage.setItem(KEY, JSON.stringify({ id: sec.id, offset: Math.max(0, window.scrollY - sec.offsetTop) }));
+        sessionStorage.setItem(KEY, JSON.stringify({ id: sec.id, offset: Math.max(0, window.scrollY - sec.offsetTop), fade: !reduce && !crossPageFade }));
       } catch (e) { /* storage blocked: the switch still works, it starts at the top */ }
+      if (!reduce && !crossPageFade) {
+        ev.preventDefault();
+        document.documentElement.classList.add('lang-leaving');
+        setTimeout(() => { window.location.href = link.href; }, 160);
+      }
     });
   });
 
@@ -400,6 +408,10 @@
     window.scrollTo(0, target.offsetTop + (saved.offset || 0));
     root.style.scrollBehavior = previous;
   };
+  if (saved.fade) {
+    document.documentElement.classList.add('lang-arrive');
+    setTimeout(() => document.documentElement.classList.remove('lang-arrive'), 320);
+  }
   restore();
   window.addEventListener('load', restore, { once: true });
 })();
