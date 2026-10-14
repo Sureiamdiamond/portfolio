@@ -858,8 +858,8 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 @keyframes bin-scan-beam { to { top: 100%; } }
 :root[data-mode="binary"] body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: linear-gradient(rgba(57, 255, 122, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 122, .07) 1px, transparent 1px); background-size: 40px 40px; }
 /* Binary mode runner game: floating play button and the game panel. Both are removed when another language is shown. */
-.bin-play { position: fixed; left: 20vw; bottom: 25vh; z-index: 930; width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #7dffa8; background: #03200f; color: #7dffa8; cursor: pointer; box-shadow: 0 0 22px rgba(125, 255, 168, .55); }
-.bin-play::before { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid #7dffa8; animation: bin-pulse 1.8s ease-out infinite; }
+.bin-play { position: fixed; left: 20vw; bottom: 25vh; z-index: 930; width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #ff3b3b; background: #140202; color: #ff3b3b; cursor: pointer; box-shadow: 0 0 22px rgba(255, 59, 59, .55); }
+.bin-play::before { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid #ff3b3b; animation: bin-pulse 1.8s ease-out infinite; }
 .bin-play[hidden] { display: none; }
 @keyframes bin-pulse { from { transform: scale(1); opacity: .8; } to { transform: scale(1.6); opacity: 0; } }
 .bin-game { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 940; width: min(640px, calc(100vw - 24px)); background: #02140a; border: 1px solid #39ff7a; box-shadow: 0 0 30px rgba(57, 255, 122, .35); color: #39ff7a; font: 500 .8rem/1.4 var(--mono); }
