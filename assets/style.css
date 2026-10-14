@@ -963,6 +963,12 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
   }
 }
 
+/* Desktop: the mark in the menu sits 25% larger and 45px (about 40% of its distance to the header edge) away from the menu text, toward the edge in each language */
+@media (min-width: 761px) {
+  .nav-links .p-mark { width: 1.1875em; height: 1.625em; position: relative; left: 45px; }
+  html[dir="ltr"] .nav-links .p-mark { left: -45px; }
+}
+
 /* Phones: the personal mark sits at the right edge of the top row (left edge in English), 10% of the screen width in from the edge, and not in the menu row. Desktop keeps it in the menu. */
 .p-mark-top { display: none; }
 @media (max-width: 760px) {
