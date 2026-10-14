@@ -3,6 +3,9 @@
 // Both language panes are live: each runs the same setup against its own elements, with its own id suffix.
 function initPane(scope, sfx) {
   const byId = (name) => scope.querySelector('#' + name + sfx);
+  // What each part of this pane needs to keep when the language changes: save() reads it, load() applies it in the other pane.
+  const sync = { save: {}, load: {} };
+  scope.paneSync = sync;
 // Progressive enhancement: the page is fully readable without this file.
 (function () {
   const root = document.documentElement;
@@ -154,6 +157,27 @@ function initPane(scope, sfx) {
     if (readme) openFile(readme);
   }
 
+  // Language switch: the same folders, tabs, file and drawer state carry over to the other pane
+  sync.save.ide = () => ({
+    folders: Array.from(tree.querySelectorAll('details')).map((d) => d.open),
+    files: Array.from(tabs.keys()).map((id) => id.replace(/-fa$/, '')),
+    active: activeId ? activeId.replace(/-fa$/, '') : null,
+    drawer: win.classList.contains('tool-open'),
+  });
+  sync.load.ide = (s) => {
+    Array.from(tabs.keys()).forEach((id) => { tabs.get(id).tab.remove(); tabs.delete(id); });
+    activeId = null;
+    view.replaceChildren();
+    tree.querySelectorAll('details').forEach((d, i) => { d.open = !!s.folders[i]; });
+    s.files.forEach((base) => {
+      const link = tree.querySelector(`a[data-src="${base + sfx}"]`);
+      if (link) openFile(link);
+    });
+    if (s.active && tabs.has(s.active + sfx)) setActive(s.active + sfx);
+    win.classList.toggle('tool-open', !!s.drawer);
+    if (toggle) toggle.setAttribute('aria-expanded', String(!!s.drawer));
+  };
+
   // Expand all / collapse all, and the mobile drawer
   win.querySelectorAll('[data-act]').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -218,6 +242,8 @@ function initPane(scope, sfx) {
     let initial = 'normal';
     try { initial = localStorage.getItem('projects-view') || 'normal'; } catch (err) { /* private mode: keep the default */ }
     show(initial === 'ide' ? 'ide' : 'normal', false);
+    sync.save.view = () => section.dataset.view || 'normal';
+    sync.load.view = (name) => show(name, false);
     applyHash(true);
     window.addEventListener('hashchange', () => applyHash(true));
 
@@ -337,6 +363,14 @@ function initPane(scope, sfx) {
   });
 })();
 
+// Skill panels keep their open state across a language switch
+sync.save.skills = () => Array.from(scope.querySelectorAll('.skill-parent')).map((c) => c.classList.contains('is-open'));
+sync.load.skills = (s) => {
+  Array.from(scope.querySelectorAll('.skill-parent')).forEach((c, i) => {
+    if (c.classList.contains('is-open') !== !!s[i]) c.querySelector('.skill-head')?.click();
+  });
+};
+
 // Project link lists: a card with several links opens a small list. Esc, a click outside, or focus leaving the list closes it.
 (function () {
   const setOpen = (menu, open) => {
@@ -364,8 +398,11 @@ function initPane(scope, sfx) {
     });
   });
   document.addEventListener('click', (ev) => {
+    if (ev.target.closest('[data-lang-switch]')) return;
     scope.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (!m.contains(ev.target)) setOpen(m, false); });
   });
+  sync.save.menus = () => Array.from(scope.querySelectorAll('.pcard-menu')).map((m) => m.classList.contains('is-open'));
+  sync.load.menus = (s) => scope.querySelectorAll('.pcard-menu').forEach((m, i) => setOpen(m, !!s[i]));
 })();
 }
 
@@ -399,6 +436,18 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     try { history.replaceState(null, '', '?lang=' + lang + location.hash); } catch (e) { /* history blocked: the URL keeps its old language */ }
   };
 
+  // Reads the state the hidden pane saves now, and returns a function that applies it to the pane being shown
+  const carry = (fromPane, lang) => {
+    const saved = {};
+    Object.entries(fromPane.paneSync ? fromPane.paneSync.save : {}).forEach(([key, read]) => { saved[key] = read(); });
+    const toPane = panes().find((p) => p.dataset.pane === lang);
+    return () => {
+      if (!toPane || !toPane.paneSync) return;
+      const keys = Object.keys(saved).sort((a) => (a === 'view' ? -1 : 0));
+      keys.forEach((key) => { if (toPane.paneSync.load[key]) toPane.paneSync.load[key](saved[key]); });
+    };
+  };
+
   document.addEventListener('click', (ev) => {
     const link = ev.target.closest('[data-lang-switch]');
     if (!link) return;
@@ -409,8 +458,10 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     const sec = sectionInView(from);
     const base = sec ? sec.id.replace(/-fa$/, '') : null;
     const offset = sec ? Math.max(0, window.scrollY - sec.offsetTop) : 0;
+    const carried = carry(from, next);
     const apply = () => {
       showLang(next);
+      carried();
       const target = base ? document.querySelector('.pane[data-pane="' + next + '"] #' + CSS.escape(base + suffixFor(next))) : null;
       if (target) window.scrollTo({ top: target.offsetTop + offset, behavior: 'instant' });
     };
