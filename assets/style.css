@@ -762,7 +762,7 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
   --accent: #39ff7a; --accent-2: #1ee06a; --shadow: none;
   --gradient: linear-gradient(90deg, #39ff7a, #b8ffcf);
   --inv-bg: #000; --inv-fg: #39ff7a; --inv-muted: #2bd65c; --inv-accent: #39ff7a;
-  --hero-bg: radial-gradient(60% 55% at 50% 42%, #1ee06a 0%, #0a5a2a 60%, #010d05 100%);
+  --hero-bg: #000;
   --sans: var(--mono); --display: var(--mono);
 }
 :root[data-mode="binary"] body::after { content: ""; position: fixed; inset: 0; z-index: 900; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(0, 0, 0, .28) 0 1px, transparent 1px 3px); }
@@ -794,7 +794,16 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 .bin-error-x { background: none; border: 0; color: #000; font: inherit; font-weight: 700; cursor: pointer; }
 .bin-error-body { margin: 0; padding: 12px; white-space: pre-wrap; font: inherit; color: inherit; }
 .bin-error-ok { margin: 0 12px 12px; padding: 4px 16px; background: #000; color: #39ff7a; border: 1px solid #39ff7a; font: inherit; cursor: pointer; }
-@media (prefers-reduced-motion: reduce) { body.bin-glitch h1, body.bin-glitch .lead, body.bin-glitch .portrait { animation: none; } }
+@media (prefers-reduced-motion: reduce) { body.bin-glitch h1, body.bin-glitch .lead, body.bin-glitch .portrait, :root[data-mode="binary"] .portrait::after { animation: none; } }
+/* Binary hero: black photo backdrop, a skull in place of the bird and icons, a scan beam and HUD grid. */
+.bin-skull, .bin-scan { display: none; }
+:root[data-mode="binary"] .chip, :root[data-mode="binary"] .dash { display: none; }
+:root[data-mode="binary"] .bin-skull { display: block; position: absolute; z-index: 3; left: 12%; top: 40%; width: 15%; height: auto; color: #39ff7a; filter: drop-shadow(0 0 6px rgba(57, 255, 122, .7)); }
+:root[data-mode="binary"] .bin-scan { display: block; position: absolute; z-index: 3; top: 5%; left: 6%; font: 500 .68rem/1 var(--mono); letter-spacing: .14em; color: #39ff7a; text-shadow: 0 0 6px rgba(57, 255, 122, .6); }
+:root[data-mode="binary"] .portrait { background: #000; }
+:root[data-mode="binary"] .portrait::after { content: ""; position: absolute; left: 0; right: 0; top: -18%; height: 18%; background: linear-gradient(transparent, rgba(57, 255, 122, .28), transparent); pointer-events: none; z-index: 2; animation: bin-scan-beam 3.2s linear infinite; }
+@keyframes bin-scan-beam { to { top: 100%; } }
+:root[data-mode="binary"] body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: linear-gradient(rgba(57, 255, 122, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 122, .07) 1px, transparent 1px); background-size: 40px 40px; }
 .tobank-link { color: var(--accent); font-weight: 600; text-decoration: underline dotted; text-underline-offset: .2em; }
 .tobank-link:hover, .tobank-link:focus-visible { text-decoration-style: solid; }
 .pcard.is-focus { outline: 2px solid var(--accent); outline-offset: 4px; transition: outline-color .6s ease; }

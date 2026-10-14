@@ -466,7 +466,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
   };
 
   // Binary pane: a copy of the English pane. Each piece of text is written as the UTF-8 bytes of the words, 8 bits per byte, so it decodes back to the same text. The IDE window, the menus and the form controls keep their English text.
-  const BINARY_SKIP = '.pt-window, .lang-menu, .tobank-link, script, style, noscript, svg, textarea, input, select, option';
+  const BINARY_SKIP = '.pt-window, .lang-menu, .tobank-link, .bin-scan, script, style, noscript, svg, textarea, input, select, option';
   const encodeBinary = (text) => Array.from(new TextEncoder().encode(text), (b) => b.toString(2).padStart(8, '0')).join(' ');
   const suffixIds = (root, sfx) => {
     root.querySelectorAll('[id]').forEach((el) => { el.id = el.id + sfx; });

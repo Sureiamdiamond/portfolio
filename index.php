@@ -106,6 +106,8 @@ function render_pane(string $lang, array $shared): array {
           <path class="dash-legs" d="M30 47 L28 55 M36 47 L37 55" stroke="#01579B" stroke-width="2.4" stroke-linecap="round" fill="none"/>
         </svg>
       </div>
+      <svg class="bin-skull" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><path d="M32 6C18 6 10 16 10 28c0 8 4 13 9 16v8h26v-8c5-3 9-8 9-16C54 16 46 6 32 6z" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><circle cx="23" cy="28" r="6" fill="currentColor"/><circle cx="41" cy="28" r="6" fill="currentColor"/><path d="M28 44v7M36 44v7M32 42v9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+      <span class="bin-scan" aria-hidden="true">SCAN 98% // ID PB-7F3A</span>
       <span class="chip chip-icon chip-a" aria-hidden="true"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></svg></span>
       <span class="chip chip-icon chip-b" aria-hidden="true"><img src="assets/img/ide/flutter_logo.png?v=<?= $assetVersion ?>" alt="" width="27" height="32" decoding="async"></span>
     </div>
