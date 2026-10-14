@@ -523,9 +523,14 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       const id = setTimeout(() => { timers = timers.filter((t) => t !== id); fn(); }, ms);
       timers.push(id);
     };
+    let staticEl = null;
     const glitch = () => {
       document.body.classList.add('bin-glitch');
-      later(() => document.body.classList.remove('bin-glitch'), 420);
+      if (staticEl) staticEl.classList.add('on');
+      later(() => {
+        document.body.classList.remove('bin-glitch');
+        if (staticEl) staticEl.classList.remove('on');
+      }, 260);
     };
     const closeWin = () => { if (win) { win.remove(); win = null; } };
     const openWin = () => {
@@ -565,9 +570,16 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       running = true;
       const burst = () => {
         if (!running) return;
-        if (!reduce.matches) glitch();
-        later(burst, 4000 + Math.random() * 6000);
+        // While the runner game is open the static is skipped, so the game stays readable
+        if (!reduce.matches && !document.querySelector('.bin-game')) glitch();
+        later(burst, 1700 + Math.random() * 600);
       };
+      if (!staticEl) {
+        staticEl = document.createElement('div');
+        staticEl.className = 'bin-static';
+        staticEl.setAttribute('aria-hidden', 'true');
+        document.body.appendChild(staticEl);
+      }
       const popup = () => {
         if (!running) return;
         openWin();
@@ -583,6 +595,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       timers = [];
       closeWin();
       document.body.classList.remove('bin-glitch');
+      if (staticEl) { staticEl.remove(); staticEl = null; }
       window.removeEventListener('wheel', onWheel);
       if (raf) cancelAnimationFrame(raf);
       raf = 0;

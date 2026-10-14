@@ -816,6 +816,11 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 .bin-game-foot { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-top: 1px solid #134d26; font-size: .72rem; }
 @media (max-width: 520px) { .bin-game-foot span:last-child { display: none; } }
 @media (prefers-reduced-motion: reduce) { .bin-play::before { animation: none; } }
+/* Binary mode static: a short noise flash with every glitch burst */
+.bin-static { position: fixed; inset: 0; z-index: 905; pointer-events: none; opacity: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); mix-blend-mode: screen; }
+.bin-static.on { opacity: .28; animation: bin-static .26s steps(4) 1; }
+@keyframes bin-static { 0% { transform: translate(0, 0); } 25% { transform: translate(-12px, 6px); } 50% { transform: translate(8px, -10px); } 75% { transform: translate(-4px, 12px); } 100% { transform: translate(0, 0); } }
+@media (prefers-reduced-motion: reduce) { .bin-static.on { animation: none; } }
 .tobank-link { color: var(--accent); font-weight: 600; text-decoration: underline dotted; text-underline-offset: .2em; }
 .tobank-link:hover, .tobank-link:focus-visible { text-decoration-style: solid; }
 .pcard.is-focus { outline: 2px solid var(--accent); outline-offset: 4px; transition: outline-color .6s ease; }
