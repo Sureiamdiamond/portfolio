@@ -279,7 +279,8 @@ html.lang-arrive main, html.lang-arrive header.topbar { animation: lang-fade-in 
 /* Research: one row per work, with a small cover on the left */
 .media-rows { grid-template-columns: 1fr; gap: 14px; }
 .media-rows .media-card { flex-direction: row; }
-.media-rows .media-cover { width: 150px; flex: 0 0 150px; height: 63px; aspect-ratio: auto; object-fit: contain; }
+.media-rows .media-thumb { align-self: stretch; }
+.media-rows .media-cover { width: auto; flex: none; height: 100%; aspect-ratio: 760 / 1000; object-fit: contain; }
 .media-rows .media-body { padding: 14px 18px; }
 /* Slides: small square thumbnails */
 .media-squares { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
@@ -926,7 +927,7 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
   .dash, .dot, .portrait { animation: none; }
   .to-top, .cv-fab { transition: none; }
 }
-@media (max-width: 520px) { .media-rows .media-card { min-height: 120px; } .media-rows .media-cover { width: 76px; flex-basis: 76px; height: 100px; object-fit: contain; } .media-rows .media-body { min-width: 0; padding: 12px 14px; } .media-squares { grid-template-columns: repeat(2, 1fr); } .media-squares .media-cover { height: 119px; } }
+@media (max-width: 520px) { .media-rows .media-card { min-height: 120px; } .media-rows .media-cover { height: 100%; } .media-rows .media-body { min-width: 0; padding: 12px 14px; } .media-squares { grid-template-columns: repeat(2, 1fr); } .media-squares .media-cover { height: 119px; } }
 
 /* Binary mode: the research and slide thumbnails and their download links are locked */
 .media-thumb { position: relative; display: block; }
