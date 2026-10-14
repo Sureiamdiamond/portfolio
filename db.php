@@ -117,6 +117,7 @@ function db(): PDO {
     run_classyar_stores_v3_migration($pdo);
     run_tobank_lead_migration($pdo);
     run_notebooklm_skill_migration($pdo);
+    run_experience_title_migration($pdo);
     return $pdo;
 }
 

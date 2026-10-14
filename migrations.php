@@ -1411,3 +1411,19 @@ function run_notebooklm_skill_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . NOTEBOOKLM_SKILL_MIGRATION . "', '1')");
 }
+
+const EXPERIENCE_TITLE_MIGRATION = 'migration_experience_title_v1';
+
+/** The IPAAM role gets the software engineer title beside the Flutter one (English and Persian). Previous values are logged. */
+function run_experience_title_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . EXPERIENCE_TITLE_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT id, title, title_fa FROM timeline WHERE title = 'Flutter developer' AND org LIKE 'IPAAM%'")->fetchAll(PDO::FETCH_ASSOC);
+    if ($previous) {
+        migration_log('experience title: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+        $stmt = $pdo->prepare("UPDATE timeline SET title = ?, title_fa = ? WHERE title = 'Flutter developer' AND org LIKE 'IPAAM%'");
+        $stmt->execute(['Software Engineer / Flutter Developer', "مهندس نرم‌افزار / برنامه\u{200C}نویس فلاتر"]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . EXPERIENCE_TITLE_MIGRATION . "', '1')");
+}
