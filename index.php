@@ -145,7 +145,6 @@ function render_pane(string $lang, array $shared): array {
       $skillGroups = skill_groups($skills);
       $languages = language_items(loc($profile, 'languages', $lang));
       $languageGroups = skill_groups($languages);
-      $location = loc($profile, 'location', $lang);
     ?>
     <?php if ($skills || $languages): ?>
       <div class="skills-langs">
@@ -312,8 +311,6 @@ function render_pane(string $lang, array $shared): array {
         if (!empty($profile['linkedin'])) $cards[] = [$profile['linkedin'], 'LinkedIn', null, '0 0 24 24', '<rect x="2.5" y="2.5" width="19" height="19" rx="3"/><path d="M7 10v7M7 6.8v.2M11 17v-7M11 13c0-1.7 1.2-3 2.8-3s2.7 1.3 2.7 3v4"/>', true];
         if (!empty($profile['email'])) $cards[] = ['mailto:' . $profile['email'], t('email', $lang), $profile['email'], '0 0 24 24', '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 6-10 7L2 6"/>', false];
         if (!empty($profile['phone'])) $cards[] = ['tel:' . preg_replace('/\s+/', '', $profile['phone']), t('phone', $lang), $profile['phone'], '0 0 24 24', '<path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.7 2z"/>', false];
-        // The location card opens Tehran on OpenStreetMap only when clicked; no map is embedded.
-        if ($location !== '') $cards[] = ['https://www.openstreetmap.org/search?query=' . rawurlencode($location), t('location', $lang), $location, '0 0 24 24', '<path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>', true];
         foreach ($cards as [$href, $label, $value, $viewBox, $icon, $external]): ?>
           <a class="cc" href="<?= e($href) ?>"<?= $external ? ' target="_blank" rel="noopener"' : '' ?>>
             <svg class="cc-ico" viewBox="<?= $viewBox ?>" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><?= $icon ?></svg>
