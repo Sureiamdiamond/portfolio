@@ -794,7 +794,7 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 .bin-error-x { background: none; border: 0; color: #000; font: inherit; font-weight: 700; cursor: pointer; }
 .bin-error-body { margin: 0; padding: 12px; white-space: pre-wrap; font: inherit; color: inherit; }
 .bin-error-ok { margin: 0 12px 12px; padding: 4px 16px; background: #000; color: #39ff7a; border: 1px solid #39ff7a; font: inherit; cursor: pointer; }
-@media (prefers-reduced-motion: reduce) { body.bin-glitch h1, body.bin-glitch .lead, body.bin-glitch .portrait, :root[data-mode="binary"] .portrait::after { animation: none; } }
+@media (prefers-reduced-motion: reduce) { body.bin-glitch h1, body.bin-glitch .lead, body.bin-glitch .portrait, body.bin-glitch .bin-eyes, :root[data-mode="binary"] .portrait::after { animation: none; } }
 /* Binary hero: black photo backdrop, a skull in place of the bird and icons, a scan beam and HUD grid. */
 .bin-skull, .bin-scan { display: none; }
 :root[data-mode="binary"] .chip, :root[data-mode="binary"] .dash { display: none; }
@@ -821,6 +821,10 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 .bin-static.on { opacity: .28; animation: bin-static .26s steps(4) 1; }
 @keyframes bin-static { 0% { transform: translate(0, 0); } 25% { transform: translate(-12px, 6px); } 50% { transform: translate(8px, -10px); } 75% { transform: translate(-4px, 12px); } 100% { transform: translate(0, 0); } }
 @media (prefers-reduced-motion: reduce) { .bin-static.on { animation: none; } }
+/* Binary mode: the skull drawing sits over the photo eyes, green like the rest of the photo, and jitters with the glitches */
+.bin-eyes { display: none; }
+:root[data-mode="binary"] .bin-eyes { display: block; position: absolute; z-index: 3; left: 33%; top: 16%; width: 34%; height: auto; pointer-events: none; filter: grayscale(1) sepia(1) hue-rotate(60deg) saturate(3) brightness(1.1); }
+body.bin-glitch .bin-eyes { animation: bin-jitter .42s steps(2, end) 1; }
 .tobank-link { color: var(--accent); font-weight: 600; text-decoration: underline dotted; text-underline-offset: .2em; }
 .tobank-link:hover, .tobank-link:focus-visible { text-decoration-style: solid; }
 .pcard.is-focus { outline: 2px solid var(--accent); outline-offset: 4px; transition: outline-color .6s ease; }

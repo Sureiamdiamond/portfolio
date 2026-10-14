@@ -97,6 +97,7 @@ function render_pane(string $lang, array $shared): array {
       <div class="portrait">
         <img class="portrait-img" src="<?= e($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png?v=' . $assetVersion) ?>" alt="<?= e($name) ?>" width="380" height="541" decoding="async">
         <img class="portrait-bin" src="assets/img/portrait-binary.png?v=<?= $assetVersion ?>" alt="" width="358" height="512" decoding="async">
+        <img class="bin-eyes" src="assets/img/skull-eye.png?v=<?= $assetVersion ?>" alt="" width="340" height="323" decoding="async">
         <svg class="dash" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
           <path class="dash-tail" d="M12 40 L3 33 L5 42 L1 47 L14 46 Z" fill="#029EFD"/>
           <path class="dash-body" d="M10 42 C16 28 34 22 48 27 C55 29 58 34 56 38 C53 44 36 48 22 49 C16 50 11 47 10 42 Z" fill="#54C5F8"/>
