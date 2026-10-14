@@ -84,6 +84,7 @@ function db(): PDO {
     run_timeline_logos_migration($pdo);
     run_ipaam_logo_migration($pdo);
     run_tobank_stack_migration($pdo);
+    run_intern_spelling_migration($pdo);
     run_codeyad_period_migration($pdo);
     run_ipam_fa_spelling_migration($pdo);
     run_techblog_github_migration($pdo);

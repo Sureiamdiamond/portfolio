@@ -326,7 +326,7 @@ function cv_timeline_rows(): array {
             'website' => $ipam['website'], 'details' => '', 'details_fa' => '', 'bullets' => $trainee[1], 'bullets_fa' => $trainee[0], 'sort' => 2,
         ],
         [
-            'kind' => 'experience', 'title' => 'Intern (Codeyad project-based course)', 'title_fa' => 'کاراموز (دوره پروژه‌محور کدیاد)',
+            'kind' => 'experience', 'title' => 'Intern (Codeyad project-based course)', 'title_fa' => 'کارآموز (دوره پروژه‌محور کدیاد)',
             'org' => 'Codeyad', 'org_fa' => 'کدیاد', 'city' => 'Tehran', 'city_fa' => 'تهران',
             'period' => 'Apr 2023 – Aug 2023', 'period_fa' => 'اردیبهشت ۱۴۰۲ – مرداد ۱۴۰۲',
             'website' => 'https://codeyad.com/', 'details' => '', 'details_fa' => '', 'bullets' => $bullets[1], 'bullets_fa' => $bullets[0], 'sort' => 3,
@@ -786,6 +786,40 @@ function run_tobank_stack_migration(PDO $pdo): void {
         }
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TOBANK_STACK_MIGRATION . "', '1')");
+}
+
+// Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.
+const INTERN_SPELLING_MIGRATION = 'migration_intern_spelling_v1';
+
+function run_intern_spelling_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . INTERN_SPELLING_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $tables = $pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")->fetchAll(PDO::FETCH_COLUMN);
+    foreach ($tables as $table) {
+        $rows = $pdo->query('SELECT * FROM "' . $table . '"')->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($rows as $row) {
+            $set = [];
+            $values = [];
+            $previous = [];
+            foreach ($row as $col => $value) {
+                if (is_string($value) && str_contains($value, 'کاراموز')) {
+                    $set[] = '"' . $col . '" = ?';
+                    $values[] = str_replace('کاراموز', 'کارآموز', $value);
+                    $previous[$col] = $value;
+                }
+            }
+            if (!$set) {
+                continue;
+            }
+            $key = $table === 'profile' ? $row['k'] : $row['id'];
+            migration_log("intern spelling: $table $key previous values " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+            $where = $table === 'profile' ? 'k = ?' : 'id = ?';
+            $values[] = $key;
+            $pdo->prepare('UPDATE "' . $table . '" SET ' . implode(', ', $set) . " WHERE $where")->execute($values);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . INTERN_SPELLING_MIGRATION . "', '1')");
 }
 
 // English becomes a panel with CAE and TTC as sub-items. Rewrites both language fields; the previous values are logged.
