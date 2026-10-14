@@ -279,8 +279,7 @@ html.lang-arrive main, html.lang-arrive header.topbar { animation: lang-fade-in 
 /* Research: one row per work, with a small cover on the left */
 .media-rows { grid-template-columns: 1fr; gap: 14px; }
 .media-rows .media-card { flex-direction: row; }
-.media-rows .media-thumb { align-self: stretch; }
-.media-rows .media-cover { width: auto; flex: none; height: 100%; aspect-ratio: 760 / 1000; object-fit: contain; }
+.media-rows .media-cover { width: 78px; flex: 0 0 78px; height: 103px; aspect-ratio: auto; object-fit: contain; }
 .media-rows .media-body { padding: 14px 18px; }
 /* Slides: small square thumbnails */
 .media-squares { grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 14px; }
@@ -927,7 +926,7 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
   .dash, .dot, .portrait { animation: none; }
   .to-top, .cv-fab { transition: none; }
 }
-@media (max-width: 520px) { .media-rows .media-card { min-height: 120px; } .media-rows .media-cover { height: 100%; } .media-rows .media-body { min-width: 0; padding: 12px 14px; } .media-squares { grid-template-columns: repeat(2, 1fr); } .media-squares .media-cover { height: 119px; } }
+@media (max-width: 520px) { .media-rows .media-card { min-height: 120px; } .media-rows .media-cover { width: 90px; flex-basis: 90px; height: 118px; } .media-rows .media-body { min-width: 0; padding: 12px 14px; } .media-squares { grid-template-columns: repeat(2, 1fr); } .media-squares .media-cover { height: 119px; } }
 
 /* Binary mode: the research and slide thumbnails and their download links are locked */
 .media-thumb { position: relative; display: block; }
@@ -964,9 +963,9 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
   }
 }
 
-/* Phones: the personal mark sits in the top row, beside the language button, and not in the menu row. Desktop keeps it in the menu. */
+/* Phones: the personal mark sits at the right edge of the top row, 10% of the screen width in from the edge, and not in the menu row. Desktop keeps it in the menu. */
 .p-mark-top { display: none; }
 @media (max-width: 760px) {
-  .p-mark-top { display: inline-block; flex: none; width: .85em; height: 1.2em; font-size: .92rem; align-self: center; margin-inline-start: 2px; background: var(--fg); -webkit-mask: url("img/p-mark.png") center / contain no-repeat; mask: url("img/p-mark.png") center / contain no-repeat; }
+  .p-mark-top { display: block; position: absolute; top: 20px; right: 10vw; width: .98em; height: 1.38em; font-size: .92rem; background: var(--fg); -webkit-mask: url("img/p-mark.png") center / contain no-repeat; mask: url("img/p-mark.png") center / contain no-repeat; }
   .nav-links .p-mark { display: none; }
 }

@@ -343,6 +343,8 @@ function downloadBinaryCv() {
     if (!list.hidden && !ev.target.closest('.cv-dock')) setOpen(false);
   });
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') setOpen(false); });
+  // Scrolling closes the chooser, so it does not float over the page after the button hides
+  window.addEventListener('scroll', () => { if (!list.hidden) setOpen(false); }, { passive: true });
 })();
 
 // Hero CV button: same chooser as the floating button, opened under the button
@@ -1113,6 +1115,8 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     if (!ev.target.closest('.lang-menu')) closeMenus();
   });
   document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') closeMenus(); });
+  // Scrolling closes the language list, so it does not float over the page
+  window.addEventListener('scroll', () => closeMenus(), { passive: true });
 
   // The choice is kept in the cookie: binary comes back on the next visit
   // Binary mode is not restored on load; a reload shows the last normal language
