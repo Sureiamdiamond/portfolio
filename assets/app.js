@@ -651,7 +651,11 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     let speed = 5;
     let nextSpawn = 60;
     let groundOffset = 0;
+    let trapped = false;
+    let joke = null;
+    const closeJoke = () => { if (joke) { joke.remove(); joke = null; } };
     const reset = () => {
+      trapped = false;
       state = 'ready';
       y = STAND;
       vy = 0;
@@ -663,6 +667,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     };
     const score = () => Math.floor(frame / 6);
     const jump = () => {
+      if (joke) { closeJoke(); return; }
       if (state === 'ready') { state = 'run'; return; }
       if (state === 'over') { reset(); state = 'run'; return; }
       if (y >= STAND) vy = JUMP;
@@ -682,8 +687,24 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       const sy = y + 4;
       return sx < o.x + o.w && sx + 14 > o.x && sy < GROUND && sy + 32 > GROUND - o.h;
     };
+    // After ten seconds the skeleton walks into a block on its own, and a joke tells the player to stop
+    const trap = () => {
+      trapped = true;
+      obstacles.push({ x: SKE_X + 6, cells: 1, rows: 1, digits: ['1'], w: 24, h: 24 });
+      gameOver();
+      if (!panel) return;
+      joke = document.createElement('div');
+      joke.className = 'bin-joke';
+      joke.setAttribute('role', 'alert');
+      joke.innerHTML = '<p class="bin-joke-fa" dir="rtl">بهتره ادامه ندی. زندگی خودش سخت‌ترین بازیه</p>'
+        + '<p class="bin-joke-en">Maybe stop here. Life is the hardest game.</p>'
+        + '<button type="button" class="bin-joke-ok">OK</button>';
+      joke.querySelector('.bin-joke-ok').addEventListener('click', closeJoke);
+      panel.appendChild(joke);
+    };
     const update = (k) => {
       frame += k;
+      if (!trapped && frame >= 600) { trap(); return; }
       groundOffset = (groundOffset + speed * k) % 20;
       vy += GRAV * k;
       y += vy * k;
@@ -780,6 +801,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       raf = requestAnimationFrame(loop);
     };
     const onKey = (ev) => {
+      if (joke && ev.key === 'Escape') { closeJoke(); return; }
       if (ev.key === 'Escape') { close(); return; }
       if (ev.key === ' ' || ev.key === 'ArrowUp') {
         ev.preventDefault();
@@ -789,6 +811,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     const closePanel = () => {
       if (!open) return;
       open = false;
+      joke = null;
       cancelAnimationFrame(raf);
       raf = 0;
       document.removeEventListener('keydown', onKey);
