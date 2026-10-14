@@ -289,7 +289,7 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
     <div class="media-grid media-rows">
     <?php foreach ($papers as $paper): $files = json_decode((string) ($paper['files'] ?? ''), true) ?: []; ?>
       <article class="media-card">
-        <?php if (!empty($paper['cover'])): ?><img class="media-cover" src="<?= e($paper['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?>
+        <div class="media-thumb"><?php if (!empty($paper['cover'])): ?><img class="media-cover" src="<?= e($paper['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?></div>
         <div class="media-body">
           <h3><?= e(loc($paper, 'title', $lang)) ?></h3>
           <?php if (trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? '')) !== ''): ?><p class="muted"><?= e(trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? ''))) ?></p><?php endif; ?>
@@ -312,7 +312,7 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
     <div class="media-grid media-squares">
     <?php foreach ($slides as $s): ?>
       <article class="media-card">
-        <?php if (!empty($s['cover'])): ?><img class="media-cover" src="<?= e($s['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?>
+        <div class="media-thumb"><?php if (!empty($s['cover'])): ?><img class="media-cover" src="<?= e($s['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?></div>
         <div class="media-body">
           <h3><?= e(loc($s, 'title', $lang)) ?></h3>
           <?php if (trim(($s['event'] ?? '') . ' ' . ($s['year'] ?? '')) !== ''): ?><p class="muted"><?= e(trim(($s['event'] ?? '') . ' ' . ($s['year'] ?? ''))) ?></p><?php endif; ?>
