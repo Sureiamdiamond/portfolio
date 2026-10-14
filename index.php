@@ -368,7 +368,7 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
 <a class="to-top" href="#top" aria-label="<?= e(t('back_to_top', $lang)) ?>" title="<?= e(t('back_to_top', $lang)) ?>"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 14l6-6 6 6"/></svg></a>
 
 <footer class="muted">
-  <?= trim((string) ($profile['footer_text'] ?? '')) !== '' ? e($profile['footer_text']) : '© ' . date('Y') . ' ' . e($name) ?>
+  <span class="foot-mark" aria-hidden="true"></span><?= trim((string) ($profile['footer_text'] ?? '')) !== '' ? e($profile['footer_text']) : '© ' . date('Y') . ' ' . e($name) ?>
 </footer>
 <?php
     $html = ob_get_clean();
@@ -461,7 +461,8 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 <meta name="twitter:title" content="<?= e($name) ?> · <?= e($headline) ?>">
 <meta name="twitter:description" content="<?= e($description) ?>">
 <meta name="twitter:image" content="<?= e($shareImage) ?>">
-<link rel="icon" href="assets/img/favicon.svg?v=<?= $assetVersion ?>" type="image/svg+xml">
+<link rel="icon" href="assets/img/favicon-32.png?v=<?= $assetVersion ?>" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png?v=<?= $assetVersion ?>">
 <script type="application/ld+json"><?= json_encode($personData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
 <script>
   // Apply the saved theme before first paint to avoid a flash.
