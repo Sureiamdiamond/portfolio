@@ -2,6 +2,7 @@
 declare(strict_types=1);
 
 const LANGUAGES = ['en', 'fa'];
+const DEFAULT_LANG = 'fa';
 
 const STRINGS = [
     'en' => [
@@ -139,11 +140,12 @@ function current_lang(): string {
         }
         return $requested === 'bin' ? 'en' : $requested;
     }
-    $cookie = $_COOKIE['lang'] ?? 'en';
+    // Default for a visitor with no saved choice is Persian; a saved binary cookie (from older visits) falls back to it too
+    $cookie = $_COOKIE['lang'] ?? DEFAULT_LANG;
     if ($cookie === 'bin') {
-        return 'en';
+        return DEFAULT_LANG;
     }
-    return in_array($cookie, LANGUAGES, true) ? $cookie : 'en';
+    return in_array($cookie, LANGUAGES, true) ? $cookie : DEFAULT_LANG;
 }
 
 /** The UTF-8 bytes of a word as 8-bit groups, so the language menu can show the word in binary. */
