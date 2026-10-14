@@ -152,10 +152,12 @@ function language_items(string $text): array {
 }
 
 /** One language card. A language with sub-items opens a panel with them, the same way as a skill group. */
-function language_card_html(array $group): string {
+function language_card_html(array $group, string $lang = 'en'): string {
     $item = $group['item'];
+    // The Cambridge C1 Advanced badge shows beside the English C1 level only; the Persian page keeps its text-only level.
+    $badge = ($lang === 'en' && stripos($item['level'], 'C1') !== false) ? '<img class="lang-badge" src="assets/img/lang/c1-advanced.webp" alt="" width="28" height="28" loading="lazy">' : '';
     $text = '<span class="lang-text"><span class="lang-name">' . e($item['name']) . '</span>'
-        . ($item['level'] !== '' ? '<span class="lang-level">' . e($item['level']) . '</span>' : '') . '</span>';
+        . ($item['level'] !== '' ? '<span class="lang-level">' . $badge . e($item['level']) . '</span>' : '') . '</span>';
     if (!$group['children']) {
         return '<li class="skill lang-card">' . $text . '</li>';
     }

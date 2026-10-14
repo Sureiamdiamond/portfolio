@@ -239,7 +239,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
         <?php if ($languages): ?>
           <p class="skills-label"><?= e(t('languages', $lang)) ?></p>
           <ul class="skill-grid">
-            <?php foreach ($languageGroups as $group): ?><?= language_card_html($group) ?><?php endforeach; ?>
+            <?php foreach ($languageGroups as $group): ?><?= language_card_html($group, $lang) ?><?php endforeach; ?>
           </ul>
         <?php endif; ?>
       </div>
