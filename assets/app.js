@@ -1076,16 +1076,31 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       // Jump to the projects section in the visible language pane and highlight that project's card
       ev.preventDefault();
       const pane = projectLink.closest('.pane') || document;
-      const found = pane.querySelector(`.pcard[data-project="${projectLink.dataset.projectLink}"]`);
-      const card = found && !found.hidden ? found : null;
-      const target = card || pane.querySelector('#projects');
-      if (!target) return;
+      const name = projectLink.dataset.projectLink;
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      target.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
-      if (card) {
-        card.classList.add('is-focus');
-        setTimeout(() => card.classList.remove('is-focus'), 1800);
+      // Only a rendered element can be scrolled to: the card view and the IDE tree are hidden in turn
+      const shown = (el) => !!el && el.getClientRects().length > 0;
+      const found = pane.querySelector(`.pcard[data-project="${name}"]`);
+      // In the IDE view the project's folder in the tree is the matching element
+      const folder = name.toLowerCase().replace(/\s+/g, '_');
+      const summary = Array.from(pane.querySelectorAll('.it-project > details > summary'))
+        .find((s) => s.textContent.trim().toLowerCase() === folder);
+      let target = null;
+      if (summary && !shown(found)) {
+        // Open the folders above the project in the tree, so it is rendered
+        for (let d = summary.parentElement; d; d = d.parentElement) if (d.tagName === 'DETAILS') d.open = true;
       }
+      if (shown(found)) {
+        target = found;
+      } else if (shown(summary)) {
+        target = summary;
+      } else {
+        target = pane.querySelector('#projects');
+      }
+      if (!target) return;
+      target.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
+      target.classList.add('is-focus');
+      setTimeout(() => target.classList.remove('is-focus'), 1800);
       return;
     }
     const choice = ev.target.closest('[data-lang-choice]');
