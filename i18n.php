@@ -41,7 +41,7 @@ const STRINGS = [
         'default_headline' => 'Software Engineer / Flutter Developer',
         'default_title' => 'Portfolio',
         'lang_switch' => 'فارسی',
-        'language' => 'Language',
+        'language' => 'زبان',
         'lang_fa' => 'فارسی',
         'lang_en' => 'English',
         'lang_bin' => 'Binary',
@@ -141,6 +141,11 @@ function current_lang(): string {
         return 'en';
     }
     return in_array($cookie, LANGUAGES, true) ? $cookie : 'en';
+}
+
+/** The UTF-8 bytes of a word as 8-bit groups, so the language menu can show the word in binary. */
+function text_to_bits(string $text): string {
+    return implode(' ', array_map(static fn(int $byte): string => str_pad(decbin($byte), 8, '0', STR_PAD_LEFT), array_values(unpack('C*', $text) ?: [])));
 }
 
 function t(string $key, string $lang): string {

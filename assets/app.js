@@ -495,9 +495,6 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
       if (!node.nodeValue.trim()) return;
       node.nodeValue = encodeBinary(node.nodeValue);
     });
-    const label = pane.querySelector('[data-lang-choice="bin"]');
-    const now = pane.querySelector('.lang-now');
-    if (label && now) now.textContent = label.textContent;
     const h1 = pane.querySelector('h1');
     if (h1) {
       const cloud = document.createElement('span');
