@@ -966,6 +966,18 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
 /* Phones: the personal mark sits at the right edge of the top row, 10% of the screen width in from the edge, and not in the menu row. Desktop keeps it in the menu. */
 .p-mark-top { display: none; }
 @media (max-width: 760px) {
-  .p-mark-top { display: block; position: absolute; top: 20px; right: 10vw; width: .98em; height: 1.38em; font-size: .92rem; background: var(--fg); -webkit-mask: url("img/p-mark.png") center / contain no-repeat; mask: url("img/p-mark.png") center / contain no-repeat; }
+  .p-mark-top { display: block; position: absolute; top: 19px; right: 10vw; width: 1.225em; height: 1.725em; font-size: .92rem; background: var(--fg); -webkit-mask: url("img/p-mark.png") center / contain no-repeat; mask: url("img/p-mark.png") center / contain no-repeat; }
   .nav-links .p-mark { display: none; }
+}
+
+/* Phones: the language list and the resume chooser are opaque. Glass styles are switched off on them, so the content behind never shows through, in light and dark mode. */
+@media (max-width: 760px) {
+  .lang-list, html[data-glass="on"] .lang-list,
+  .cv-choices .btn, .cv-choices .btn-outline, html[data-glass="on"] .cv-choices .btn, html[data-glass="on"] .cv-choices .btn-outline,
+  .cv-hero-choices .btn, .cv-hero-choices .btn-outline, html[data-glass="on"] .cv-hero-choices .btn, html[data-glass="on"] .cv-hero-choices .btn-outline {
+    background-color: var(--surface); background-image: none; opacity: 1;
+    backdrop-filter: none; -webkit-backdrop-filter: none;
+    border: 1px solid var(--muted); box-shadow: 0 12px 26px -10px rgba(15, 23, 42, .5);
+  }
+  .lang-list { border-color: var(--muted); box-shadow: 0 12px 26px -10px rgba(15, 23, 42, .5); }
 }
