@@ -1578,3 +1578,16 @@ function run_research_revert_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . RESEARCH_REVERT_MIGRATION . "', '1')");
 }
+
+const RESEARCH_DATE_MIGRATION = 'migration_research_date_v5';
+
+/** The research rows no longer show a date. Clears the venue and year that the date line was built from. */
+function run_research_date_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . RESEARCH_DATE_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query('SELECT title, venue, year FROM papers')->fetchAll(PDO::FETCH_ASSOC);
+    migration_log('research date: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $pdo->exec('UPDATE papers SET venue = NULL, year = NULL');
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . RESEARCH_DATE_MIGRATION . "', '1')");
+}

@@ -122,6 +122,7 @@ function db(): PDO {
     run_research_bullets_migration($pdo);
     run_slide_rename_migration($pdo);
     run_research_revert_migration($pdo);
+    run_research_date_migration($pdo);
     return $pdo;
 }
 
