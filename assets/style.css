@@ -230,6 +230,8 @@ html.lang-arrive main, html.lang-arrive header.topbar { animation: lang-fade-in 
 .pcard-ext:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 .pcard-shot { margin: 0 0 14px; }
 .pcard-summary { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; white-space: normal; }
+/* A card with one summary line per group project: show every line */
+.pcard-summary--lines { -webkit-line-clamp: 6; }
 .pcard-shot img, .pcard-shots img { display: block; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; border-radius: 10px; border: 1px solid var(--border); }
 .pcard-shots { display: flex; gap: 8px; list-style: none; padding: 0; margin: 10px 0 0; }
 .pcard-shots li { width: 72px; }

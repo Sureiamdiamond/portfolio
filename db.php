@@ -86,7 +86,7 @@ function db(): PDO {
     run_tobank_stack_migration($pdo);
     run_intern_spelling_migration($pdo);
     run_techblog_single_link_migration($pdo);
-    run_techblog_codeyad_card_migration($pdo);
+    run_techblog_two_lines_migration($pdo);
     run_codeyad_period_migration($pdo);
     run_ipam_fa_spelling_migration($pdo);
     run_techblog_github_migration($pdo);

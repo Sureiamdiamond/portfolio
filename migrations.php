@@ -803,29 +803,26 @@ function run_techblog_single_link_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_SINGLE_LINK_MIGRATION . "', '1')");
 }
 
-// Second TechBlog card for the Codeyad group project, same app and GitHub link. Inserted once, only if no card with this title exists.
-const TECHBLOG_CODEYAD_CARD_MIGRATION = 'migration_techblog_codeyad_card_v1';
+// One TechBlog card carries both group descriptions, one per line, with the tags flutter and dart. The second card created for Codeyad is removed. Previous values are logged.
+const TECHBLOG_TWO_LINES_MIGRATION = 'migration_techblog_two_lines_v1';
+const TECHBLOG_EN_SUMMARY = "Group project for Professor Safari (Azad University): a podcast and tech-news application built with Flutter.\nGroup project by Sasan Safari, Flutter instructor (Codeyad): a podcast and tech-news application built with Flutter.";
+const TECHBLOG_FA_SUMMARY = "پروژه گروهی برای استاد صفری (دانشگاه آزاد): اپلیکیشن پادکست و اخبار در حوزه تکنولوژی با فلاتر\nپروژه گروهی ساسان صفری مدرس فلاتر (کدیاد): اپلیکیشن پادکست و اخبار در حوزه تکنولوژی با فلاتر";
 
-function run_techblog_codeyad_card_migration(PDO $pdo): void {
-    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TECHBLOG_CODEYAD_CARD_MIGRATION . "'")->fetchColumn()) {
+function run_techblog_two_lines_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TECHBLOG_TWO_LINES_MIGRATION . "'")->fetchColumn()) {
         return;
     }
-    $exists = $pdo->query("SELECT 1 FROM projects WHERE title = 'TechBlog (Codeyad)' LIMIT 1")->fetchColumn();
-    if (!$exists) {
-        $source = $pdo->query("SELECT * FROM projects WHERE LOWER(TRIM(title)) = 'techblog' ORDER BY id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
-        if ($source) {
-            $sort = (int) $pdo->query('SELECT COALESCE(MAX(sort), 0) + 1 FROM projects')->fetchColumn();
-            $stmt = $pdo->prepare('INSERT INTO projects (title, title_fa, kind, summary, summary_fa, tags, url, github_url, appstore_url, playstore_url, bazaar_url, icon, extra_links, sort) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-            $stmt->execute([
-                'TechBlog (Codeyad)', 'تک‌بلاگ (کدیاد)', $source['kind'],
-                'Group project by Sasan Safari, Flutter instructor (Codeyad): a podcast and tech-news application built with Flutter.',
-                'پروژه گروهی ساسان صفری مدرس فلاتر (کدیاد): اپلیکیشن پادکست و اخبار در حوزه تکنولوژی با فلاتر',
-                $source['tags'], '', $source['github_url'], '', '', '', $source['icon'], null, $sort,
-            ]);
-            migration_log('techblog codeyad card: inserted project ' . $pdo->lastInsertId());
-        }
+    $extra = $pdo->query("SELECT id, title_fa, summary, summary_fa FROM projects WHERE title = 'TechBlog (Codeyad)'")->fetchAll(PDO::FETCH_ASSOC);
+    foreach ($extra as $row) {
+        migration_log("techblog two lines: removed second card {$row['id']} previous " . json_encode($row, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('DELETE FROM projects WHERE id = ?')->execute([$row['id']]);
     }
-    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_CODEYAD_CARD_MIGRATION . "', '1')");
+    $row = $pdo->query("SELECT id, summary, summary_fa, tags FROM projects WHERE LOWER(TRIM(title)) = 'techblog' ORDER BY id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($row && ($row['summary'] !== TECHBLOG_EN_SUMMARY || $row['summary_fa'] !== TECHBLOG_FA_SUMMARY || $row['tags'] !== 'flutter, dart')) {
+        migration_log("techblog two lines: project {$row['id']} previous " . json_encode(['summary' => $row['summary'], 'summary_fa' => $row['summary_fa'], 'tags' => $row['tags']], JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE projects SET summary = ?, summary_fa = ?, tags = ? WHERE id = ?')->execute([TECHBLOG_EN_SUMMARY, TECHBLOG_FA_SUMMARY, 'flutter, dart', $row['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_TWO_LINES_MIGRATION . "', '1')");
 }
 
 // Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.

@@ -195,7 +195,8 @@ function render_pane(string $lang, array $shared): array {
             <?php endif; ?>
             <?= project_tile($p) ?>
             <h3><?= e(loc($p, 'title', $lang)) ?></h3>
-            <p class="muted pcard-summary"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
+            <?php $summaryText = loc($p, 'summary', $lang); ?>
+            <p class="muted pcard-summary<?= substr_count($summaryText, "\n") === 1 && mb_strlen($summaryText) < 400 ? ' pcard-summary--lines' : '' ?>"><?= nl2br(e($summaryText)) ?></p>
             <?php $tags = array_filter(array_map('trim', explode(',', (string) $p['tags']))); ?>
             <?php if ($tags): ?>
               <ul class="pcard-tags"><?php foreach ($tags as $tag): ?><li><?= e($tag) ?></li><?php endforeach; ?></ul>
