@@ -1028,3 +1028,19 @@ function run_role_headline_v2_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ROLE_HEADLINE_V2_MIGRATION . "', '1')");
 }
+
+// TechBlog's description is one line that keeps the group-project prefix: the English and Persian lines are replaced in full, with the previous values logged.
+const TECHBLOG_V5_MIGRATION = 'migration_techblog_group_line_v5';
+const TECHBLOG_V5_EN = 'Group project for Professor Safari (Azad University): a podcast and tech-news application built with Flutter.';
+const TECHBLOG_V5_FA = 'پروژه گروهی برای استاد صفری (دانشگاه آزاد): اپلیکیشن پادکست و اخبار در حوزه تکنولوژی با فلاتر';
+function run_techblog_group_line_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TECHBLOG_V5_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $row = $pdo->query("SELECT * FROM projects WHERE LOWER(TRIM(title)) = 'techblog' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($row && ($row['summary'] !== TECHBLOG_V5_EN || $row['summary_fa'] !== TECHBLOG_V5_FA)) {
+        migration_log("techblog group line: project {$row['id']} previous " . json_encode([$row['summary'], $row['summary_fa']], JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE projects SET summary = ?, summary_fa = ? WHERE id = ?')->execute([TECHBLOG_V5_EN, TECHBLOG_V5_FA, $row['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TECHBLOG_V5_MIGRATION . "', '1')");
+}

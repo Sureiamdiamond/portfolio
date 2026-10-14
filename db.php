@@ -97,6 +97,7 @@ function db(): PDO {
     run_techblog_podcast_migration($pdo);
     run_classyar_stores_migration($pdo);
     run_role_headline_v2_migration($pdo);
+    run_techblog_group_line_migration($pdo);
     return $pdo;
 }
 
@@ -127,8 +128,8 @@ const RESUME_PROJECTS = [
         'summary_fa' => "اپلیکیشن آب و هوا با Bloc و Clean Architecture. پروژه دانشگاه. بازه: فروردین ۱۴۰۴.",
         'tags' => 'flutter, dart, bloc, clean architecture', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/weather_app', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 2],
     ['title' => 'TechBlog', 'title_fa' => 'تک‌بلاگ', 'kind' => 'academic',
-        'summary' => "A podcast and tech-news application.",
-        'summary_fa' => "اپلیکیشن پادکست و اخبار در حوزه تکنولوژی",
+        'summary' => "Group project for Professor Safari (Azad University): a podcast and tech-news application built with Flutter.",
+        'summary_fa' => "پروژه گروهی برای استاد صفری (دانشگاه آزاد): اپلیکیشن پادکست و اخبار در حوزه تکنولوژی با فلاتر",
         'tags' => 'flutter, dart', 'url' => '', 'github_url' => 'https://github.com/sasansafari/techblog', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 3],
     ['title' => 'Classyar App', 'title_fa' => 'کلاسیار', 'kind' => 'work',
         'summary' => "Flutter app for Classyar, built for Azad Islamic University (Tehran West). Dynamic UI, state management with GetX and Bloc, data from an API and Firebase, published on Cafebazaar. Period: Mehr 1404.",

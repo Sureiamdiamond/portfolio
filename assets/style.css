@@ -187,10 +187,7 @@ html[data-projects-view="normal"] .pt-window { display: none !important; }
 .pv-normal { margin-top: 8px; }
 .pv-normal .grid { gap: 36px; }
 .pcard { position: relative; }
-/* The title link covers the whole card, so a tap anywhere opens the main link. The IDE button sits above it. */
-.pcard-link { color: inherit; text-decoration: none; }
-.pcard-link::after { content: ""; position: absolute; inset: 0; border-radius: inherit; }
-.pcard-link:focus-visible { outline: none; }
+/* Card titles are plain text, and the card itself does not navigate: the links at the bottom of the card open the sites. */
 /* Project link list: opens below the button, stays above the card below it, and closes on Esc, outside click or focus leaving. */
 .pcard-menu { position: relative; z-index: 2; display: inline-block; }
 .pcard-menu-btn { font: inherit; color: var(--accent); background: none; border: 0; padding: 0; cursor: pointer; }
@@ -200,7 +197,6 @@ html[data-projects-view="normal"] .pt-window { display: none !important; }
 .pcard-menu-list a { display: block; padding: 8px 10px; border-radius: 8px; color: var(--fg); text-decoration: none; font-size: .92rem; }
 .pcard-menu-list a:hover, .pcard-menu-list a:focus-visible { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent); outline: none; }
 .pcard.menu-open { z-index: 30; }
-.pcard:has(.pcard-link:focus-visible) { outline: 2px solid var(--accent); outline-offset: 3px; }
 .pcard-ext { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-size: .9rem; }
 .pcard-ext:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 .pcard-shot { margin: 0 0 14px; }

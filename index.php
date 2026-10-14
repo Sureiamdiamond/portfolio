@@ -274,7 +274,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
               <figure class="pcard-shot"><img src="<?= e($shots[0]) ?>" alt="" loading="lazy"></figure>
             <?php endif; ?>
             <?= project_tile($p) ?>
-            <h3><?php if ($primary !== ''): ?><a class="pcard-link" href="<?= e($primary) ?>" target="_blank" rel="noopener"><?= e(loc($p, 'title', $lang)) ?></a><?php else: ?><?= e(loc($p, 'title', $lang)) ?><?php endif; ?></h3>
+            <h3><?= e(loc($p, 'title', $lang)) ?></h3>
             <p class="muted pcard-summary"><?= nl2br(e(loc($p, 'summary', $lang))) ?></p>
             <?php $tags = array_filter(array_map('trim', explode(',', (string) $p['tags']))); ?>
             <?php if ($tags): ?>
