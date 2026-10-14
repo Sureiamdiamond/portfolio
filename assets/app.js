@@ -1,3 +1,8 @@
+// Page scripts run per language pane (see initPane); the switch between panes is at the end of this file.
+
+// Both language panes are live: each runs the same setup against its own elements, with its own id suffix.
+function initPane(scope, sfx) {
+  const byId = (name) => scope.querySelector('#' + name + sfx);
 // Progressive enhancement: the page is fully readable without this file.
 (function () {
   const root = document.documentElement;
@@ -9,11 +14,11 @@
 
   // Fail loudly in the console if controls this script depends on are missing
   ['#theme-toggle', '[data-pt]'].forEach((selector) => {
-    if (!document.querySelector(selector)) console.error('[portfolio] element not found:', selector);
+    if (sfx === '' && !scope.querySelector(selector)) console.error('[portfolio] element not found:', selector);
   });
 
   // Theme toggle: remembers the choice, otherwise follows the system preference
-  const toggle = document.getElementById('theme-toggle');
+  const toggle = byId('theme-toggle');
   const effectiveTheme = () => root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
   // Browser chrome colour: one tag for the chosen theme, replacing the per-scheme pair from the page head
   const setChromeColor = (theme) => {
@@ -33,7 +38,7 @@
   }
 
   // Scroll entrance: each section fades up once when it first enters the viewport
-  const sections = document.querySelectorAll('.reveal');
+  const sections = scope.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window && !reduce) {
     const io = new IntersectionObserver((entries) => {
       entries.forEach((entry) => {
@@ -52,15 +57,15 @@
 // Project window: opens files in editor tabs, resizable tool window, keyboard navigation.
 // Without this script the tree still works: folders are native <details>, and each file is a link.
 (function () {
-  const win = document.querySelector('[data-pt]');
+  const win = scope.querySelector('[data-pt]');
   if (!win) return;
-  const tree = document.getElementById('pt-tree');
-  const tabsEl = document.getElementById('pt-tabs');
-  const view = document.getElementById('pt-view');
-  const statusPath = document.getElementById('pt-status-path');
-  const statusLang = document.getElementById('pt-status-lang');
-  const split = document.getElementById('pt-split');
-  const toggle = document.getElementById('pt-toggle');
+  const tree = byId('pt-tree');
+  const tabsEl = byId('pt-tabs');
+  const view = byId('pt-view');
+  const statusPath = byId('pt-status-path');
+  const statusLang = byId('pt-status-lang');
+  const split = byId('pt-split');
+  const toggle = byId('pt-toggle');
   const tabs = new Map(); // source id -> { tab, name }
   let activeId = null;
 
@@ -68,7 +73,7 @@
   const langName = { dart: 'Dart', yaml: 'YAML', markdown: 'Markdown', image: 'Image', text: 'Plain text' };
 
   function setActive(id) {
-    const src = document.getElementById(id);
+    const src = scope.querySelector('#' + CSS.escape(id));
     if (!src) return;
     activeId = id;
     tabs.forEach((entry, key) => {
@@ -171,11 +176,11 @@
   }
 
   // Projects view switch: Normal cards or the IDE window. Remembers the choice.
-  const section = document.getElementById('projects');
-  const switcher = document.getElementById('view-switch');
+  const section = byId('projects');
+  const switcher = byId('view-switch');
   if (section && switcher) {
     const views = {
-      normal: document.getElementById('view-normal'),
+      normal: byId('view-normal'),
       ide: section.querySelector('.pt-window'),
     };
     const buttons = Array.from(switcher.querySelectorAll('[role="radio"]'));
@@ -289,9 +294,9 @@
 
 // Floating CV button: shown once the reader has scrolled past most of the hero
 (function () {
-  const fab = document.querySelector('.cv-fab');
-  const hero = document.getElementById('top');
-  const toTop = document.querySelector('.to-top');
+  const fab = scope.querySelector('.cv-fab');
+  const hero = byId('top');
+  const toTop = scope.querySelector('.to-top');
   const update = () => {
     const limit = hero ? hero.offsetHeight * 0.6 : 400;
     if (fab) fab.classList.toggle('show', window.scrollY > limit);
@@ -304,7 +309,7 @@
 // Skill groups (Flutter, AI): each card's own panel slides out beside it. Only that card changes; the others keep their size.
 (function () {
   const root = document.documentElement;
-  document.querySelectorAll('.skill-parent').forEach((card) => {
+  scope.querySelectorAll('.skill-parent').forEach((card) => {
     const head = card.querySelector('.skill-head');
     const panel = card.querySelector('.skill-panel');
     if (!head || !panel) return;
@@ -340,9 +345,9 @@
     const card = menu.closest('.pcard');
     if (card) card.classList.toggle('menu-open', open);
   };
-  const closeAll = (except) => document.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (m !== except) setOpen(m, false); });
+  const closeAll = (except) => scope.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (m !== except) setOpen(m, false); });
 
-  document.querySelectorAll('.pcard-menu').forEach((menu) => {
+  scope.querySelectorAll('.pcard-menu').forEach((menu) => {
     const btn = menu.querySelector('.pcard-menu-btn');
     btn.addEventListener('click', (ev) => {
       ev.stopPropagation();
@@ -359,59 +364,64 @@
     });
   });
   document.addEventListener('click', (ev) => {
-    document.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (!m.contains(ev.target)) setOpen(m, false); });
+    scope.querySelectorAll('.pcard-menu.is-open').forEach((m) => { if (!m.contains(ev.target)) setOpen(m, false); });
   });
 })();
+}
 
-// Language switch keeps the place: the section in view and the offset inside it are saved before the page reloads, and restored instantly (no smooth scroll) on the new page. A first visit still starts at the top.
+document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset.pane === 'fa' ? '-fa' : ''));
+
+// Language switch without a reload: both languages are on the page and one pane is shown. The reading position (the section in view and the offset inside it) is kept, and the swap cross-fades when the browser allows it. Reduced motion gets an instant swap.
 (function () {
-  const KEY = 'lang-switch-position';
-  const current = () => {
-    const list = Array.from(document.querySelectorAll('main > section[id]'));
+  const html = document.documentElement;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const panes = () => Array.from(document.querySelectorAll('.pane'));
+  const activePane = () => panes().find((p) => !p.hidden) || panes()[0];
+  const suffixFor = (lang) => (lang === 'fa' ? '-fa' : '');
+
+  const sectionInView = (pane) => {
+    const list = Array.from(pane.querySelectorAll('section[id]'));
     const line = window.scrollY + 1;
-    let found = list[0];
+    let found = list[0] || null;
     list.forEach((sec) => { if (sec.offsetTop <= line) found = sec; });
     return found;
   };
 
-  // Browsers with cross-page view transitions cross-fade on their own (see the CSS); elsewhere the page fades out here first.
-  const crossPageFade = 'CSSViewTransitionRule' in window;
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  document.querySelectorAll('[data-lang-switch]').forEach((link) => {
-    link.addEventListener('click', (ev) => {
-      const sec = current();
-      if (!sec) return;
-      try {
-        sessionStorage.setItem(KEY, JSON.stringify({ id: sec.id, offset: Math.max(0, window.scrollY - sec.offsetTop), fade: !reduce && !crossPageFade }));
-      } catch (e) { /* storage blocked: the switch still works, it starts at the top */ }
-      if (!reduce && !crossPageFade) {
-        ev.preventDefault();
-        document.documentElement.classList.add('lang-leaving');
-        setTimeout(() => { window.location.href = link.href; }, 160);
-      }
-    });
-  });
-
-  let saved = null;
-  try {
-    saved = JSON.parse(sessionStorage.getItem(KEY) || 'null');
-    sessionStorage.removeItem(KEY);
-  } catch (e) { saved = null; }
-  if (!saved || !saved.id) return;
-
-  const restore = () => {
-    const target = document.getElementById(saved.id);
-    if (!target) return;
-    const root = document.documentElement;
-    const previous = root.style.scrollBehavior;
-    root.style.scrollBehavior = 'auto';
-    window.scrollTo(0, target.offsetTop + (saved.offset || 0));
-    root.style.scrollBehavior = previous;
+  const showLang = (lang) => {
+    panes().forEach((p) => { p.hidden = p.dataset.pane !== lang; });
+    html.lang = lang;
+    html.dir = lang === 'fa' ? 'rtl' : 'ltr';
+    const cap = lang === 'fa' ? 'Fa' : 'En';
+    if (html.dataset['title' + cap]) document.title = html.dataset['title' + cap];
+    const meta = document.querySelector('meta[name="description"]');
+    if (meta && html.dataset['desc' + cap]) meta.setAttribute('content', html.dataset['desc' + cap]);
+    try { document.cookie = 'lang=' + lang + '; path=/; max-age=31536000; samesite=lax'; } catch (e) { /* cookies blocked: the choice applies to this page */ }
+    try { history.replaceState(null, '', '?lang=' + lang + location.hash); } catch (e) { /* history blocked: the URL keeps its old language */ }
   };
-  if (saved.fade) {
-    document.documentElement.classList.add('lang-arrive');
-    setTimeout(() => document.documentElement.classList.remove('lang-arrive'), 320);
-  }
-  restore();
-  window.addEventListener('load', restore, { once: true });
+
+  document.addEventListener('click', (ev) => {
+    const link = ev.target.closest('[data-lang-switch]');
+    if (!link) return;
+    ev.preventDefault();
+    const current = activePane().dataset.pane;
+    const next = current === 'fa' ? 'en' : 'fa';
+    const from = activePane();
+    const sec = sectionInView(from);
+    const base = sec ? sec.id.replace(/-fa$/, '') : null;
+    const offset = sec ? Math.max(0, window.scrollY - sec.offsetTop) : 0;
+    const apply = () => {
+      showLang(next);
+      const target = base ? document.querySelector('.pane[data-pane="' + next + '"] #' + CSS.escape(base + suffixFor(next))) : null;
+      if (target) window.scrollTo({ top: target.offsetTop + offset, behavior: 'instant' });
+    };
+    if (reduce) { apply(); return; }
+    if (document.startViewTransition) { document.startViewTransition(apply); return; }
+    html.classList.add('lang-leaving');
+    setTimeout(() => {
+      apply();
+      html.classList.remove('lang-leaving');
+      html.classList.add('lang-arrive');
+      setTimeout(() => html.classList.remove('lang-arrive'), 300);
+    }, 160);
+  });
 })();

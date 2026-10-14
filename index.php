@@ -5,7 +5,6 @@ require __DIR__ . '/i18n.php';
 require_once __DIR__ . '/project_tree.php';
 
 $lang = current_lang();
-$dir = $lang === 'fa' ? 'rtl' : 'ltr';
 $pdo = db();
 $profile = [];
 foreach ($pdo->query('SELECT k, v FROM profile') as $row) {
@@ -32,108 +31,29 @@ $slides = $pdo->query('SELECT * FROM presentations ORDER BY year DESC, sort, id 
 $timeline = $pdo->query('SELECT * FROM timeline ORDER BY sort, id DESC')->fetchAll();
 $education = array_values(array_filter($timeline, fn($t) => $t['kind'] === 'education'));
 $experience = array_values(array_filter($timeline, fn($t) => $t['kind'] === 'experience'));
-
-$name = loc($profile, 'name', $lang) ?: t('default_name', $lang);
 // Hero photo uploaded in /admin (a transparent PNG or WebP); empty means the built-in cutout
 $heroPhoto = (string) ($profile['hero_photo'] ?? '');
-// Name on two lines for the hero: first name, then the rest
-$nameLines = array_values(array_filter(preg_split('/\s+/u', trim($name), 2) ?: [], 'strlen'));
-$headline = loc($profile, 'headline', $lang) ?: t('default_headline', $lang);
-$about = loc($profile, 'about', $lang);
-$switchLang = $lang === 'fa' ? 'en' : 'fa';
-
-$words = preg_split('/\s+/u', trim($name)) ?: [];
-// The last word of the name gets the gradient highlight
-$lastWord = count($words) > 1 ? array_pop($words) : '';
-$firstWords = implode(' ', $words);
-
-// Projects: the Project window tree and the viewer source for every file (rendered on the server)
-$projectSources = [];
-$projectTree = $projects ? render_project_window($projects, $pdo, $lang, $projectSources) : '';
-
 // Content hash of the CSS and JS: changes whenever the files change, so caches can't serve an old build
 $assetVersion = substr(md5((string) file_get_contents(__DIR__ . '/assets/style.css') . (string) file_get_contents(__DIR__ . '/assets/app.js')), 0, 8);
 
-
-?>
-<!doctype html>
-<html lang="<?= $lang ?>" dir="<?= $dir ?>"<?= $themeSettings['theme_mode'] !== 'system' ? ' data-theme="' . $themeSettings['theme_mode'] . '"' : '' ?> data-motion="<?= $themeSettings['theme_motion'] ?>" data-glass="<?= $themeSettings['theme_glass'] ?>">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<?php
-// Browser chrome colour (status bar, address bar, overscroll) follows the theme: the forced theme gets one tag, system gets one per scheme.
-$chromeColors = ['light' => '#FAFAFA', 'dark' => '#0B1222'];
-$chromeMode = $themeSettings['theme_mode'];
-if (isset($chromeColors[$chromeMode])) {
-    echo '<meta name="theme-color" content="' . $chromeColors[$chromeMode] . '">' . "\n";
-} else {
-    echo '<meta name="theme-color" content="' . $chromeColors['light'] . '" media="(prefers-color-scheme: light)">' . "\n";
-    echo '<meta name="theme-color" content="' . $chromeColors['dark'] . '" media="(prefers-color-scheme: dark)">' . "\n";
-}
-?>
-<meta name="color-scheme" content="light dark">
-<?php
-// Search and sharing metadata. The site lives at the domain; each language has its own address.
-$siteUrl = 'https://parsabanitaba.ir';
-$pageUrl = $lang === 'fa' ? $siteUrl . '/?lang=fa' : $siteUrl . '/';
-$summary = trim(preg_replace('/\s+/u', ' ', strip_tags($about)));
-$description = mb_substr(trim($name . ' · ' . $headline . ($summary !== '' ? ' — ' . $summary : '')), 0, 160);
-if (trim((string) ($profile['meta_description'] ?? '')) !== '') {
-    $description = trim((string) $profile['meta_description']);
-}
-$shareImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png');
-$personData = [
-    '@context' => 'https://schema.org',
-    '@type' => 'Person',
-    'name' => 'Parsa Banitaba',
-    'alternateName' => 'پارسا بنی‌طبا',
-    'jobTitle' => $headline,
-    'description' => $summary !== '' ? mb_substr($summary, 0, 300) : null,
-    'url' => $siteUrl . '/',
-    'image' => $shareImage,
-    'email' => !empty($profile['email']) ? 'mailto:' . $profile['email'] : null,
-    'knowsAbout' => ['Flutter', 'Dart'],
-    'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Tehran', 'addressCountry' => 'IR'],
-    'sameAs' => array_values(array_filter([$profile['github'] ?? '', $profile['linkedin'] ?? ''])),
-];
-$personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
-?>
-<title><?= e($name) ?> · <?= e($headline !== '' ? $headline : t('default_title', $lang)) ?></title>
-<meta name="description" content="<?= e($description) ?>">
-<meta name="robots" content="<?= $isPreview ? 'noindex, nofollow' : 'index, follow' ?>">
-<link rel="canonical" href="<?= e($pageUrl) ?>">
-<link rel="alternate" hreflang="en" href="<?= e($siteUrl . '/') ?>">
-<link rel="alternate" hreflang="fa" href="<?= e($siteUrl . '/?lang=fa') ?>">
-<link rel="alternate" hreflang="x-default" href="<?= e($siteUrl . '/') ?>">
-<meta property="og:type" content="profile">
-<meta property="og:site_name" content="<?= e($name) ?>">
-<meta property="og:title" content="<?= e($name) ?> · <?= e($headline) ?>">
-<meta property="og:description" content="<?= e($description) ?>">
-<meta property="og:url" content="<?= e($pageUrl) ?>">
-<meta property="og:image" content="<?= e($shareImage) ?>">
-<meta property="og:locale" content="<?= $lang === 'fa' ? 'fa_IR' : 'en_US' ?>">
-<meta property="og:locale:alternate" content="<?= $lang === 'fa' ? 'en_US' : 'fa_IR' ?>">
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="<?= e($name) ?> · <?= e($headline) ?>">
-<meta name="twitter:description" content="<?= e($description) ?>">
-<meta name="twitter:image" content="<?= e($shareImage) ?>">
-<link rel="icon" href="assets/img/favicon.svg?v=<?= $assetVersion ?>" type="image/svg+xml">
-<script type="application/ld+json"><?= json_encode($personData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
-<script>
-  // Apply the saved theme before first paint to avoid a flash.
-  try { var s = localStorage.getItem('theme'); if (s) document.documentElement.dataset.theme = s; } catch (e) {}
-  // Projects view before first paint: #projects-ide wins, then the saved choice, then Normal.
-  try {
-    var pv = location.hash === '#projects-ide' ? 'ide' : localStorage.getItem('projects-view');
-    document.documentElement.dataset.projectsView = pv === 'ide' ? 'ide' : 'normal';
-  } catch (e) { document.documentElement.dataset.projectsView = 'normal'; }
-</script>
-<link rel="stylesheet" href="assets/style.css?v=<?= $assetVersion ?>">
-<style id="theme"><?= theme_css($themeSettings) ?></style>
-</head>
-<body>
-
+/** Site text for one language: the same page markup is rendered once per language and shown as one pane. */
+function render_pane(string $lang, array $shared): array {
+    extract($shared, EXTR_SKIP);
+    $dir = $lang === 'fa' ? 'rtl' : 'ltr';
+    $name = loc($profile, 'name', $lang) ?: t('default_name', $lang);
+    $headline = loc($profile, 'headline', $lang) ?: t('default_headline', $lang);
+    $about = loc($profile, 'about', $lang);
+    $switchLang = $lang === 'fa' ? 'en' : 'fa';
+    $words = preg_split('/\s+/u', trim($name)) ?: [];
+    // The last word of the name gets the gradient highlight
+    $lastWord = count($words) > 1 ? array_pop($words) : '';
+    $firstWords = implode(' ', $words);
+    // Projects: the Project window tree and the viewer source for every file (rendered on the server)
+    $projectSources = [];
+    $projectTree = $projects ? render_project_window($projects, $pdo, $lang, $projectSources) : '';
+    $title = $name . ' · ' . ($headline !== '' ? $headline : t('default_title', $lang));
+    ob_start();
+    ?>
 <a class="skip" href="#main"><?= e($lang === 'fa' ? 'رفتن به محتوا' : 'Skip to content') ?></a>
 
 <header class="topbar">
@@ -261,7 +181,7 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
       </button>
     </div>
 
-    <div class="pv-normal" id="view-normal">
+    <div class="pv-normal view-normal" id="view-normal">
       <div class="grid">
         <?php foreach ($projects as $p): $shots = $projectShots[$p['id']] ?? []; ?>
           <?php
@@ -417,6 +337,119 @@ $personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
 <footer class="muted">
   <?= trim((string) ($profile['footer_text'] ?? '')) !== '' ? e($profile['footer_text']) : '© ' . date('Y') . ' ' . e($name) ?>
 </footer>
+<?php
+    $html = ob_get_clean();
+    return compact('html', 'dir', 'name', 'headline', 'about', 'switchLang', 'title');
+}
+
+/** Meta description for one language: the profile's own text when set, otherwise name, headline and the start of the about text. */
+function site_description(array $pane, array $profile): string {
+    $summary = trim(preg_replace('/\s+/u', ' ', strip_tags($pane['about'])));
+    $description = mb_substr(trim($pane['name'] . ' · ' . $pane['headline'] . ($summary !== '' ? ' — ' . $summary : '')), 0, 160);
+    if (trim((string) ($profile['meta_description'] ?? '')) !== '') {
+        $description = trim((string) $profile['meta_description']);
+    }
+    return $description;
+}
+
+/** Ids are unique across both panes: the Persian pane's ids, their in-page links and their references get a suffix. */
+function suffix_ids(string $html, string $suffix): string {
+    $html = preg_replace_callback('/(\s)(id|for|aria-controls|aria-labelledby|aria-describedby|data-src)="([^"]*)"/', fn($m) => $m[1] . $m[2] . '="' . $m[3] . $suffix . '"', $html);
+    return preg_replace_callback('/href="#([^"]+)"/', fn($m) => 'href="#' . $m[1] . $suffix . '"', $html);
+}
+
+$lang = current_lang();
+$shared = compact('pdo', 'profile', 'projects', 'projectShots', 'papers', 'slides', 'education', 'experience', 'heroPhoto', 'assetVersion');
+$panes = ['en' => render_pane('en', $shared), 'fa' => render_pane('fa', $shared)];
+$descs = ['en' => site_description($panes['en'], $profile), 'fa' => site_description($panes['fa'], $profile)];
+$titles = ['en' => $panes['en']['title'], 'fa' => $panes['fa']['title']];
+$active = $panes[$lang];
+$dir = $active['dir'];
+$name = $active['name'];
+$headline = $active['headline'];
+$about = $active['about'];
+$switchLang = $active['switchLang'];
+?>
+<!doctype html>
+<html lang="<?= $lang ?>" dir="<?= $dir ?>" data-title-en="<?= e($titles['en']) ?>" data-title-fa="<?= e($titles['fa']) ?>" data-desc-en="<?= e($descs['en']) ?>" data-desc-fa="<?= e($descs['fa']) ?>"<?= $themeSettings['theme_mode'] !== 'system' ? ' data-theme="' . $themeSettings['theme_mode'] . '"' : '' ?> data-motion="<?= $themeSettings['theme_motion'] ?>" data-glass="<?= $themeSettings['theme_glass'] ?>">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<?php
+// Browser chrome colour (status bar, address bar, overscroll) follows the theme: the forced theme gets one tag, system gets one per scheme.
+$chromeColors = ['light' => '#FAFAFA', 'dark' => '#0B1222'];
+$chromeMode = $themeSettings['theme_mode'];
+if (isset($chromeColors[$chromeMode])) {
+    echo '<meta name="theme-color" content="' . $chromeColors[$chromeMode] . '">' . "\n";
+} else {
+    echo '<meta name="theme-color" content="' . $chromeColors['light'] . '" media="(prefers-color-scheme: light)">' . "\n";
+    echo '<meta name="theme-color" content="' . $chromeColors['dark'] . '" media="(prefers-color-scheme: dark)">' . "\n";
+}
+?>
+<meta name="color-scheme" content="light dark">
+<?php
+// Search and sharing metadata. The site lives at the domain; each language has its own address.
+$siteUrl = 'https://parsabanitaba.ir';
+$pageUrl = $lang === 'fa' ? $siteUrl . '/?lang=fa' : $siteUrl . '/';
+$summary = trim(preg_replace('/\s+/u', ' ', strip_tags($about)));
+$description = $descs[$lang];
+$shareImage = $siteUrl . '/' . ($heroPhoto !== '' ? $heroPhoto : 'assets/img/portrait.png');
+$personData = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Person',
+    'name' => 'Parsa Banitaba',
+    'alternateName' => 'پارسا بنی‌طبا',
+    'jobTitle' => $headline,
+    'description' => $summary !== '' ? mb_substr($summary, 0, 300) : null,
+    'url' => $siteUrl . '/',
+    'image' => $shareImage,
+    'email' => !empty($profile['email']) ? 'mailto:' . $profile['email'] : null,
+    'knowsAbout' => ['Flutter', 'Dart'],
+    'address' => ['@type' => 'PostalAddress', 'addressLocality' => 'Tehran', 'addressCountry' => 'IR'],
+    'sameAs' => array_values(array_filter([$profile['github'] ?? '', $profile['linkedin'] ?? ''])),
+];
+$personData = array_filter($personData, fn($v) => $v !== null && $v !== []);
+?>
+<title><?= e($titles[$lang]) ?></title>
+<meta name="description" content="<?= e($description) ?>">
+<meta name="robots" content="<?= $isPreview ? 'noindex, nofollow' : 'index, follow' ?>">
+<link rel="canonical" href="<?= e($pageUrl) ?>">
+<link rel="alternate" hreflang="en" href="<?= e($siteUrl . '/') ?>">
+<link rel="alternate" hreflang="fa" href="<?= e($siteUrl . '/?lang=fa') ?>">
+<link rel="alternate" hreflang="x-default" href="<?= e($siteUrl . '/') ?>">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="<?= e($name) ?>">
+<meta property="og:title" content="<?= e($name) ?> · <?= e($headline) ?>">
+<meta property="og:description" content="<?= e($description) ?>">
+<meta property="og:url" content="<?= e($pageUrl) ?>">
+<meta property="og:image" content="<?= e($shareImage) ?>">
+<meta property="og:locale" content="<?= $lang === 'fa' ? 'fa_IR' : 'en_US' ?>">
+<meta property="og:locale:alternate" content="<?= $lang === 'fa' ? 'en_US' : 'fa_IR' ?>">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="<?= e($name) ?> · <?= e($headline) ?>">
+<meta name="twitter:description" content="<?= e($description) ?>">
+<meta name="twitter:image" content="<?= e($shareImage) ?>">
+<link rel="icon" href="assets/img/favicon.svg?v=<?= $assetVersion ?>" type="image/svg+xml">
+<script type="application/ld+json"><?= json_encode($personData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_HEX_TAG | JSON_HEX_AMP) ?></script>
+<script>
+  // Apply the saved theme before first paint to avoid a flash.
+  try { var s = localStorage.getItem('theme'); if (s) document.documentElement.dataset.theme = s; } catch (e) {}
+  // Projects view before first paint: #projects-ide wins, then the saved choice, then Normal.
+  try {
+    var pv = location.hash === '#projects-ide' ? 'ide' : localStorage.getItem('projects-view');
+    document.documentElement.dataset.projectsView = pv === 'ide' ? 'ide' : 'normal';
+  } catch (e) { document.documentElement.dataset.projectsView = 'normal'; }
+</script>
+<link rel="stylesheet" href="assets/style.css?v=<?= $assetVersion ?>">
+<style id="theme"><?= theme_css($themeSettings) ?></style>
+</head>
+<body>
+<?php foreach (['en', 'fa'] as $paneLang): $pane = $panes[$paneLang]; ?>
+<div class="pane" data-pane="<?= $paneLang ?>" lang="<?= $paneLang ?>" dir="<?= $pane['dir'] ?>"<?= $paneLang === $lang ? '' : ' hidden' ?>>
+<?= $paneLang === 'fa' ? suffix_ids($pane['html'], '-fa') : $pane['html'] ?>
+</div>
+<?php endforeach; ?>
+
 <!-- build <?= $assetVersion ?> -->
 
 <script src="assets/app.js?v=<?= $assetVersion ?>" defer></script>
