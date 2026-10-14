@@ -1528,3 +1528,27 @@ function run_research_bullets_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . RESEARCH_BULLETS_MIGRATION . "', '1')");
 }
+
+const SLIDE_RENAME_MIGRATION = 'migration_slide_titles_v3';
+
+/** Renames the slides and their files: the Claude deck has no "presentation" word, and three others get new titles. Previous values are logged. */
+function run_slide_rename_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SLIDE_RENAME_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $renames = [
+        // [old file, new file, English title, Persian title]
+        ['assets/slides/claude-presentation.pptx', 'assets/slides/claude.pptx', 'Claude', 'Claude'],
+        ['assets/slides/final-fde-llm.pptx', 'assets/slides/social-opinions-prediction-llm-based-agents.pptx', 'Social opinions prediction - LLM base agents', 'Social opinions prediction - LLM base agents'],
+        ['assets/slides/software-engineering.pptx', 'assets/slides/use-case-based-project.pptx', 'use case based project', 'use case based project'],
+        ['assets/slides/shojaieekian.pdf', 'assets/slides/decision-petri-nets.pdf', 'Decision Petri Nets', 'شبکه‌های پتری تصمیمی'],
+    ];
+    $update = $pdo->prepare('UPDATE presentations SET title = ?, title_fa = ?, cover = ?, pptx = CASE WHEN pptx = ? THEN ? ELSE pptx END, pdf = CASE WHEN pdf = ? THEN ? ELSE pdf END WHERE pptx = ? OR pdf = ?');
+    $previous = $pdo->query('SELECT id, title, title_fa, pptx, pdf, cover FROM presentations')->fetchAll(PDO::FETCH_ASSOC);
+    migration_log('slide titles: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    foreach ($renames as [$old, $new, $en, $fa]) {
+        $cover = 'assets/slides/covers/' . basename($new, '.' . pathinfo($new, PATHINFO_EXTENSION)) . '.jpg';
+        $update->execute([$en, $fa, $cover, $old, $new, $old, $new, $old, $old]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SLIDE_RENAME_MIGRATION . "', '1')");
+}

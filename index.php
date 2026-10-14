@@ -286,7 +286,7 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
 <?php if (($profile['show_research'] ?? '1') !== '0'): ?>
   <section id="research" class="block reveal">
     <h2><?= e(t('papers', $lang)) ?></h2>
-    <div class="media-grid">
+    <div class="media-grid media-rows">
     <?php foreach ($papers as $paper): $files = json_decode((string) ($paper['files'] ?? ''), true) ?: []; ?>
       <article class="media-card">
         <?php if (!empty($paper['cover'])): ?><img class="media-cover" src="<?= e($paper['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?>
@@ -308,7 +308,7 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
 <?php if (($profile['show_slides'] ?? '1') !== '0'): ?>
   <section id="slides" class="block reveal">
     <h2><?= e(t('presentations', $lang)) ?></h2>
-    <div class="media-grid">
+    <div class="media-grid media-squares">
     <?php foreach ($slides as $s): ?>
       <article class="media-card">
         <?php if (!empty($s['cover'])): ?><img class="media-cover" src="<?= e($s['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?>

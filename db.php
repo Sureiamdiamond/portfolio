@@ -120,6 +120,7 @@ function db(): PDO {
     run_experience_title_migration($pdo);
     run_media_migration($pdo);
     run_research_bullets_migration($pdo);
+    run_slide_rename_migration($pdo);
     return $pdo;
 }
 
