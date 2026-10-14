@@ -913,6 +913,27 @@ function run_about_middle_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ABOUT_MIDDLE_MIGRATION . "', '1')");
 }
 
+// About text, final version: adds the emphasis on polished UI and smooth experience. Replaces the middle-tone text in both languages. Previous values are logged.
+const ABOUT_FINAL_MIGRATION = 'migration_about_final_v1';
+const ABOUT_FINAL_EN = <<<'TXT'
+Hi, I'm Parsa Banitaba, a software engineer and Flutter developer. I'm on the mobile app team at IPAAM, working on the Tobank app for Tourism Bank, and I'm a Master's student in Software Engineering. I put real emphasis on polished UI and smooth, fluid user experience, alongside clean architecture and solid state management (Bloc, GetX), and I like building apps that are a pleasure to use and easy to maintain. If you have a project in mind, I'd love to talk.
+TXT;
+const ABOUT_FINAL_FA = <<<'TXT'
+سلام، من پارسا بنیطبا هستم، مهندس نرمافزار و توسعهدهندهی فلاتر. در تیم اپلیکیشن موبایل شرکت ایپام روی اپلیکیشن توبانک (بانک گردشگری) کار میکنم و دانشجوی ارشد نرمافزار هستم. به رابط کاربری خوب و روانی اپلیکیشن اهمیت ویژه میدم و کنار معماری تمیز و مدیریت وضعیت (مثل Bloc و GetX)، دوست دارم اپهایی بسازم که استفاده ازشون لذتبخش باشه و نگهداریشون هم راحت. اگه پروژهای در ذهن داری، خوشحال میشم صحبت کنیم.
+TXT;
+
+function run_about_final_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . ABOUT_FINAL_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('about', 'about_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('about final: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('INSERT INTO profile (k, v) VALUES (?, ?) ON CONFLICT(k) DO UPDATE SET v = excluded.v');
+    $stmt->execute(['about', ABOUT_FINAL_EN]);
+    $stmt->execute(['about_fa', ABOUT_FINAL_FA]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ABOUT_FINAL_MIGRATION . "', '1')");
+}
+
 // Persian spelling fix: کاراموز becomes کارآموز in every stored text field. Changed rows are logged with their previous values.
 const INTERN_SPELLING_MIGRATION = 'migration_intern_spelling_v1';
 
