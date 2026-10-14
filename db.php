@@ -119,6 +119,7 @@ function db(): PDO {
     run_notebooklm_skill_migration($pdo);
     run_experience_title_migration($pdo);
     run_media_migration($pdo);
+    run_research_bullets_migration($pdo);
     return $pdo;
 }
 

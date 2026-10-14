@@ -1481,3 +1481,50 @@ function run_media_migration(PDO $pdo): void {
     migration_log('slides and research: added ' . count($slides) . ' slides and ' . count($works) . ' research works');
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . MEDIA_MIGRATION . "', '1')");
 }
+
+const RESEARCH_BULLETS_MIGRATION = 'migration_research_bullets_v2';
+
+/** Research works: each list item is a paper title, and the cards no longer show a date. Previous values are logged. */
+function run_research_bullets_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . RESEARCH_BULLETS_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $works = [
+        ['Linux Kernel Security and Isolation', 'assets/research/1', [
+            'Rust for Linux: Understanding the Security Impact of Rust in the Linux Kernel',
+            'RetSpill: Igniting User-Controlled Data to Burn Away Linux Kernel Protections',
+            'ISLAB: Immutable Memory Management Metadata for Commodity Operating System Kernels',
+            'Safeslab: Mitigating Use-After-Free Vulnerabilities via Memory Protection Keys',
+            'μSwitch: Fast Kernel Context Isolation with Implicit Context Switches',
+        ]],
+        ['Social Opinion Prediction with LLM Agents', 'assets/research/2', [
+            'Social opinions prediction utilizes fusing dynamics equation with LLM-based agents',
+        ]],
+        ['Distributed Petri Nets for ROS Robotics', 'assets/research/3', [
+            'Distributed Petri nets for model-driven verifiable robotic applications in ROS',
+        ]],
+        ['IoT Security with Blockchain', 'assets/research/4', [
+            'Application of IoT and blockchain technology in the integration of innovation and industrial chains in high-tech manufacturing',
+            'Collaborative threat intelligence: Enhancing IoT security through blockchain and machine learning integration',
+            'Enhancing security of Internet of Robotic Things: A review of recent…',
+            'A Promising Integration of SDN and Blockchain for IoT Networks: A Survey',
+            'A Survey on Addressing IoT Security Issues by Embedding Blockchain Technology Solutions',
+            'Agricultural IoT Data Storage Optimization and Information Security Method Based on Blockchain',
+            'Blockchain Empowered Secure Federated Learning for Consumer IoT Applications in Cloud-Edge Collaborative Environment',
+            'Enhancing data security and privacy in energy applications…',
+            'Optimizing Security in IoT Ecosystems Using Hybrid Artificial Intelligence and Blockchain Models',
+            'A review of IoT security and privacy using decentralized blockchain',
+        ]],
+    ];
+    $update = $pdo->prepare("UPDATE papers SET files = ?, venue = '', year = NULL WHERE title = ?");
+    $previous = $pdo->query('SELECT title, venue, year, files FROM papers')->fetchAll(PDO::FETCH_ASSOC);
+    migration_log('research bullets: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    foreach ($works as [$title, $dir, $items]) {
+        $files = [];
+        foreach ($items as $j => $label) {
+            $files[] = ['path' => $dir . '/' . ($j + 1) . '.pdf', 'label' => $label];
+        }
+        $update->execute([json_encode($files, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE), $title]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . RESEARCH_BULLETS_MIGRATION . "', '1')");
+}
