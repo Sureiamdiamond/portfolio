@@ -124,6 +124,7 @@ function db(): PDO {
     run_research_revert_migration($pdo);
     run_research_date_migration($pdo);
     run_english_titles_migration($pdo);
+    run_ipaam_role_arsham_migration($pdo);
     return $pdo;
 }
 

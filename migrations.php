@@ -298,7 +298,7 @@ function cv_timeline_rows(): array {
         "زبان‌ها و فریم‌ورک‌ها: Dart، Flutter\nمدیریت وضعیت: BLoC، GetX؛ استفاده از Freezed برای مدل‌سازی داده و مدیریت ایونت‌ها و استیت‌ها\nمعماری نرم‌افزار: MVP، Clean Architecture، MVVM\nپروژه SDUI\nارتباط با سرور: کار با Dio و HTTP برای API Integration\nتم و ظاهر اپلیکیشن: پیاده‌سازی تم‌های پویا و سفارشی‌سازی کامل UI\nرابط کاربری: تبدیل طراحی‌های Figma به UI واکنش‌گرا\nچندزبانه‌سازی اپلیکیشن: تجربه در پیاده‌سازی Localization\nابزارهای تیمی و مدیریتی: Jira، Git (GitHub/GitLab)\nتوسعه تیمی: آشنایی با متدولوژی Agile و کار گروهی",
         "Languages and frameworks: Dart, Flutter\nState management: BLoC and GetX, with Freezed for data models and events and states\nSoftware architecture: MVP, Clean Architecture, MVVM\nSDUI project\nServer communication: Dio and HTTP for API integration\nApp theming: dynamic themes and full UI customisation\nUI: turning Figma designs into responsive UI\nLocalisation: experience implementing multi-language apps\nTeam tools: Jira, Git (GitHub and GitLab)\nTeamwork: familiar with Agile and group work",
     ];
-    $ipam = ['org' => 'ایپام (ایده‌پرداز دانش نوین ارشم)', 'org_en' => 'IPAAM (Ideh Pardaz Danesh Novin Arsham)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
+    $ipam = ['org' => 'ایپام (ایده‌پرداز دانش نوین آرشام)', 'org_en' => 'IPAAM (Ideh Pardaz Danesh Novin Arsham)', 'website' => 'https://ipaam.ir/', 'city' => 'تهران', 'city_en' => 'Tehran'];
     $azad = ['website_w' => '', 'website_c' => ''];
     return [
         [
@@ -1620,4 +1620,20 @@ function run_english_titles_migration(PDO $pdo): void {
     }
     $pdo->exec('UPDATE papers SET title_fa = title');
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ENGLISH_TITLES_MIGRATION . "', '1')");
+}
+
+const IPAAM_ROLE_ARSHAM_MIGRATION = 'migration_ipaam_role_arsham_v7';
+
+/** The IPAAM role reads «برنامه‌نویس فلاتر» in Persian and «Flutter Developer» in English, without the software engineer prefix. The workplace name spells «آرشام». Only IPAAM rows change; previous values are logged. */
+function run_ipaam_role_arsham_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . IPAAM_ROLE_ARSHAM_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT id, title, title_fa, org_fa FROM timeline WHERE org LIKE 'IPAAM%'")->fetchAll(PDO::FETCH_ASSOC);
+    migration_log('ipaam role arsham: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $pdo->exec("UPDATE timeline SET title = 'Flutter Developer' WHERE org LIKE 'IPAAM%' AND title IN ('Software Engineer / Flutter Developer', 'Software Engineer / Flutter developer', 'Flutter developer')");
+    $pdo->prepare("UPDATE timeline SET title_fa = ? WHERE org LIKE 'IPAAM%' AND title_fa LIKE '%مهندس نرم%'")
+        ->execute(["برنامه\u{200C}نویس فلاتر"]);
+    $pdo->exec("UPDATE timeline SET org_fa = REPLACE(org_fa, 'ارشم', 'آرشام') WHERE org_fa LIKE '%ارشم%'");
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_ROLE_ARSHAM_MIGRATION . "', '1')");
 }
