@@ -242,6 +242,10 @@ function initPane(scope, sfx) {
     sync.load.view = (name) => show(name, false);
     applyHash(true);
     window.addEventListener('hashchange', () => applyHash(true));
+    // The rotate prompt can be dismissed; it stays dismissed until the page is reloaded
+    section.querySelectorAll('[data-rotate-dismiss]').forEach((btn) => {
+      btn.addEventListener('click', () => { btn.closest('.rotate-hint').dataset.dismissed = '1'; });
+    });
 
     buttons.forEach((btn, i) => {
       btn.addEventListener('click', () => {
