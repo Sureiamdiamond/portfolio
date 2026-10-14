@@ -529,9 +529,9 @@ body { overflow-x: clip; }
   box-shadow: 0 8px 18px -10px hsl(var(--hue) 85% 45% / .9);
 }
 .ptile-img { object-fit: contain; background: var(--surface); }
-/* TechBlog's mark is dark ink; on dark it is turned into a solid white silhouette on the card, keeping its transparency. */
-@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="techblog"] { filter: brightness(0) invert(1); } }
-html[data-theme="dark"] img.ptile-img[src*="techblog"] { filter: brightness(0) invert(1); }
+/* TechBlog's mark is drawn on a transparent background. On dark it is a white silhouette: the filter also covers the element's own background, so that is cleared here, otherwise it turns into a white box. */
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); } }
+html[data-theme="dark"] img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); }
 .pcard > .ptile { margin-bottom: 12px; }
 .ptile.sm { width: 18px; height: 18px; border-radius: 5px; font-size: 8px; box-shadow: none; vertical-align: middle; }
 .it .ptile.sm { margin-inline-end: 4px; }
