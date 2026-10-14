@@ -760,6 +760,9 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 .skill-child .skill-initials { font-size: .62rem; }
 /* Narrow screens have no room beside the card: the panel reveals downwards inside the card. */
 @media (max-width: 560px) {
+  .skill-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+  .skill, .skill-head { min-height: 44px; padding: 6px 8px; gap: 6px; font-size: .92rem; }
+  .skill-icon { width: 26px; height: 26px; }
   .skill-panel { position: static; min-width: 0; padding: 0 12px; border: 0; border-radius: 0 0 12px 12px; background: none; box-shadow: none; max-height: 0; overflow: hidden; clip-path: none !important; transition: max-height .36s ease, opacity .24s ease, visibility 0s linear .36s; }
   html[dir] .skill-parent.is-open .skill-panel { max-height: 520px; padding: 0 12px 10px; clip-path: none !important; transition: max-height .36s ease, opacity .24s ease, visibility 0s; }
 }
