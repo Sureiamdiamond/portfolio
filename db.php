@@ -92,6 +92,7 @@ function db(): PDO {
     run_sdui_links_migration($pdo);
     run_classyar_name_fa_migration($pdo);
     run_role_headline_migration($pdo);
+    run_project_fa_names_migration($pdo);
     return $pdo;
 }
 
@@ -121,7 +122,7 @@ const RESUME_PROJECTS = [
         'summary' => "Weather app built with Bloc and Clean Architecture. University project. Period: Farvardin 1404.",
         'summary_fa' => "اپلیکیشن آب و هوا با Bloc و Clean Architecture. پروژه دانشگاه. بازه: فروردین ۱۴۰۴.",
         'tags' => 'flutter, dart, bloc, clean architecture', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/weather_app', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 2],
-    ['title' => 'TechBlog', 'title_fa' => 'تک بلاگ', 'kind' => 'academic',
+    ['title' => 'TechBlog', 'title_fa' => 'تکبلاگ', 'kind' => 'academic',
         'summary' => "Group project for Prof. Safari, built with Flutter. Period: Tir 1401.",
         'summary_fa' => "پروژه گروهی استاد صفری با فلاتر. بازه: تیر ۱۴۰۱.",
         'tags' => 'flutter, dart', 'url' => '', 'github_url' => 'https://github.com/Sureiamdiamond/Techblog-Fork', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 3],

@@ -514,6 +514,9 @@ body { overflow-x: clip; }
   box-shadow: 0 8px 18px -10px hsl(var(--hue) 85% 45% / .9);
 }
 .ptile-img { object-fit: contain; background: var(--surface); }
+/* TechBlog's mark is dark ink; on dark it sits on a light rounded tile so it stays legible. */
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="techblog"] { background: #F1F5F9; border-radius: 12px; padding: 6px; box-sizing: border-box; } }
+html[data-theme="dark"] img.ptile-img[src*="techblog"] { background: #F1F5F9; border-radius: 12px; padding: 6px; box-sizing: border-box; }
 .pcard > .ptile { margin-bottom: 12px; }
 .ptile.sm { width: 18px; height: 18px; border-radius: 5px; font-size: 8px; box-shadow: none; vertical-align: middle; }
 .it .ptile.sm { margin-inline-end: 4px; }
@@ -655,7 +658,7 @@ html[data-theme="dark"] .tl-initials { background: hsl(var(--hue) 45% 22%); colo
 @media (max-width: 560px) { .skills-langs > h3.sub { margin-top: 110px; } }
 .skills-label { margin: 16px 0 8px; font: 500 .8rem var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
 html[lang="fa"] .skills-label { font-family: Vazirmatn, system-ui, sans-serif; letter-spacing: 0; text-transform: none; font-size: .9rem; }
-.skill-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 10px; align-items: start; }
+.skill-grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(196px, 1fr)); gap: 10px; align-items: start; }
 .skill { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); font-weight: 500; }
 .skill-icon { width: 30px; height: 30px; flex: none; display: grid; place-items: center; color: var(--fg); }
 .skill-svg { width: 24px; height: 24px; }
@@ -664,6 +667,7 @@ html[lang="fa"] .skills-label { font-family: Vazirmatn, system-ui, sans-serif; l
 .skill-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 12px; margin: 0; background: none; border: 0; border-radius: 12px; color: inherit; font: inherit; text-align: start; cursor: pointer; }
 .skill-head::after { content: ""; margin-inline-start: auto; width: 7px; height: 7px; flex: none; border-inline-end: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .3s cubic-bezier(.2,.7,.2,1); }
 .skill-head[aria-expanded="true"]::after { transform: rotate(-135deg); }
+.skill-head { white-space: nowrap; }
 .skill-head:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 /* Beside the card on the reading-direction end (inline-start is the right in RTL). Flipped: the other end. Reveal grows from the card side. */
 .skill-panel { position: absolute; top: -1px; z-index: 20; inset-inline-start: calc(100% + 8px); inset-inline-end: auto; min-width: 180px; margin: 0; padding: 10px; list-style: none; display: grid; gap: 6px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: 0 14px 34px rgba(0, 0, 0, .14); visibility: hidden; opacity: 0; clip-path: inset(0 100% 0 0 round 14px); transition: clip-path .36s cubic-bezier(.2,.7,.2,1), opacity .24s ease, visibility 0s linear .36s; }

@@ -897,3 +897,42 @@ function run_role_headline_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . ROLE_HEADLINE_MIGRATION . "', '1')");
 }
+
+// Persian project names and descriptions for the cards, IDE tree and README. Rows are matched by English title, ignoring case, because the live titles differ in case from the seed. A Persian name is written only when it is empty or still the old wording; a Persian description is written only when the stored Persian or English text is in the wrong script.
+const PROJECT_FA_NAMES_MIGRATION = 'migration_project_fa_names_v2';
+const PROJECT_FA_NAMES = [
+    'classyar app' => ['کلاسیار', ['', 'اپلیکیشن کلاسیار', 'Classyar App']],
+    'techblog' => ['تکبلاگ', ['', 'تک بلاگ', 'تک‌بلاگ']],
+];
+const TECHBLOG_SUMMARY_EN = 'Group project for Prof. Safari, built with Flutter. Period: Tir 1401.';
+const TECHBLOG_SUMMARY_FA = 'پروژه گروهی استاد صفری با فلاتر. بازه: تیر ۱۴۰۱.';
+function run_project_fa_names_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . PROJECT_FA_NAMES_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $rows = $pdo->query('SELECT * FROM projects')->fetchAll(PDO::FETCH_ASSOC);
+    $update = $pdo->prepare('UPDATE projects SET title_fa = ? WHERE id = ?');
+    foreach ($rows as $row) {
+        $key = mb_strtolower(trim((string) $row['title']));
+        if (!isset(PROJECT_FA_NAMES[$key])) {
+            continue;
+        }
+        [$fa, $old] = PROJECT_FA_NAMES[$key];
+        if (in_array(trim((string) $row['title_fa']), $old, true)) {
+            migration_log("project fa name: project {$row['id']} previous title_fa " . json_encode($row['title_fa'], JSON_UNESCAPED_UNICODE));
+            $update->execute([$fa, $row['id']]);
+        }
+    }
+    $techblog = $pdo->query("SELECT * FROM projects WHERE LOWER(TRIM(title)) = 'techblog'")->fetch(PDO::FETCH_ASSOC);
+    if ($techblog) {
+        $en = (string) $techblog['summary'];
+        $fa = (string) $techblog['summary_fa'];
+        $newEn = preg_match('/\p{Arabic}/u', $en) || trim($en) === '' ? TECHBLOG_SUMMARY_EN : $en;
+        $newFa = preg_match('/\p{Arabic}/u', $fa) ? $fa : TECHBLOG_SUMMARY_FA;
+        if ($newEn !== $en || $newFa !== $fa) {
+            migration_log("techblog summary: project {$techblog['id']} previous " . json_encode([$en, $fa], JSON_UNESCAPED_UNICODE));
+            $pdo->prepare('UPDATE projects SET summary = ?, summary_fa = ? WHERE id = ?')->execute([$newEn, $newFa, $techblog['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . PROJECT_FA_NAMES_MIGRATION . "', '1')");
+}
