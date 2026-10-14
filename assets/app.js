@@ -371,6 +371,45 @@ sync.load.skills = (s) => {
   });
 };
 
+// Contact button: once the page has scrolled to Contact, the tiles light up one after another in a fixed order (email, phone, GitHub, LinkedIn). Reduced motion gets a short static highlight.
+(function () {
+  const section = byId('contact');
+  if (!section) return;
+  const order = ['mailto:', 'tel:', 'github', 'linkedin'];
+  const tiles = () => {
+    const all = Array.from(section.querySelectorAll('.cc'));
+    return order.map((key) => all.find((a) => (a.getAttribute('href') || '').includes(key))).filter(Boolean);
+  };
+  const run = () => {
+    const list = tiles();
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    list.forEach((el, i) => {
+      el.classList.remove('cc-glow', 'cc-static');
+      void el.offsetWidth;
+      if (reduced) {
+        el.classList.add('cc-static');
+        setTimeout(() => el.classList.remove('cc-static'), 1200);
+        return;
+      }
+      el.style.setProperty('--glow-delay', (i * 450) + 'ms');
+      el.classList.add('cc-glow');
+      el.addEventListener('animationend', () => el.classList.remove('cc-glow'), { once: true });
+    });
+  };
+  scope.querySelectorAll('a[href="#contact' + sfx + '"]').forEach((link) => {
+    link.addEventListener('click', () => {
+      let timer = null;
+      const start = () => {
+        window.removeEventListener('scrollend', start);
+        clearTimeout(timer);
+        run();
+      };
+      window.addEventListener('scrollend', start);
+      timer = setTimeout(start, 1000);
+    });
+  });
+})();
+
 // Project link lists: a card with several links opens a small list. Esc, a click outside, or focus leaving the list closes it.
 (function () {
   const setOpen = (menu, open) => {

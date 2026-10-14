@@ -285,6 +285,14 @@ html.lang-arrive main, html.lang-arrive header.topbar { animation: lang-fade-in 
   transition: background .2s var(--ease), border-color .2s var(--ease);
 }
 .contact-cards .cc:hover { background: rgba(255, 255, 255, .09); border-color: var(--inv-accent); text-decoration: none; }
+/* Contact button: the tiles light up in turn (set by app.js) */
+.contact-cards .cc.cc-glow { animation: cc-glow 1.2s var(--glow-delay, 0s) ease-out both; }
+.contact-cards .cc.cc-static { border-color: var(--inv-accent); }
+@keyframes cc-glow {
+  0% { border-color: rgba(255, 255, 255, .14); box-shadow: 0 0 0 0 rgba(125, 162, 255, 0); }
+  25% { border-color: var(--inv-accent); box-shadow: 0 0 0 4px rgba(125, 162, 255, .28), 0 0 18px rgba(125, 162, 255, .45); }
+  100% { border-color: rgba(255, 255, 255, .14); box-shadow: 0 0 0 0 rgba(125, 162, 255, 0); }
+}
 .contact-cards .cc-ico { width: 24px; height: 24px; flex: none; color: var(--inv-accent); }
 .contact-cards .cc-text { display: flex; flex-direction: column; min-width: 0; }
 .contact-cards .cc-label { font-size: .8rem; color: var(--inv-muted); }
