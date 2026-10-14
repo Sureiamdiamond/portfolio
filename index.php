@@ -291,8 +291,7 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
       <article class="media-card">
         <div class="media-thumb"><?php if (!empty($paper['cover'])): ?><img class="media-cover" src="<?= e($paper['cover']) ?>" alt="" width="640" height="400" loading="lazy" decoding="async"><?php endif; ?></div>
         <div class="media-body">
-          <h3><?= e(loc($paper, 'title', $lang)) ?></h3>
-          <?php if (trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? '')) !== ''): ?><p class="muted"><?= e(trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? ''))) ?></p><?php endif; ?>
+          <h3><?= e(loc($paper, 'title', $lang)) ?><?php if (trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? '')) !== ''): ?> <span class="media-date"><?= e(trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? ''))) ?></span><?php endif; ?></h3>
           <div class="links media-files">
             <?php if ($paper['pdf']): ?><a href="<?= e($paper['pdf']) ?>" target="_blank" rel="noopener">PDF</a><?php endif; ?>
             <?php foreach ($files as $file): ?><a href="<?= e($file['path']) ?>" download><?= e($file['label']) ?></a><?php endforeach; ?>

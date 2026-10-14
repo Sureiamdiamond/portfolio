@@ -913,7 +913,7 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
   .dash, .dot, .portrait { animation: none; }
   .to-top, .cv-fab { transition: none; }
 }
-@media (max-width: 520px) { .media-rows .media-cover { width: 84px; flex-basis: 84px; height: 35px; } .media-rows .media-body { min-width: 0; padding: 12px 14px; } .media-squares { grid-template-columns: repeat(2, 1fr); } .media-squares .media-cover { height: 119px; } }
+@media (max-width: 520px) { .media-rows .media-card { min-height: 120px; } .media-rows .media-cover { width: 84px; flex-basis: 84px; height: 35px; } .media-rows .media-body { min-width: 0; padding: 12px 14px; } .media-squares { grid-template-columns: repeat(2, 1fr); } .media-squares .media-cover { height: 119px; } }
 
 /* Binary mode: the research and slide thumbnails and their download links are locked */
 .media-thumb { position: relative; display: block; }
@@ -928,3 +928,8 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
 .bin-leave { border-color: #ff3b3b; color: #ff3b3b; background: #140202; box-shadow: 0 0 30px rgba(255, 59, 59, .4); }
 .bin-leave .bin-error-bar { background: #ff3b3b; color: #000; }
 .bin-leave .bin-key, .bin-leave .bin-error-ok { color: #ff3b3b; border-color: #ff3b3b; }
+
+/* Research rows: the date sits beside the title and the PDF links stay on one scrolling line, so every row has the same height */
+.media-date { font-size: .85rem; font-weight: 500; color: var(--muted); margin-inline-start: 6px; white-space: nowrap; }
+.media-rows .media-files { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; margin-top: 6px; padding-bottom: 2px; }
+.media-rows .media-files a { flex: 0 0 auto; white-space: nowrap; min-height: 32px; }
