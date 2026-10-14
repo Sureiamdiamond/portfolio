@@ -168,6 +168,9 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 .node-edu .period { font-size: .9rem; font-weight: 600; }
 .node-exp strong { font-size: 1.05rem; }
 /* Floating CV button: appears after the hero, bottom-right; visible without JS */
+.cv-choices { position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: 84px; z-index: 21; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+.cv-choices[hidden] { display: none; }
+.cv-choices .btn { min-height: 44px; background: var(--surface); }
 .cv-fab {
   position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 20;
   border-radius: 999px; box-shadow: 0 10px 22px -8px rgba(0, 82, 255, .6); isolation: isolate;
@@ -805,8 +808,8 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 @keyframes bin-scan-beam { to { top: 100%; } }
 :root[data-mode="binary"] body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: linear-gradient(rgba(57, 255, 122, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 122, .07) 1px, transparent 1px); background-size: 40px 40px; }
 /* Binary mode runner game: floating play button and the game panel. Both are removed when another language is shown. */
-.bin-play { position: fixed; left: 20vw; bottom: 25vh; z-index: 930; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #39ff7a; background: #02140a; color: #39ff7a; cursor: pointer; box-shadow: 0 0 18px rgba(57, 255, 122, .45); }
-.bin-play::before { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid #39ff7a; animation: bin-pulse 1.8s ease-out infinite; }
+.bin-play { position: fixed; left: 20vw; bottom: 25vh; z-index: 930; width: 64px; height: 64px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #7dffa8; background: #03200f; color: #7dffa8; cursor: pointer; box-shadow: 0 0 22px rgba(125, 255, 168, .55); }
+.bin-play::before { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid #7dffa8; animation: bin-pulse 1.8s ease-out infinite; }
 .bin-play[hidden] { display: none; }
 @keyframes bin-pulse { from { transform: scale(1); opacity: .8; } to { transform: scale(1.6); opacity: 0; } }
 .bin-game { position: fixed; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 940; width: min(640px, calc(100vw - 24px)); background: #02140a; border: 1px solid #39ff7a; box-shadow: 0 0 30px rgba(57, 255, 122, .35); color: #39ff7a; font: 500 .8rem/1.4 var(--mono); }
@@ -823,7 +826,7 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 @media (prefers-reduced-motion: reduce) { .bin-static.on { animation: none; } }
 /* Binary mode: the skull drawing sits over the photo eyes, green like the rest of the photo, and jitters with the glitches */
 .bin-eyes { display: none; }
-:root[data-mode="binary"] .bin-eyes { display: block; position: absolute; z-index: 3; left: 37.25%; top: 19.2%; width: 25.5%; height: auto; pointer-events: none; filter: grayscale(1) sepia(1) hue-rotate(60deg) saturate(3) brightness(1.1); }
+:root[data-mode="binary"] .bin-eyes { display: block; position: absolute; z-index: 3; left: 32.3%; top: 16.3%; width: 25.5%; height: auto; pointer-events: none; filter: grayscale(1) sepia(1) hue-rotate(60deg) saturate(3) brightness(1.1); }
 body.bin-glitch .bin-eyes { animation: bin-jitter .42s steps(2, end) 1; }
 /* Binary mode: the one-off 404 screen shown after six seconds */
 .bin-404 { position: fixed; inset: 0; z-index: 960; background: #000; color: #39ff7a; display: grid; place-items: center; cursor: pointer; }
@@ -844,6 +847,14 @@ body.bin-glitch .bin-eyes { animation: bin-jitter .42s steps(2, end) 1; }
 .bin-key { min-width: 44px; min-height: 44px; background: #000; color: #39ff7a; border: 1px solid #39ff7a; font: inherit; cursor: pointer; }
 @media (any-hover: none), (max-width: 520px) { .bin-leave-keys { display: flex; } }
 @media (prefers-reduced-motion: reduce) { .bin-caret { animation: none; } }
+/* Binary mode: the projects IDE is replaced by an empty terminal that says there is no admin access */
+.bin-term { display: none; }
+:root[data-mode="binary"] .pt-window { display: none !important; }
+:root[data-mode="binary"][data-projects-view="ide"] .bin-term { display: block; border: 1px solid #39ff7a; background: #02140a; color: #39ff7a; box-shadow: 0 0 24px rgba(57, 255, 122, .25); font: 500 .85rem/1.6 var(--mono); }
+.bin-term-bar { padding: 4px 10px; background: #39ff7a; color: #000; font-size: .8rem; }
+.bin-term-body { margin: 0; padding: 14px; white-space: pre-wrap; font: inherit; color: inherit; min-height: 180px; }
+:root[data-mode="binary"] .bin-caret { animation: bin-blink 1s steps(2, start) infinite; }
+@media (prefers-reduced-motion: reduce) { :root[data-mode="binary"] .bin-caret { animation: none; } }
 .tobank-link { color: var(--accent); font-weight: 600; text-decoration: underline dotted; text-underline-offset: .2em; }
 .tobank-link:hover, .tobank-link:focus-visible { text-decoration-style: solid; }
 .pcard.is-focus { outline: 2px solid var(--accent); outline-offset: 4px; transition: outline-color .6s ease; }

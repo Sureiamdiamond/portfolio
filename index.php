@@ -231,6 +231,16 @@ function render_pane(string $lang, array $shared): array {
       <?php if (!$projects): ?><p class="muted"><?= e(t('empty_projects', $lang)) ?></p><?php endif; ?>
     </div>
 
+    <div class="bin-term" aria-hidden="true">
+      <div class="bin-term-bar"><span>guest@parsa: ~</span></div>
+      <pre class="bin-term-body">guest@parsa:~$ open projects
+bash: open: permission denied
+guest@parsa:~$ sudo open projects
+[sudo] password for guest:
+guest is not in the sudoers file.
+You do not have admin access.
+guest@parsa:~$ <span class="bin-caret">▌</span></pre>
+    </div>
     <div class="pt-window" data-pt dir="ltr">
       <div class="pt-titlebar" aria-hidden="true"><span class="dots"><i></i><i></i><i></i></span><span class="pt-title">ParsaBanitaba.ir — <?= e(t('projects', $lang)) ?></span></div>
       <div class="pt-main">
@@ -339,7 +349,13 @@ function render_pane(string $lang, array $shared): array {
   </section>
 </main>
 
-<?php if (!empty($profile['cv'])): ?><a class="btn btn-primary cv-fab" href="<?= e($profile['cv']) ?>" download><?= e(t('download_cv', $lang)) ?></a><?php endif; ?>
+<div class="cv-dock">
+  <div class="cv-choices" id="cv-choices" hidden>
+    <a class="btn btn-outline" href="assets/cv/resume-fa.pdf" download="Parsa-Banitaba-Resume-fa.pdf" hreflang="fa">فارسی</a>
+    <a class="btn btn-outline" href="assets/cv/resume-en.pdf" download="Parsa-Banitaba-Resume-en.pdf" hreflang="en">English</a>
+  </div>
+  <button type="button" class="btn btn-primary cv-fab" aria-expanded="false" aria-controls="cv-choices"><?= e(t('download_cv', $lang)) ?></button>
+</div>
 <a class="to-top" href="#top" aria-label="<?= e(t('back_to_top', $lang)) ?>" title="<?= e(t('back_to_top', $lang)) ?>"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="M6 14l6-6 6 6"/></svg></a>
 
 <footer class="muted">

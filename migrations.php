@@ -1393,3 +1393,21 @@ function run_tobank_lead_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TOBANK_LEAD_MIGRATION . "', '1')");
 }
+
+const NOTEBOOKLM_SKILL_MIGRATION = 'migration_notebooklm_skill_v1';
+
+/** Adds NotebookLM to the Skills list (English and Persian) with its brand icon. Previous values are logged. */
+function run_notebooklm_skill_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . NOTEBOOKLM_SKILL_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT k, v FROM profile WHERE k IN ('skills', 'skills_fa')")->fetchAll(PDO::FETCH_KEY_PAIR);
+    migration_log('notebooklm skill: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+    $stmt = $pdo->prepare('UPDATE profile SET v = ? WHERE k = ?');
+    foreach ($previous as $key => $value) {
+        if (!preg_match('/^NotebookLM\b/mi', (string) $value)) {
+            $stmt->execute([rtrim((string) $value, "\n") . "\nNotebookLM | notebooklm", $key]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . NOTEBOOKLM_SKILL_MIGRATION . "', '1')");
+}

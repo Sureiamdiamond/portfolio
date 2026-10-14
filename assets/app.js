@@ -318,6 +318,26 @@ function initPane(scope, sfx) {
   });
 })();
 
+// Floating CV button opens a small chooser: Persian or English PDF
+(function () {
+  // Each language pane has its own copy of the button, so the lookup starts from this pane
+  const fab = scope.querySelector('.cv-fab');
+  const list = scope.querySelector('.cv-choices');
+  if (!fab || !list) return;
+  const setOpen = (open) => {
+    list.hidden = !open;
+    fab.setAttribute('aria-expanded', String(open));
+  };
+  fab.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    setOpen(list.hidden);
+  });
+  document.addEventListener('click', (ev) => {
+    if (!list.hidden && !ev.target.closest('.cv-dock')) setOpen(false);
+  });
+  document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') setOpen(false); });
+})();
+
 // Floating CV button: shown once the reader has scrolled past most of the hero
 (function () {
   const fab = scope.querySelector('.cv-fab');
@@ -466,7 +486,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
   };
 
   // Binary pane: a copy of the English pane. Each piece of text is written as the UTF-8 bytes of the words, 8 bits per byte, so it decodes back to the same text. The IDE window, the menus and the form controls keep their English text.
-  const BINARY_SKIP = '.pt-window, .lang-menu, .tobank-link, .bin-scan, script, style, noscript, svg, textarea, input, select, option';
+  const BINARY_SKIP = '.pt-window, .bin-term, .lang-menu, .tobank-link, .bin-scan, script, style, noscript, svg, textarea, input, select, option';
   const encodeBinary = (text) => Array.from(new TextEncoder().encode(text), (b) => b.toString(2).padStart(8, '0')).join(' ');
   const suffixIds = (root, sfx) => {
     root.querySelectorAll('[id]').forEach((el) => { el.id = el.id + sfx; });
