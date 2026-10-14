@@ -149,13 +149,9 @@ function initPane(scope, sfx) {
     openFile(link);
   });
 
-  // On load the first project opens, with its README.md shown; its assets, android and ios folders stay closed.
-  const firstProject = tree.querySelector('li.it-project > details');
-  if (firstProject) {
-    firstProject.open = true;
-    const readme = Array.from(firstProject.querySelectorAll(':scope > ul.kids a.it.file')).find((a) => a.querySelector('.nm')?.textContent === 'README.md');
-    if (readme) openFile(readme);
-  }
+  // The project folders stay collapsed; the root README.md opens in the editor
+  const rootReadme = tree.querySelector('a.it.file[data-path="portfolio/README.md"]');
+  if (rootReadme) openFile(rootReadme);
 
   // Language switch: the same folders, tabs, file and drawer state carry over to the other pane
   sync.save.ide = () => ({
@@ -375,11 +371,15 @@ function downloadBinaryCv() {
   const fab = scope.querySelector('.cv-fab');
   const hero = byId('top');
   const toTop = scope.querySelector('.to-top');
+  // The hero height is read once and on resize: reading layout on every scroll event makes phones stutter
+  let limit = 400;
+  const measure = () => { limit = hero ? hero.offsetHeight * 0.6 : 400; };
   const update = () => {
-    const limit = hero ? hero.offsetHeight * 0.6 : 400;
     if (fab) fab.classList.toggle('show', window.scrollY > limit);
     if (toTop) toTop.classList.toggle('show', window.scrollY > 600);
   };
+  measure();
+  window.addEventListener('resize', measure, { passive: true });
   window.addEventListener('scroll', update, { passive: true });
   update();
 })();
