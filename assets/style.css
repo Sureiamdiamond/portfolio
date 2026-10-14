@@ -804,6 +804,18 @@ body.bin-glitch h1 { text-shadow: 3px 0 rgba(0, 255, 255, .55), -3px 0 rgba(255,
 :root[data-mode="binary"] .portrait::after { content: ""; position: absolute; left: 0; right: 0; top: -18%; height: 18%; background: linear-gradient(transparent, rgba(57, 255, 122, .28), transparent); pointer-events: none; z-index: 2; animation: bin-scan-beam 3.2s linear infinite; }
 @keyframes bin-scan-beam { to { top: 100%; } }
 :root[data-mode="binary"] body::before { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; background-image: linear-gradient(rgba(57, 255, 122, .07) 1px, transparent 1px), linear-gradient(90deg, rgba(57, 255, 122, .07) 1px, transparent 1px); background-size: 40px 40px; }
+/* Binary mode runner game: floating play button and the game panel. Both are removed when another language is shown. */
+.bin-play { position: fixed; left: 16px; bottom: 16px; z-index: 930; width: 56px; height: 56px; display: grid; place-items: center; border-radius: 50%; border: 1px solid #39ff7a; background: #02140a; color: #39ff7a; cursor: pointer; box-shadow: 0 0 18px rgba(57, 255, 122, .45); }
+.bin-play::before { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid #39ff7a; animation: bin-pulse 1.8s ease-out infinite; }
+.bin-play[hidden] { display: none; }
+@keyframes bin-pulse { from { transform: scale(1); opacity: .8; } to { transform: scale(1.6); opacity: 0; } }
+.bin-game { position: fixed; left: 50%; bottom: 16px; transform: translateX(-50%); z-index: 940; width: min(640px, calc(100vw - 24px)); background: #02140a; border: 1px solid #39ff7a; box-shadow: 0 0 30px rgba(57, 255, 122, .35); color: #39ff7a; font: 500 .8rem/1.4 var(--mono); }
+.bin-game-bar { display: flex; justify-content: space-between; align-items: center; padding: 4px 8px; background: #39ff7a; color: #000; }
+.bin-game-x { background: none; border: 0; color: #000; font: inherit; font-weight: 700; cursor: pointer; }
+.bin-game-canvas { display: block; width: 100%; height: auto; touch-action: none; cursor: pointer; }
+.bin-game-foot { display: flex; justify-content: space-between; gap: 8px; padding: 6px 10px; border-top: 1px solid #134d26; font-size: .72rem; }
+@media (max-width: 520px) { .bin-game-foot span:last-child { display: none; } }
+@media (prefers-reduced-motion: reduce) { .bin-play::before { animation: none; } }
 .tobank-link { color: var(--accent); font-weight: 600; text-decoration: underline dotted; text-underline-offset: .2em; }
 .tobank-link:hover, .tobank-link:focus-visible { text-decoration-style: solid; }
 .pcard.is-focus { outline: 2px solid var(--accent); outline-offset: 4px; transition: outline-color .6s ease; }

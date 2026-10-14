@@ -541,7 +541,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     };
     const onWheel = (ev) => {
       if (ev.ctrlKey || ev.metaKey || ev.defaultPrevented) return;
-      if (ev.target.closest && ev.target.closest('.pt-window, .lang-list, textarea')) return;
+      if (ev.target.closest && ev.target.closest('.pt-window, .lang-list, .bin-game, textarea')) return;
       ev.preventDefault();
       const max = document.documentElement.scrollHeight - window.innerHeight;
       if (target === null) target = window.scrollY;
@@ -597,10 +597,225 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
     return { start, stop };
   })();
 
+  // Binary mode mini game: a skeleton runs over blocks of 0 and 1, like the offline dinosaur game.
+  // A floating play button opens it. Space, ArrowUp or a tap jumps; it closes with the × button or Escape.
+  const binaryGame = (() => {
+    const W = 600;
+    const H = 180;
+    const GROUND = 160;
+    const STAND = GROUND - 40;
+    const GRAV = 0.6;
+    const JUMP = -11.5;
+    const SKE_X = 60;
+    let button = null;
+    let panel = null;
+    let canvas = null;
+    let ctx = null;
+    let raf = 0;
+    let last = 0;
+    let open = false;
+    let best = 0;
+    let state = 'ready';
+    let y = STAND;
+    let vy = 0;
+    let obstacles = [];
+    let frame = 0;
+    let speed = 5;
+    let nextSpawn = 60;
+    let groundOffset = 0;
+    const reset = () => {
+      state = 'ready';
+      y = STAND;
+      vy = 0;
+      obstacles = [];
+      frame = 0;
+      speed = 5;
+      nextSpawn = 60;
+      groundOffset = 0;
+    };
+    const score = () => Math.floor(frame / 6);
+    const jump = () => {
+      if (state === 'ready') { state = 'run'; return; }
+      if (state === 'over') { reset(); state = 'run'; return; }
+      if (y >= STAND) vy = JUMP;
+    };
+    const gameOver = () => {
+      state = 'over';
+      best = Math.max(best, score());
+    };
+    const spawn = () => {
+      const cells = 1 + Math.floor(Math.random() * 3);
+      const rows = Math.random() < 0.3 ? 2 : 1;
+      const digits = Array.from({ length: cells * rows }, () => (Math.random() < 0.5 ? '0' : '1'));
+      obstacles.push({ x: W + 10, cells, rows, digits, w: cells * 24, h: rows * 24 });
+    };
+    const hits = (o) => {
+      const sx = SKE_X + 4;
+      const sy = y + 4;
+      return sx < o.x + o.w && sx + 14 > o.x && sy < GROUND && sy + 32 > GROUND - o.h;
+    };
+    const update = (k) => {
+      frame += k;
+      groundOffset = (groundOffset + speed * k) % 20;
+      vy += GRAV * k;
+      y += vy * k;
+      if (y >= STAND) { y = STAND; vy = 0; }
+      speed = Math.min(12, 5 + frame / 900);
+      nextSpawn -= k;
+      if (nextSpawn <= 0) {
+        spawn();
+        nextSpawn = Math.max(35, 55 + Math.random() * 60 - frame / 60);
+      }
+      obstacles.forEach((o) => { o.x -= speed * k; });
+      obstacles = obstacles.filter((o) => o.x + o.w > -10);
+      if (obstacles.some(hits)) gameOver();
+    };
+    const drawSkeleton = () => {
+      const x = SKE_X;
+      const cx = x + 11;
+      const airborne = y < STAND;
+      const swing = airborne ? 0 : Math.sin(frame * 0.35);
+      ctx.strokeStyle = '#39ff7a';
+      ctx.fillStyle = '#39ff7a';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.arc(cx, y + 8, 7, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.fillRect(cx - 4, y + 6, 3, 3);
+      ctx.fillRect(cx + 1, y + 6, 3, 3);
+      ctx.beginPath();
+      ctx.moveTo(cx, y + 15);
+      ctx.lineTo(cx, y + 28);
+      ctx.moveTo(cx, y + 19);
+      ctx.lineTo(cx + 8 + swing * 2, y + 26);
+      ctx.moveTo(cx, y + 19);
+      ctx.lineTo(cx - 8 - swing * 2, y + 26);
+      ctx.moveTo(cx, y + 28);
+      if (airborne) {
+        ctx.lineTo(cx - 5, y + 36);
+        ctx.moveTo(cx, y + 28);
+        ctx.lineTo(cx + 5, y + 36);
+      } else {
+        ctx.lineTo(cx - 5 + swing * 4, y + 40);
+        ctx.moveTo(cx, y + 28);
+        ctx.lineTo(cx + 5 - swing * 4, y + 40);
+      }
+      ctx.stroke();
+    };
+    const draw = () => {
+      ctx.fillStyle = '#02140a';
+      ctx.fillRect(0, 0, W, H);
+      ctx.strokeStyle = '#134d26';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([6, 8]);
+      ctx.lineDashOffset = -groundOffset;
+      ctx.beginPath();
+      ctx.moveTo(0, GROUND + 0.5);
+      ctx.lineTo(W, GROUND + 0.5);
+      ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.font = '600 14px ui-monospace, Menlo, Consolas, monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      obstacles.forEach((o) => {
+        for (let r = 0; r < o.rows; r += 1) {
+          for (let c = 0; c < o.cells; c += 1) {
+            const cx = o.x + c * 24;
+            const cy = GROUND - (r + 1) * 24;
+            ctx.strokeStyle = '#39ff7a';
+            ctx.strokeRect(cx + 0.5, cy + 0.5, 23, 23);
+            ctx.fillStyle = '#39ff7a';
+            ctx.fillText(o.digits[r * o.cells + c], cx + 12, cy + 13);
+          }
+        }
+      });
+      drawSkeleton();
+      ctx.fillStyle = '#39ff7a';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'top';
+      ctx.font = '500 13px ui-monospace, Menlo, Consolas, monospace';
+      const pad = (n) => String(n).padStart(5, '0');
+      ctx.fillText(`HI ${pad(best)}  ${pad(score())}`, W - 12, 10);
+      if (state !== 'run') {
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.font = '600 15px ui-monospace, Menlo, Consolas, monospace';
+        const msg = state === 'over' ? 'GAME OVER  //  SPACE OR TAP TO RETRY' : 'SPACE OR TAP TO START';
+        ctx.fillText(msg, W / 2, 60);
+      }
+    };
+    const loop = (t) => {
+      const k = Math.min(3, (t - last) / 16.67 || 1);
+      last = t;
+      if (state === 'run') update(k);
+      draw();
+      raf = requestAnimationFrame(loop);
+    };
+    const onKey = (ev) => {
+      if (ev.key === 'Escape') { close(); return; }
+      if (ev.key === ' ' || ev.key === 'ArrowUp') {
+        ev.preventDefault();
+        jump();
+      }
+    };
+    const closePanel = () => {
+      if (!open) return;
+      open = false;
+      cancelAnimationFrame(raf);
+      raf = 0;
+      document.removeEventListener('keydown', onKey);
+      if (panel) { panel.remove(); panel = null; }
+      canvas = null;
+      ctx = null;
+      if (button) button.hidden = false;
+    };
+    function close() { closePanel(); }
+    const openPanel = () => {
+      if (open) return;
+      open = true;
+      reset();
+      panel = document.createElement('div');
+      panel.className = 'bin-game';
+      panel.setAttribute('role', 'dialog');
+      panel.setAttribute('aria-label', 'SKELETON.RUN');
+      panel.innerHTML = '<div class="bin-game-bar"><span>SKELETON.RUN</span><button type="button" class="bin-game-x" aria-label="Close">×</button></div>'
+        + '<canvas class="bin-game-canvas" width="' + W + '" height="' + H + '" aria-label="Game canvas"></canvas>'
+        + '<div class="bin-game-foot"><span>SPACE / ARROW UP / TAP  to jump</span><span>ESC  to close</span></div>';
+      document.body.appendChild(panel);
+      canvas = panel.querySelector('canvas');
+      const dpr = Math.min(2, window.devicePixelRatio || 1);
+      canvas.width = W * dpr;
+      canvas.height = H * dpr;
+      ctx = canvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      canvas.addEventListener('pointerdown', (ev) => { ev.preventDefault(); jump(); });
+      panel.querySelector('.bin-game-x').addEventListener('click', closePanel);
+      if (button) button.hidden = true;
+      document.addEventListener('keydown', onKey);
+      last = performance.now();
+      raf = requestAnimationFrame(loop);
+    };
+    const start = () => {
+      if (button) return;
+      button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'bin-play';
+      button.setAttribute('aria-label', 'Play');
+      button.innerHTML = '<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" focusable="false"><path d="M7 4.5v15l12.5-7.5z" fill="currentColor"/></svg>';
+      button.addEventListener('click', openPanel);
+      document.body.appendChild(button);
+    };
+    const stop = () => {
+      closePanel();
+      if (button) { button.remove(); button = null; }
+    };
+    return { start, stop };
+  })();
+
   const showLang = (lang) => {
     if (lang === 'bin') buildBinaryPane();
-    if (lang === 'bin') binaryFun.start();
-    else binaryFun.stop();
+    if (lang === 'bin') { binaryFun.start(); binaryGame.start(); }
+    else { binaryFun.stop(); binaryGame.stop(); }
     panes().forEach((p) => { p.hidden = p.dataset.pane !== lang; });
     html.lang = lang === 'fa' ? 'fa' : 'en';
     html.dir = lang === 'fa' ? 'rtl' : 'ltr';
