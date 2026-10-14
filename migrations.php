@@ -746,6 +746,24 @@ function run_timeline_logos_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TIMELINE_LOGOS_MIGRATION . "', '1')");
 }
 
+// IPAAM logo re-keyed from the original JPG (white background removed); the rows point at the new file. Previous logo values are logged.
+const IPAAM_LOGO_MIGRATION = 'migration_ipaam_logo_v2';
+const IPAAM_LOGO = 'assets/img/timeline/ipaam-logo.webp';
+
+function run_ipaam_logo_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . IPAAM_LOGO_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare('UPDATE timeline SET logo = ? WHERE id = ?');
+    foreach ($pdo->query("SELECT id, org, logo FROM timeline WHERE org LIKE '%IPAAM%'")->fetchAll(PDO::FETCH_ASSOC) as $row) {
+        if ((string) $row['logo'] !== IPAAM_LOGO) {
+            migration_log("ipaam logo {$row['id']}: previous logo " . json_encode($row['logo'], JSON_UNESCAPED_UNICODE));
+            $update->execute([IPAAM_LOGO, $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_LOGO_MIGRATION . "', '1')");
+}
+
 // English becomes a panel with CAE and TTC as sub-items. Rewrites both language fields; the previous values are logged.
 const LANGUAGES_PANEL_MIGRATION = 'migration_languages_v2';
 

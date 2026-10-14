@@ -644,6 +644,8 @@ html[data-theme="dark"] img.tl-logo[src*="baqer"] { filter: invert(1) hue-rotate
 /* Codeyad is a blue mark on transparent: on dark it is a solid white logo, with no box. */
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.tl-logo[src*="codeyad"] { filter: brightness(0) invert(1); } }
 html[data-theme="dark"] img.tl-logo[src*="codeyad"] { filter: brightness(0) invert(1); }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.tl-logo[src*="ipaam-logo"] { filter: brightness(0) invert(1); } }
+html[data-theme="dark"] img.tl-logo[src*="ipaam-logo"] { filter: brightness(0) invert(1); }
 .tl-logo.tl-initials { width: 56px; height: 56px; border-radius: 14px; border: 1px solid var(--border); box-sizing: border-box; }
 .tl-initials {
   display: grid; place-items: center; padding: 0; background: hsl(var(--hue) 70% 92%); color: hsl(var(--hue) 60% 28%);
