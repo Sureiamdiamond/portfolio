@@ -330,6 +330,16 @@ function initPane(scope, sfx) {
   };
   fab.addEventListener('click', (ev) => {
     ev.stopPropagation();
+    // Binary mode has no real CV: the button downloads a binary PDF with the contact details instead
+    if (document.documentElement.dataset.mode === 'binary') {
+      const link = document.createElement('a');
+      link.href = 'assets/cv/binary-cv.pdf';
+      link.download = 'binary-cv.pdf';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      return;
+    }
     setOpen(list.hidden);
   });
   document.addEventListener('click', (ev) => {
