@@ -764,6 +764,30 @@ function run_ipaam_logo_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_LOGO_MIGRATION . "', '1')");
 }
 
+// Tobank card gets the firebase and bloc tags next to dart and flutter. Only the Tobank row changes; existing tags are kept. Previous tags are logged.
+const TOBANK_STACK_MIGRATION = 'migration_tobank_stack_v1';
+
+function run_tobank_stack_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . TOBANK_STACK_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $row = $pdo->query("SELECT id, tags FROM projects WHERE title = 'Tobank' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($row) {
+        $tags = array_values(array_filter(array_map('trim', explode(',', (string) $row['tags'])), 'strlen'));
+        $have = array_map('strtolower', $tags);
+        foreach (['firebase', 'bloc'] as $add) {
+            if (!in_array($add, $have, true)) {
+                $tags[] = $add;
+            }
+        }
+        if ($tags !== array_values(array_filter(array_map('trim', explode(',', (string) $row['tags'])), 'strlen'))) {
+            migration_log("tobank stack: project {$row['id']} previous tags " . json_encode($row['tags'], JSON_UNESCAPED_UNICODE));
+            $pdo->prepare('UPDATE projects SET tags = ? WHERE id = ?')->execute([implode(', ', $tags), $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . TOBANK_STACK_MIGRATION . "', '1')");
+}
+
 // English becomes a panel with CAE and TTC as sub-items. Rewrites both language fields; the previous values are logged.
 const LANGUAGES_PANEL_MIGRATION = 'migration_languages_v2';
 

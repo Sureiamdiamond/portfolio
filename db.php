@@ -83,6 +83,7 @@ function db(): PDO {
     run_ipaam_order_migration($pdo);
     run_timeline_logos_migration($pdo);
     run_ipaam_logo_migration($pdo);
+    run_tobank_stack_migration($pdo);
     run_codeyad_period_migration($pdo);
     run_ipam_fa_spelling_migration($pdo);
     run_techblog_github_migration($pdo);
@@ -127,7 +128,7 @@ const RESUME_PROJECTS = [
     ['title' => 'Tobank', 'title_fa' => 'اپلیکیشن توبانک (شعبه مجازی بانک گردشگری)', 'kind' => 'work',
         'summary' => "Flutter mobile app for Tobank, the virtual branch of Tourism Bank (Bank Gardeshgari). Banking domain. Period: Farvardin 1403.",
         'summary_fa' => "اپلیکیشن موبایل توبانک، شعبه مجازی بانک گردشگری، با فلاتر. حوزه بانکی. بازه: فروردین ۱۴۰۳.",
-        'tags' => 'flutter, dart', 'url' => 'https://tobank.ir', 'github_url' => '', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 1],
+        'tags' => 'flutter, dart, firebase, bloc', 'url' => 'https://tobank.ir', 'github_url' => '', 'appstore_url' => '', 'playstore_url' => '', 'bazaar_url' => '', 'sort' => 1],
     ['title' => 'Weather App', 'title_fa' => 'اپلیکیشن آب و هوا', 'kind' => 'academic',
         'summary' => "Weather app built with Bloc and Clean Architecture. University project. Period: Farvardin 1404.",
         'summary_fa' => "اپلیکیشن آب و هوا با Bloc و Clean Architecture. پروژه دانشگاه. بازه: فروردین ۱۴۰۴.",
