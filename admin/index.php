@@ -287,6 +287,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 [$skillsEn, $skillsFa] = sync_skill_languages(trim($_POST['skills'] ?? ''), trim($_POST['skills_fa'] ?? ''));
                 $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skills', ?)")->execute([$skillsEn]);
                 $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skills_fa', ?)")->execute([$skillsFa]);
+                // Skill logos are kept per skill name, so an upload in either language's editor applies to both
+                $skillLogos = json_decode((string) ($pdo->query("SELECT v FROM profile WHERE k = 'skill_logos'")->fetchColumn() ?: '[]'), true);
+                $skillLogos = is_array($skillLogos) ? $skillLogos : [];
+                foreach (array_keys($_POST) as $field) {
+                    if (!str_starts_with((string) $field, 'skill_logo_name_')) {
+                        continue;
+                    }
+                    $key = substr((string) $field, strlen('skill_logo_name_'));
+                    $name = strtolower(trim((string) $_POST[$field]));
+                    if ($name === '') {
+                        continue;
+                    }
+                    $old = $skillLogos[$name] ?? null;
+                    if ($old && isset($_POST['skill_logo_clear_' . $key])) {
+                        remove_upload($old);
+                        unset($skillLogos[$name]);
+                    }
+                    if ($logo = save_file_upload('skill_logo_file_' . $key, ['png', 'webp', 'jpg', 'jpeg'])) {
+                        if ($old && $old !== $logo['path']) {
+                            remove_upload($old);
+                        }
+                        $skillLogos[$name] = $logo['path'];
+                    }
+                }
+                $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logos', ?)")->execute([json_encode($skillLogos, JSON_UNESCAPED_UNICODE)]);
                 foreach (array_keys(SECTION_SWITCHES) as $switch) {
                     $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)')->execute([$switch, isset($_POST[$switch]) ? '1' : '0']);
                 }
@@ -578,6 +603,11 @@ if ($loggedIn) {
   .se-row { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr) minmax(0,1fr) auto; gap: 6px; align-items: center; margin-bottom: 6px; }
   .se-row input, .se-row select { width: 100%; }
   .se-row button { padding: 6px 8px; }
+  .se-row .se-logo { grid-column: 1 / -1; }
+  .se-logo { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 4px; font-size: 13px; }
+  .se-logo .se-preview { width: 30px; height: 30px; object-fit: contain; border: 1px solid #d6e4ec; border-radius: 6px; }
+  .se-logo .se-file { width: auto; max-width: 100%; }
+  .se-logo .check { margin: 0; }
   @media (max-width: 760px) { .se-row { grid-template-columns: 1fr 1fr; } .se-row .se-parent, .se-row .se-remove { grid-column: 1 / -1; } .se-row .se-remove { justify-self: start; } }
   @media (max-width: 760px) { .split { grid-template-columns: 1fr; } .preview { position: static; } }
 </style>
@@ -826,7 +856,7 @@ if ($loggedIn) {
       <?php foreach (PROFILE_FIELDS as $field): ?>
         <label for="p-<?= $field ?>"><?= e(label($field)) ?></label>
         <?php if (in_array($field, ['skills', 'skills_fa'], true)): ?>
-          <div class="skill-editor" data-source="p-<?= $field ?>" data-labels="<?= e(json_encode(['name' => t('skills.name'), 'icon' => t('skills.icon'), 'parent' => t('skills.parent'), 'none' => t('skills.none'), 'remove' => t('skills.remove')], JSON_UNESCAPED_UNICODE)) ?>">
+          <div class="skill-editor" data-source="p-<?= $field ?>" data-labels="<?= e(json_encode(['name' => t('skills.name'), 'icon' => t('skills.icon'), 'parent' => t('skills.parent'), 'none' => t('skills.none'), 'remove' => t('skills.remove'), 'logo' => t('skills.logo'), 'logoRemove' => t('skills.logo_remove')], JSON_UNESCAPED_UNICODE)) ?>" data-logos="<?= e((string) ($profile['skill_logos'] ?? '{}')) ?>">
             <p class="muted"><?= e(t('skills.hint')) ?></p>
             <div class="se-rows"></div>
             <p><button type="button" class="se-add"><?= e(t('skills.add')) ?></button></p>
@@ -883,7 +913,10 @@ if ($loggedIn) {
             parts.slice(2).forEach((flag) => { if (/^parent:/i.test(flag)) parent = flag.slice(7).trim(); });
             return { name: parts[0], icon: (parts[1] || ''), parent };
           }).filter((r) => r.name);
-          let rows = parse(ta.value);
+          const logos = JSON.parse(box.dataset.logos || '{}') || {};
+          let nextKey = 0;
+          // Row keys carry the editor's field name, so the two language editors never post the same file field
+          let rows = parse(ta.value).map((r) => Object.assign(r, { key: box.dataset.source + '-' + nextKey++ }));
           const commit = () => {
             ta.value = rows.filter((r) => r.name.trim()).map((r) => {
               const name = r.name.trim(), icon = r.icon.trim(), parent = r.parent.trim();
@@ -897,19 +930,31 @@ if ($loggedIn) {
             rows.forEach((row, i) => {
               const el = document.createElement('div');
               el.className = 'se-row';
-              el.innerHTML = '<input type="text" aria-label="' + L.name + '" class="se-name"><input type="text" aria-label="' + L.icon + '" class="se-icon" dir="ltr"><select aria-label="' + L.parent + '" class="se-parent"></select><button type="button" class="danger se-remove"></button>';
+              const k = row.key;
+              el.innerHTML = '<input type="text" aria-label="' + L.name + '" class="se-name"><input type="text" aria-label="' + L.icon + '" class="se-icon" dir="ltr"><select aria-label="' + L.parent + '" class="se-parent"></select><button type="button" class="danger se-remove"></button>'
+                + '<div class="se-logo"><img class="se-preview" alt="" width="30" height="30" hidden><input type="file" class="se-file" accept=".png,.webp,.jpg,.jpeg,image/png,image/webp,image/jpeg" aria-label="' + L.logo + '" name="skill_logo_file_' + k + '"><label class="check se-clear-wrap" hidden><input type="checkbox" class="se-clear" name="skill_logo_clear_' + k + '"> ' + L.logoRemove + '</label><input type="hidden" class="se-logo-name" name="skill_logo_name_' + k + '"></div>';
+              const logoName = el.querySelector('.se-logo-name'), preview = el.querySelector('.se-preview');
+              const clearWrap = el.querySelector('.se-clear-wrap');
+              const showLogo = () => {
+                const path = logos[(row.name || '').trim().toLowerCase()] || '';
+                logoName.value = row.name.trim();
+                preview.hidden = !path;
+                if (path) preview.src = '../' + path;
+                clearWrap.hidden = !path;
+              };
               const nameIn = el.querySelector('.se-name'), iconIn = el.querySelector('.se-icon');
               const sel = el.querySelector('.se-parent'), del = el.querySelector('.se-remove');
               nameIn.value = row.name; iconIn.value = row.icon; del.textContent = L.remove;
               nameIn.addEventListener('input', () => {
                 const old = row.name.trim(), now = nameIn.value;
                 rows.forEach((r) => { if (old && r.parent === old) r.parent = now; });
-                row.name = now; commit(); refreshSelects();
+                row.name = now; commit(); refreshSelects(); showLogo();
               });
               iconIn.addEventListener('input', () => { row.icon = iconIn.value; commit(); });
               sel.addEventListener('change', () => { row.parent = sel.value; commit(); });
               del.addEventListener('click', () => { rows.splice(i, 1); commit(); render(); });
               rowsBox.appendChild(el);
+            showLogo();
             });
             refreshSelects();
           };
@@ -925,7 +970,7 @@ if ($loggedIn) {
           };
           const addBtn = box.querySelector('.se-add');
           addBtn.addEventListener('click', () => {
-            rows.push({ name: '', icon: '', parent: '' });
+            rows.push({ name: '', icon: '', parent: '', key: box.dataset.source + '-' + nextKey++ });
             commit(); render();
             const last = rowsBox.querySelector('.se-row:last-child .se-name');
             if (last) last.focus();

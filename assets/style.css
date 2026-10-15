@@ -748,6 +748,9 @@ html[lang="fa"] .skills-label { font-family: Vazirmatn, system-ui, sans-serif; l
 .skill { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 8px 12px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); font-weight: 500; }
 .skill-icon { width: 30px; height: 30px; flex: none; display: grid; place-items: center; color: var(--fg); }
 .skill-svg { width: 24px; height: 24px; }
+/* Uploaded skill logos are shown in grayscale, in light and dark mode alike */
+.skill-logo-wrap { overflow: hidden; border-radius: 6px; }
+.skill-logo { display: block; width: 100%; height: 100%; object-fit: contain; filter: grayscale(1); }
 .skill-initials { border-radius: 8px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font: 700 .72rem var(--sans); }
 .skill-parent { display: block; padding: 0; position: relative; }
 .skill-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 12px; margin: 0; background: none; border: 0; border-radius: 12px; color: inherit; font: inherit; text-align: start; cursor: pointer; }

@@ -158,7 +158,8 @@ function render_pane(string $lang, array $shared): array {
       <?php endforeach; ?>
     </div>
     <?php
-      $skills = skill_items(loc($profile, 'skills', $lang));
+      $skillLogos = json_decode((string) ($profile['skill_logos'] ?? ''), true);
+      $skills = skill_items(loc($profile, 'skills', $lang), is_array($skillLogos) ? $skillLogos : []);
       $skillGroups = skill_groups($skills);
       $languages = language_items(loc($profile, 'languages', $lang));
       $languageGroups = skill_groups($languages);

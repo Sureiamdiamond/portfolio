@@ -60,7 +60,8 @@ function timeline_site(array $item, string $lang): string {
  * Skills as "name | icon key | parent:Name | more" lines. Entries without a brand icon get initials instead of a made-up logo.
  * "parent:" puts a skill inside its parent's expandable panel.
  */
-function skill_items(string $text): array {
+/** $logos maps a lowercase skill name to an uploaded logo path, which replaces the built-in icon on the page. */
+function skill_items(string $text, array $logos = []): array {
     $items = [];
     foreach (preg_split('/\R/u', $text) ?: [] as $line) {
         $parts = array_map('trim', explode('|', $line));
@@ -68,7 +69,7 @@ function skill_items(string $text): array {
         if ($name === '') {
             continue;
         }
-        $item = ['name' => $name, 'icon' => strtolower($parts[1] ?? ''), 'parent' => ''];
+        $item = ['name' => $name, 'icon' => strtolower($parts[1] ?? ''), 'parent' => '', 'logo' => (string) ($logos[strtolower($name)] ?? '')];
         foreach (array_slice($parts, 2) as $flag) {
             if (stripos($flag, 'parent:') === 0) {
                 $item['parent'] = trim(substr($flag, 7));
@@ -105,13 +106,22 @@ function skill_groups(array $items): array {
     return $cards;
 }
 
+/** The skill's icon: its uploaded logo (grayscale on the page) when there is one, otherwise the built-in icon, otherwise its initials. */
+function skill_icon_html(array $item, string $size): string {
+    if (($item['logo'] ?? '') !== '') {
+        return '<span class="skill-icon' . $size . ' skill-logo-wrap"><img class="skill-logo" src="' . e($item['logo']) . '" alt="" width="30" height="30" loading="lazy"></span>';
+    }
+    $svg = skill_icon_svg($item['icon']);
+    if ($svg !== null) {
+        return '<span class="skill-icon' . $size . '">' . $svg . '</span>';
+    }
+    return '<span class="skill-icon' . $size . ' skill-initials" aria-hidden="true">' . e(mb_strtoupper(mb_substr($item['name'], 0, 2))) . '</span>';
+}
+
 /** One skill card. A card with children becomes a native disclosure, so it works with keyboard and screen readers without script. */
 function skill_card_html(array $group): string {
     $item = $group['item'];
-    $svg = skill_icon_svg($item['icon']);
-    $icon = $svg !== null
-        ? '<span class="skill-icon">' . $svg . '</span>'
-        : '<span class="skill-icon skill-initials" aria-hidden="true">' . e(mb_strtoupper(mb_substr($item['name'], 0, 2))) . '</span>';
+    $icon = skill_icon_html($item, '');
     $head = $icon . '<span class="skill-name">' . e($item['name']) . '</span>';
     if (!$group['children']) {
         return '<li class="skill">' . $head . '</li>';
@@ -119,10 +129,7 @@ function skill_card_html(array $group): string {
     $panelId = 'skill-panel-' . substr(md5($item['name']), 0, 8);
     $list = '';
     foreach ($group['children'] as $index => $child) {
-        $childSvg = skill_icon_svg($child['icon']);
-        $childIcon = $childSvg !== null
-            ? '<span class="skill-icon skill-icon-sm">' . $childSvg . '</span>'
-            : '<span class="skill-icon skill-icon-sm skill-initials" aria-hidden="true">' . e(mb_strtoupper(mb_substr($child['name'], 0, 2))) . '</span>';
+        $childIcon = skill_icon_html($child, ' skill-icon-sm');
         $list .= '<li class="skill-child" style="--i:' . $index . '">' . $childIcon . '<span>' . e($child['name']) . '</span></li>';
     }
     return '<li class="skill skill-parent"><button type="button" class="skill-head" aria-expanded="false" aria-controls="' . $panelId . '">' . $head . '</button>'
