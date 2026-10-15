@@ -752,9 +752,10 @@ html[lang="fa"] .skills-label { font-family: Vazirmatn, system-ui, sans-serif; l
 /* Uploaded skill logos are shown in grayscale, in light and dark mode alike */
 .skill-logo-wrap { overflow: hidden; border-radius: 6px; }
 .skill-logo { display: block; width: 100%; height: 100%; object-fit: contain; filter: grayscale(1); }
-/* A dark logo is inverted in dark mode so it reads white like the built-in icons */
-@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .skill-logo-inv .skill-logo { filter: grayscale(1) invert(1); } }
-:root[data-theme="dark"] .skill-logo-inv .skill-logo { filter: grayscale(1) invert(1); }
+/* A marked logo becomes a flat silhouette in the text colour: black in light mode, white in dark mode, like the built-in icons */
+.skill-logo-inv .skill-logo { filter: brightness(0); }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .skill-logo-inv .skill-logo { filter: brightness(0) invert(1); } }
+:root[data-theme="dark"] .skill-logo-inv .skill-logo { filter: brightness(0) invert(1); }
 .skill-initials { border-radius: 8px; background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--accent); font: 700 .72rem var(--sans); }
 .skill-parent { display: block; padding: 0; position: relative; }
 .skill-head { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 48px; padding: 8px 12px; margin: 0; background: none; border: 0; border-radius: 12px; color: inherit; font: inherit; text-align: start; cursor: pointer; }
