@@ -128,6 +128,7 @@ function db(): PDO {
     run_store_links_skills_v8_migration($pdo);
     run_clean_links_v9_migration($pdo);
     run_skill_logo_opts_v10_migration($pdo);
+    run_rest_api_top_level_v11_migration($pdo);
     return $pdo;
 }
 

@@ -1753,3 +1753,33 @@ function run_skill_logo_opts_v10_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILL_LOGO_OPTS_V10_MIGRATION . "', '1')");
 }
 
+const REST_TOP_LEVEL_V11_MIGRATION = 'migration_rest_api_top_level_v11';
+
+/** REST API is a general skill, not a Flutter one, so its parent flag is removed in both language lists. Previous lists are logged. */
+function run_rest_api_top_level_v11_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . REST_TOP_LEVEL_V11_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    foreach (['skills', 'skills_fa'] as $key) {
+        $previous = (string) ($pdo->query("SELECT v FROM profile WHERE k = '$key'")->fetchColumn() ?: '');
+        $lines = [];
+        foreach (preg_split('/\R/u', $previous) ?: [] as $line) {
+            $parts = array_map('trim', explode('|', $line));
+            if (strcasecmp($parts[0] ?? '', 'REST API') === 0) {
+                $parts = array_values(array_filter($parts, fn($part) => stripos($part, 'parent:') !== 0));
+                while (count($parts) > 1 && end($parts) === '') {
+                    array_pop($parts);
+                }
+                $line = implode(' | ', $parts);
+            }
+            $lines[] = $line;
+        }
+        $next = implode("\n", $lines);
+        if ($next !== $previous) {
+            migration_log("rest api top level ($key): previous " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+            $pdo->prepare("UPDATE profile SET v = ? WHERE k = ?")->execute([$next, $key]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . REST_TOP_LEVEL_V11_MIGRATION . "', '1')");
+}
+
