@@ -1783,3 +1783,35 @@ function run_rest_api_top_level_v11_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . REST_TOP_LEVEL_V11_MIGRATION . "', '1')");
 }
 
+const API_TOOLS_V12_MIGRATION = 'migration_api_tools_v12';
+
+/** Postman, Swagger and Bruno go under REST API in both language lists. Each line is added only if the skill is not already listed. Previous lists are logged. */
+function run_api_tools_v12_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . API_TOOLS_V12_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $tools = [['Postman', 'postman'], ['Swagger', ''], ['Bruno', '']];
+    foreach (['skills', 'skills_fa'] as $key) {
+        $previous = (string) ($pdo->query("SELECT v FROM profile WHERE k = '$key'")->fetchColumn() ?: '');
+        $lines = preg_split('/\R/u', $previous) ?: [];
+        $names = array_map(fn($line) => strtolower(trim(explode('|', $line)[0])), $lines);
+        $at = array_search('rest api', $names, true);
+        if ($at === false) {
+            continue;
+        }
+        $insert = [];
+        foreach ($tools as [$name, $icon]) {
+            if (!in_array(strtolower($name), $names, true)) {
+                $insert[] = $icon === '' ? "$name | | parent:REST API" : "$name | $icon | parent:REST API";
+            }
+        }
+        if (!$insert) {
+            continue;
+        }
+        array_splice($lines, $at + 1, 0, $insert);
+        migration_log("api tools ($key): previous " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare("UPDATE profile SET v = ? WHERE k = ?")->execute([implode("\n", $lines), $key]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . API_TOOLS_V12_MIGRATION . "', '1')");
+}
+
