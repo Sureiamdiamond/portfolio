@@ -323,6 +323,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Skill logos are kept per skill name, so an upload in either language's editor applies to both
                 $skillLogos = json_decode((string) ($pdo->query("SELECT v FROM profile WHERE k = 'skill_logos'")->fetchColumn() ?: '[]'), true);
                 $skillLogos = is_array($skillLogos) ? $skillLogos : [];
+                $skillLogoOpts = json_decode((string) ($pdo->query("SELECT v FROM profile WHERE k = 'skill_logo_opts'")->fetchColumn() ?: '[]'), true);
+                $skillLogoOpts = is_array($skillLogoOpts) ? $skillLogoOpts : [];
                 foreach (array_keys($_POST) as $field) {
                     if (!str_starts_with((string) $field, 'skill_logo_name_')) {
                         continue;
@@ -336,6 +338,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     if ($old && isset($_POST['skill_logo_clear_' . $key])) {
                         remove_upload($old);
                         unset($skillLogos[$name]);
+                        unset($skillLogoOpts[$name]);
+                    }
+                    // Size (percent) and invert are kept only when they differ from the defaults
+                    $size = max(60, min(140, (int) ($_POST['skill_logo_size_' . $key] ?? 100)));
+                    $invert = isset($_POST['skill_logo_invert_' . $key]);
+                    if ($size !== 100 || $invert) {
+                        $skillLogoOpts[$name] = ['size' => $size, 'invert' => $invert];
+                    } else {
+                        unset($skillLogoOpts[$name]);
                     }
                     if ($logo = save_file_upload('skill_logo_file_' . $key, ['png', 'webp', 'jpg', 'jpeg'])) {
                         if ($old && $old !== $logo['path']) {
@@ -345,6 +356,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     }
                 }
                 $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logos', ?)")->execute([json_encode($skillLogos, JSON_UNESCAPED_UNICODE)]);
+                $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logo_opts', ?)")->execute([json_encode($skillLogoOpts ?: new stdClass(), JSON_UNESCAPED_UNICODE)]);
                 foreach (array_keys(SECTION_SWITCHES) as $switch) {
                     $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)')->execute([$switch, isset($_POST[$switch]) ? '1' : '0']);
                 }
@@ -907,7 +919,7 @@ if ($loggedIn) {
       <?php foreach (PROFILE_FIELDS as $field): ?>
         <label for="p-<?= $field ?>"><?= e(label($field)) ?></label>
         <?php if (in_array($field, ['skills', 'skills_fa'], true)): ?>
-          <div class="skill-editor" data-source="p-<?= $field ?>" data-labels="<?= e(json_encode(['name' => t('skills.name'), 'icon' => t('skills.icon'), 'parent' => t('skills.parent'), 'none' => t('skills.none'), 'remove' => t('skills.remove'), 'up' => t('skills.up'), 'down' => t('skills.down'), 'logo' => t('skills.logo'), 'logoRemove' => t('skills.logo_remove')], JSON_UNESCAPED_UNICODE)) ?>" data-logos="<?= e((string) ($profile['skill_logos'] ?? '{}')) ?>">
+          <div class="skill-editor" data-source="p-<?= $field ?>" data-labels="<?= e(json_encode(['name' => t('skills.name'), 'icon' => t('skills.icon'), 'parent' => t('skills.parent'), 'none' => t('skills.none'), 'remove' => t('skills.remove'), 'up' => t('skills.up'), 'down' => t('skills.down'), 'logo' => t('skills.logo'), 'logoRemove' => t('skills.logo_remove'), 'logoSize' => t('skills.logo_size'), 'logoInvert' => t('skills.logo_invert')], JSON_UNESCAPED_UNICODE)) ?>" data-logos="<?= e((string) ($profile['skill_logos'] ?? '{}')) ?>" data-logo-opts="<?= e((string) ($profile['skill_logo_opts'] ?? '{}')) ?>">
             <p class="muted"><?= e(t('skills.hint')) ?></p>
             <div class="se-rows"></div>
             <p><button type="button" class="se-add"><?= e(t('skills.add')) ?></button></p>
@@ -965,6 +977,7 @@ if ($loggedIn) {
             return { name: parts[0], icon: (parts[1] || ''), parent };
           }).filter((r) => r.name);
           const logos = JSON.parse(box.dataset.logos || '{}') || {};
+          const logoOpts = JSON.parse(box.dataset.logoOpts || '{}') || {};
           let nextKey = 0;
           // Row keys carry the editor's field name, so the two language editors never post the same file field
           let rows = parse(ta.value).map((r) => Object.assign(r, { key: box.dataset.source + '-' + nextKey++ }));
@@ -983,15 +996,22 @@ if ($loggedIn) {
               el.className = 'se-row';
               const k = row.key;
               el.innerHTML = '<input type="text" aria-label="' + L.name + '" class="se-name"><input type="text" aria-label="' + L.icon + '" class="se-icon" dir="ltr"><select aria-label="' + L.parent + '" class="se-parent"></select><span class="se-actions"><button type="button" class="se-up" aria-label="' + L.up + '">▲</button><button type="button" class="se-down" aria-label="' + L.down + '">▼</button><button type="button" class="danger se-remove"></button></span>'
-                + '<div class="se-logo"><img class="se-preview" alt="" width="30" height="30" hidden><input type="file" class="se-file" accept=".png,.webp,.jpg,.jpeg,image/png,image/webp,image/jpeg" aria-label="' + L.logo + '" name="skill_logo_file_' + k + '"><label class="check se-clear-wrap" hidden><input type="checkbox" class="se-clear" name="skill_logo_clear_' + k + '"> ' + L.logoRemove + '</label><input type="hidden" class="se-logo-name" name="skill_logo_name_' + k + '"></div>';
+                + '<div class="se-logo"><img class="se-preview" alt="" width="30" height="30" hidden><input type="file" class="se-file" accept=".png,.webp,.jpg,.jpeg,image/png,image/webp,image/jpeg" aria-label="' + L.logo + '" name="skill_logo_file_' + k + '"><label class="check se-clear-wrap" hidden><input type="checkbox" class="se-clear" name="skill_logo_clear_' + k + '"> ' + L.logoRemove + '</label><label class="se-opt" hidden>' + L.logoSize + ' <input type="number" class="se-size" min="60" max="140" step="1" value="100" name="skill_logo_size_' + k + '"> %</label><label class="check se-opt" hidden><input type="checkbox" class="se-invert" name="skill_logo_invert_' + k + '"> ' + L.logoInvert + '</label><input type="hidden" class="se-logo-name" name="skill_logo_name_' + k + '"></div>';
               const logoName = el.querySelector('.se-logo-name'), preview = el.querySelector('.se-preview');
               const clearWrap = el.querySelector('.se-clear-wrap');
+              const sizeIn = el.querySelector('.se-size'), invertIn = el.querySelector('.se-invert');
+              const optWraps = el.querySelectorAll('.se-opt');
               const showLogo = () => {
-                const path = logos[(row.name || '').trim().toLowerCase()] || '';
+                const id = (row.name || '').trim().toLowerCase();
+                const path = logos[id] || '';
+                const opts = logoOpts[id] || {};
                 logoName.value = row.name.trim();
                 preview.hidden = !path;
                 if (path) preview.src = '../' + path;
                 clearWrap.hidden = !path;
+                optWraps.forEach((w) => { w.hidden = !path; });
+                sizeIn.value = opts.size || 100;
+                invertIn.checked = !!opts.invert;
               };
               const nameIn = el.querySelector('.se-name'), iconIn = el.querySelector('.se-icon');
               const sel = el.querySelector('.se-parent'), del = el.querySelector('.se-remove');

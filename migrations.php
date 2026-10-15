@@ -1734,3 +1734,22 @@ function run_clean_links_v9_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLEAN_LINKS_V9_MIGRATION . "', '1')");
 }
+
+const SKILL_LOGO_OPTS_V10_MIGRATION = 'migration_skill_logo_opts_v10';
+
+/** Dio and REST API logos are 7% larger, and Dio, REST API and Supabase invert in dark mode. Previous values are logged. */
+function run_skill_logo_opts_v10_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SKILL_LOGO_OPTS_V10_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = (string) ($pdo->query("SELECT v FROM profile WHERE k = 'skill_logo_opts'")->fetchColumn() ?: '');
+    $opts = json_decode($previous, true);
+    $opts = is_array($opts) ? $opts : [];
+    $opts['dio'] = ['size' => 107, 'invert' => true];
+    $opts['rest api'] = ['size' => 107, 'invert' => true];
+    $opts['supabase'] = ['invert' => true];
+    migration_log('skill logo options: previous ' . ($previous === '' ? '(none)' : $previous));
+    $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logo_opts', ?)")->execute([json_encode($opts, JSON_UNESCAPED_UNICODE)]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SKILL_LOGO_OPTS_V10_MIGRATION . "', '1')");
+}
+

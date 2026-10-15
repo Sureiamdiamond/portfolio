@@ -127,6 +127,7 @@ function db(): PDO {
     run_ipaam_role_arsham_migration($pdo);
     run_store_links_skills_v8_migration($pdo);
     run_clean_links_v9_migration($pdo);
+    run_skill_logo_opts_v10_migration($pdo);
     return $pdo;
 }
 

@@ -61,7 +61,7 @@ function timeline_site(array $item, string $lang): string {
  * "parent:" puts a skill inside its parent's expandable panel.
  */
 /** $logos maps a lowercase skill name to an uploaded logo path, which replaces the built-in icon on the page. */
-function skill_items(string $text, array $logos = []): array {
+function skill_items(string $text, array $logos = [], array $logoOpts = []): array {
     $items = [];
     foreach (preg_split('/\R/u', $text) ?: [] as $line) {
         $parts = array_map('trim', explode('|', $line));
@@ -69,7 +69,7 @@ function skill_items(string $text, array $logos = []): array {
         if ($name === '') {
             continue;
         }
-        $item = ['name' => $name, 'icon' => strtolower($parts[1] ?? ''), 'parent' => '', 'logo' => (string) ($logos[strtolower($name)] ?? '')];
+        $item = ['name' => $name, 'icon' => strtolower($parts[1] ?? ''), 'parent' => '', 'logo' => (string) ($logos[strtolower($name)] ?? ''), 'logo_opts' => (array) ($logoOpts[strtolower($name)] ?? [])];
         foreach (array_slice($parts, 2) as $flag) {
             if (stripos($flag, 'parent:') === 0) {
                 $item['parent'] = trim(substr($flag, 7));
@@ -109,7 +109,12 @@ function skill_groups(array $items): array {
 /** The skill's icon: its uploaded logo (grayscale on the page) when there is one, otherwise the built-in icon, otherwise its initials. */
 function skill_icon_html(array $item, string $size): string {
     if (($item['logo'] ?? '') !== '') {
-        return '<span class="skill-icon' . $size . ' skill-logo-wrap"><img class="skill-logo" src="' . e($item['logo']) . '" alt="" width="30" height="30" loading="lazy"></span>';
+        // size is a percent set in the admin; invert turns a dark logo white in dark mode
+        $opts = $item['logo_opts'] ?? [];
+        $scale = isset($opts['size']) ? max(60, min(140, (int) $opts['size'])) / 100 : 1;
+        $invert = !empty($opts['invert']) ? ' skill-logo-inv' : '';
+        $style = $scale === 1 ? '' : ' style="transform:scale(' . $scale . ')"';
+        return '<span class="skill-icon' . $size . ' skill-logo-wrap' . $invert . '"><img class="skill-logo" src="' . e($item['logo']) . '" alt="" width="30" height="30" loading="lazy"' . $style . '></span>';
     }
     $svg = skill_icon_svg($item['icon']);
     if ($svg !== null) {
