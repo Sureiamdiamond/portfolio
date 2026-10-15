@@ -538,6 +538,13 @@ if ($loggedIn) {
   label.check input { width: auto; }
   a.button { padding: 8px 12px; border-radius: 8px; border: 1px solid #9bb8c9; text-decoration: none; color: #0f2a3d; background: #fff; }
   .hero-mini { width: 180px; aspect-ratio: 4 / 5; border-radius: 16px; background: var(--hero-bg, #0052FF); box-shadow: 0 2px 10px rgba(15,42,61,.12); }
+  /* The save button stays in view at the bottom of its form, so it can be reached on a phone */
+  .savebar { position: sticky; bottom: 0; z-index: 5; background: #fff; margin: 12px -16px -16px; padding: 12px 16px; border-top: 1px solid #d6e4ec; border-radius: 0 0 12px 12px; }
+  .skill-editor { border: 1px solid #d6e4ec; border-radius: 8px; padding: 10px; margin: 6px 0 10px; }
+  .se-row { display: grid; grid-template-columns: minmax(0,1.2fr) minmax(0,.8fr) minmax(0,1fr) auto; gap: 6px; align-items: center; margin-bottom: 6px; }
+  .se-row input, .se-row select { width: 100%; }
+  .se-row button { padding: 6px 8px; }
+  @media (max-width: 760px) { .se-row { grid-template-columns: 1fr 1fr; } .se-row .se-parent, .se-row .se-remove { grid-column: 1 / -1; } .se-row .se-remove { justify-self: start; } }
   @media (max-width: 760px) { .split { grid-template-columns: 1fr; } .preview { position: static; } }
 </style>
 <script>const ADMIN_T = <?= json_encode(['photo' => t('profile.photo_hint'), 'cv' => t('profile.cv_label'), 'kb' => 'KB', 'previewFailed' => t('theme.preview_failed')], JSON_HEX_TAG | JSON_UNESCAPED_UNICODE) ?>;</script>
@@ -665,7 +672,7 @@ if ($loggedIn) {
       <label class="check"><input type="checkbox" name="theme_bg_clear" value="1"> <?= e(t('theme.bg_clear')) ?></label>
       <input type="hidden" id="t-bg-image" name="theme_bg_image" value="<?= e($current['theme_bg_image']) ?>">
       <div id="t-warnings" class="msg err" hidden></div>
-      <p><button type="submit"><?= e(t('theme.publish')) ?></button></p>
+      <p class="savebar"><button type="submit"><?= e(t('theme.publish')) ?></button></p>
     </form>
     <aside class="preview">
       <h3><?= e(t('theme.live')) ?></h3>
@@ -784,7 +791,14 @@ if ($loggedIn) {
       <input type="hidden" name="action" value="profile">
       <?php foreach (PROFILE_FIELDS as $field): ?>
         <label for="p-<?= $field ?>"><?= e(label($field)) ?></label>
-        <?php if (in_array($field, PROFILE_LONG, true)): ?>
+        <?php if (in_array($field, ['skills', 'skills_fa'], true)): ?>
+          <div class="skill-editor" data-source="p-<?= $field ?>" data-labels="<?= e(json_encode(['name' => t('skills.name'), 'icon' => t('skills.icon'), 'parent' => t('skills.parent'), 'none' => t('skills.none'), 'remove' => t('skills.remove')], JSON_UNESCAPED_UNICODE)) ?>">
+            <p class="muted"><?= e(t('skills.hint')) ?></p>
+            <div class="se-rows"></div>
+            <p><button type="button" class="se-add"><?= e(t('skills.add')) ?></button></p>
+          </div>
+          <textarea id="p-<?= $field ?>" name="<?= $field ?>"><?= e($profile[$field] ?? '') ?></textarea>
+        <?php elseif (in_array($field, PROFILE_LONG, true)): ?>
           <textarea id="p-<?= $field ?>" name="<?= $field ?>"><?= e($profile[$field] ?? '') ?></textarea>
         <?php else: ?>
           <input id="p-<?= $field ?>" name="<?= $field ?>"<?= ltr_attr($field) ?> value="<?= e($profile[$field] ?? '') ?>">
@@ -802,7 +816,7 @@ if ($loggedIn) {
       <label for="photo"><?= e(t('profile.photo')) ?></label>
       <input id="photo" type="file" name="file_photo" accept="image/png,image/webp,.png,.webp">
       <p class="muted"><?= e(t('profile.current_photo')) ?> <?= !empty($profile['hero_photo']) ? '<a href="../' . e($profile['hero_photo']) . '" target="_blank">' . e(t('common.open')) . '</a>' : e(t('common.built_in')) ?></p>
-      <p><button type="submit"><?= e(t('profile.save')) ?></button> <a class="button" href="../index.php" target="_blank"><?= e(t('profile.preview_saved')) ?></a></p>
+      <p class="savebar"><button type="submit"><?= e(t('profile.save')) ?></button> <a class="button" href="../index.php" target="_blank"><?= e(t('profile.preview_saved')) ?></a></p>
     </form>
     <aside class="preview" aria-label="Live preview">
       <h3><?= e(t('profile.live')) ?></h3>
@@ -821,6 +835,73 @@ if ($loggedIn) {
       <p class="muted" id="pv-file"></p>
     </aside>
     </div>
+    <script>
+      // Skills editor: each row is name, icon key and parent. It writes the same "name | icon | parent:Name" lines the page reads, into the textarea that is saved
+      (function () {
+        document.querySelectorAll('.skill-editor').forEach((box) => {
+          const ta = document.getElementById(box.dataset.source);
+          const rowsBox = box.querySelector('.se-rows');
+          const L = JSON.parse(box.dataset.labels);
+          if (!ta || !rowsBox) return;
+          const parse = (text) => text.split(/\r?\n/).map((line) => line.trim()).filter(Boolean).map((line) => {
+            const parts = line.split('|').map((x) => x.trim());
+            let parent = '';
+            parts.slice(2).forEach((flag) => { if (/^parent:/i.test(flag)) parent = flag.slice(7).trim(); });
+            return { name: parts[0], icon: (parts[1] || ''), parent };
+          }).filter((r) => r.name);
+          let rows = parse(ta.value);
+          const commit = () => {
+            ta.value = rows.filter((r) => r.name.trim()).map((r) => {
+              const name = r.name.trim(), icon = r.icon.trim(), parent = r.parent.trim();
+              if (!icon && !parent) return name;
+              return name + ' | ' + icon + (parent ? ' | parent:' + parent : '');
+            }).join('\n');
+          };
+          const names = () => [...new Set(rows.map((r) => r.name.trim()).filter(Boolean))];
+          const render = () => {
+            rowsBox.innerHTML = '';
+            rows.forEach((row, i) => {
+              const el = document.createElement('div');
+              el.className = 'se-row';
+              el.innerHTML = '<input type="text" aria-label="' + L.name + '" class="se-name"><input type="text" aria-label="' + L.icon + '" class="se-icon" dir="ltr"><select aria-label="' + L.parent + '" class="se-parent"></select><button type="button" class="danger se-remove"></button>';
+              const nameIn = el.querySelector('.se-name'), iconIn = el.querySelector('.se-icon');
+              const sel = el.querySelector('.se-parent'), del = el.querySelector('.se-remove');
+              nameIn.value = row.name; iconIn.value = row.icon; del.textContent = L.remove;
+              nameIn.addEventListener('input', () => {
+                const old = row.name.trim(), now = nameIn.value;
+                rows.forEach((r) => { if (old && r.parent === old) r.parent = now; });
+                row.name = now; commit(); refreshSelects();
+              });
+              iconIn.addEventListener('input', () => { row.icon = iconIn.value; commit(); });
+              sel.addEventListener('change', () => { row.parent = sel.value; commit(); });
+              del.addEventListener('click', () => { rows.splice(i, 1); commit(); render(); });
+              rowsBox.appendChild(el);
+            });
+            refreshSelects();
+          };
+          const refreshSelects = () => {
+            const list = names();
+            rowsBox.querySelectorAll('.se-row').forEach((el, i) => {
+              const sel = el.querySelector('.se-parent'), row = rows[i];
+              const options = [['', L.none]].concat(list.filter((n) => n !== row.name.trim()).map((n) => [n, n]));
+              if (row.parent && !options.some((o) => o[0] === row.parent)) options.push([row.parent, row.parent]);
+              sel.innerHTML = '';
+              options.forEach(([value, text]) => { const o = document.createElement('option'); o.value = value; o.textContent = text; if (value === row.parent) o.selected = true; sel.appendChild(o); });
+            });
+          };
+          const addBtn = box.querySelector('.se-add');
+          addBtn.addEventListener('click', () => {
+            rows.push({ name: '', icon: '', parent: '' });
+            commit(); render();
+            const last = rowsBox.querySelector('.se-row:last-child .se-name');
+            if (last) last.focus();
+          });
+          ta.hidden = true;
+          commit();
+          render();
+        });
+      })();
+    </script>
     <script>
       // Live preview of the profile text and the chosen photo, before anything is uploaded
       (function () {
@@ -1070,7 +1151,7 @@ if ($loggedIn) {
         <input id="f-icon" type="file" name="file_icon" accept=".png,.webp,.jpg,.jpeg">
         <p class="muted"><?= e(t('common.current')) ?>: <?= !empty($edit['icon']) ? e($edit['icon']) : e(t('common.generated_tile')) ?></p>
       <?php endif; ?>
-      <p><button type="submit"><?= e(t('common.save')) ?></button>
+      <p class="savebar"><button type="submit"><?= e(t('common.save')) ?></button>
         <?php if ($edit): ?><a href="index.php?t=<?= $tab ?>"><?= e(t('common.cancel')) ?></a><?php endif; ?></p>
     </form>
 
