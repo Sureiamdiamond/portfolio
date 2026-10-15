@@ -85,6 +85,36 @@ const TYPES = [
 ];
 const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'location', 'location_fa', 'linkedin', 'github', 'skills', 'skills_fa', 'languages', 'languages_fa', 'meta_description', 'footer_text'];
 const PROFILE_LONG = ['about', 'about_fa', 'skills', 'skills_fa', 'languages', 'languages_fa', 'meta_description'];
+
+/** Skill lines (name | icon | parent:Name) that the other language list lacks, matched by name, appended to it. Both lists must have skills; an empty list keeps its fallback to the other language. */
+function sync_skill_languages(string $en, string $fa): array {
+    if (trim($en) === '' || trim($fa) === '') {
+        return [$en, $fa];
+    }
+    $namesOf = static function (string $text): array {
+        $names = [];
+        foreach (preg_split('/\R/u', $text) ?: [] as $line) {
+            $name = strtolower(trim(explode('|', $line)[0]));
+            if ($name !== '') {
+                $names[$name] = true;
+            }
+        }
+        return $names;
+    };
+    $missingFrom = static function (string $from, string $to) use ($namesOf): string {
+        $have = $namesOf($to);
+        $extra = [];
+        foreach (preg_split('/\R/u', $from) ?: [] as $line) {
+            $name = strtolower(trim(explode('|', $line)[0]));
+            if ($name !== '' && !isset($have[$name])) {
+                $extra[] = rtrim($line);
+                $have[$name] = true;
+            }
+        }
+        return implode("\n", array_merge([rtrim($to)], $extra));
+    };
+    return [$missingFrom($fa, $en), $missingFrom($en, $fa)];
+}
 // Sections of the public page that can be hidden; stored as '1' (shown) or '0' (hidden)
 const SECTION_SWITCHES = [
     'show_journey' => 'Education & experience',
@@ -253,6 +283,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt = $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)');
                     $stmt->execute([$field, trim($_POST[$field] ?? '')]);
                 }
+                // A skill added in one language's editor also appears in the other language's list
+                [$skillsEn, $skillsFa] = sync_skill_languages(trim($_POST['skills'] ?? ''), trim($_POST['skills_fa'] ?? ''));
+                $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skills', ?)")->execute([$skillsEn]);
+                $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skills_fa', ?)")->execute([$skillsFa]);
                 foreach (array_keys(SECTION_SWITCHES) as $switch) {
                     $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)')->execute([$switch, isset($_POST[$switch]) ? '1' : '0']);
                 }
