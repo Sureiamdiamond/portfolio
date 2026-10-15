@@ -1637,3 +1637,63 @@ function run_ipaam_role_arsham_migration(PDO $pdo): void {
     $pdo->exec("UPDATE timeline SET org_fa = REPLACE(org_fa, 'ارشم', 'آرشام') WHERE org_fa LIKE '%ارشم%'");
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . IPAAM_ROLE_ARSHAM_MIGRATION . "', '1')");
 }
+
+const STORE_LINKS_SKILLS_V8_MIGRATION = 'migration_store_links_skills_v8';
+
+/** Skills: the AI group is named «AI» in both languages, and NotebookLM sits under it. Other lines keep their text, and their parent is renamed to AI too. */
+function skills_ai_group_text(string $text): string {
+    $out = [];
+    $hasAi = false;
+    $hasNotebook = false;
+    foreach (preg_split('/\R/u', $text) ?: [] as $line) {
+        if (trim($line) === '') {
+            continue;
+        }
+        $name = trim(explode('|', $line)[0]);
+        if (preg_match('/^(AI|هوش مصنوعی)$/iu', $name)) {
+            $out[] = 'AI | ai';
+            $hasAi = true;
+        } elseif (preg_match('/^NotebookLM$/i', $name)) {
+            $out[] = 'NotebookLM | notebooklm | parent:AI';
+            $hasNotebook = true;
+        } else {
+            $out[] = preg_replace('/parent:\s*هوش مصنوعی/u', 'parent:AI', rtrim($line));
+        }
+    }
+    if (!$hasNotebook) {
+        $out[] = 'NotebookLM | notebooklm | parent:AI';
+    }
+    if (!$hasAi) {
+        array_unshift($out, 'AI | ai');
+    }
+    return implode("\n", $out);
+}
+
+/** Store links: Classyar lists its Myket page. Tobank and Tobank SDUI get their Cafe Bazaar and Myket pages (Gardeshpay), and their website stays. Previous values are logged. */
+function run_store_links_skills_v8_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . STORE_LINKS_SKILLS_V8_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = [
+        'skills' => $pdo->query("SELECT v FROM profile WHERE k = 'skills'")->fetchColumn(),
+        'skills_fa' => $pdo->query("SELECT v FROM profile WHERE k = 'skills_fa'")->fetchColumn(),
+        'projects' => $pdo->query("SELECT id, title, bazaar_url, extra_links FROM projects WHERE LOWER(TRIM(title)) IN ('classyar app', 'tobank', 'tobank sdui')")->fetchAll(PDO::FETCH_ASSOC),
+    ];
+    migration_log('store links and skills v8: previous values ' . json_encode($previous, JSON_UNESCAPED_UNICODE));
+
+    $setProfile = $pdo->prepare('UPDATE profile SET v = ? WHERE k = ?');
+    foreach (['skills', 'skills_fa'] as $key) {
+        $value = (string) ($previous[$key] ?? '');
+        if (trim($value) === '') {
+            continue;
+        }
+        $setProfile->execute([skills_ai_group_text($value), $key]);
+    }
+
+    $myket = fn(string $url, string $icon = 'assets/img/stores/myket.png') => json_encode([['label' => 'Myket', 'label_fa' => 'مایکت', 'url' => $url, 'icon' => $icon]], JSON_UNESCAPED_UNICODE);
+    $pdo->prepare("UPDATE projects SET extra_links = ? WHERE LOWER(TRIM(title)) = 'classyar app'")
+        ->execute([$myket('https://myket.ir/app/com.classyar.app')]);
+    $stores = $pdo->prepare("UPDATE projects SET bazaar_url = ?, extra_links = ? WHERE LOWER(TRIM(title)) IN ('tobank', 'tobank sdui')");
+    $stores->execute(['https://cafebazaar.ir/app/com.gardeshpay.app', $myket('https://myket.ir/app/com.gardeshpay.app')]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . STORE_LINKS_SKILLS_V8_MIGRATION . "', '1')");
+}

@@ -224,7 +224,7 @@ function render_pane(string $lang, array $shared): array {
               <a class="pcard-ext" href="<?= e($options[0][1]) ?>" target="_blank" rel="noopener"><?= e($options[0][0]) ?> <span class="arr" aria-hidden="true">→</span></a>
             <?php elseif (count($options) > 1): ?>
               <div class="pcard-menu">
-                <button type="button" class="pcard-ext pcard-menu-btn" aria-haspopup="menu" aria-expanded="false"><?= $lang === 'fa' ? 'وب‌سایت' : 'Website' ?> <span class="arr" aria-hidden="true">▾</span></button>
+                <button type="button" class="pcard-ext pcard-menu-btn" aria-haspopup="menu" aria-expanded="false"><?= $lang === 'fa' ? 'لینک‌ها' : 'Links' ?> <span class="arr" aria-hidden="true">▾</span></button>
                 <ul class="pcard-menu-list" role="menu">
                   <?php foreach ($options as [$optionLabel, $optionUrl, $optionIcon]): ?>
                     <li role="none"><a role="menuitem" href="<?= e($optionUrl) ?>" target="_blank" rel="noopener"><?php if ($optionIcon !== ''): ?><img class="pmenu-icon" src="<?= e($optionIcon) ?>" alt="" width="20" height="20" loading="lazy"><?php endif; ?><span><?= e($optionLabel) ?></span></a></li>
