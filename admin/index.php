@@ -372,6 +372,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 foreach ($spec['fields'] as $field) {
                     $data[$field] = trim((string) ($_POST[$field] ?? ''));
                 }
+                // Store and website links are saved clean (no invisible characters from a paste, https:// on a bare domain)
+                if ($type === 'projects') {
+                    foreach (['url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url'] as $linkField) {
+                        $data[$linkField] = clean_link($data[$linkField]);
+                    }
+                    $extra = json_decode($data['extra_links'], true);
+                    if (is_array($extra)) {
+                        foreach ($extra as $i => $link) {
+                            if (is_array($link)) {
+                                $extra[$i]['url'] = clean_link((string) ($link['url'] ?? ''));
+                            }
+                        }
+                        $data['extra_links'] = json_encode($extra, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+                    }
+                }
                 foreach ($spec['files'] as $ext) {
                     if ($path = save_upload('file_' . $ext, $ext)) {
                         $data[$ext] = $path;

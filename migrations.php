@@ -1697,3 +1697,40 @@ function run_store_links_skills_v8_migration(PDO $pdo): void {
     $stores->execute(['https://cafebazaar.ir/app/com.gardeshpay.app', $myket('https://myket.ir/app/com.gardeshpay.app')]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . STORE_LINKS_SKILLS_V8_MIGRATION . "', '1')");
 }
+
+const CLEAN_LINKS_V9_MIGRATION = 'migration_clean_links_v9';
+
+/** Stored store and website links are cleaned once: invisible characters from a paste are removed and a bare domain gets https://. Changed rows are logged with their previous values. */
+function run_clean_links_v9_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CLEAN_LINKS_V9_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $fields = ['url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url'];
+    $rows = $pdo->query('SELECT id, title, extra_links, ' . implode(', ', $fields) . ' FROM projects')->fetchAll(PDO::FETCH_ASSOC);
+    $update = $pdo->prepare('UPDATE projects SET url = ?, github_url = ?, appstore_url = ?, playstore_url = ?, bazaar_url = ?, extra_links = ? WHERE id = ?');
+    foreach ($rows as $row) {
+        $new = [];
+        foreach ($fields as $field) {
+            $new[$field] = clean_link((string) ($row[$field] ?? ''));
+        }
+        $extraNew = (string) ($row['extra_links'] ?? '');
+        $extra = json_decode($extraNew, true);
+        if (is_array($extra)) {
+            foreach ($extra as $i => $link) {
+                if (is_array($link)) {
+                    $extra[$i]['url'] = clean_link((string) ($link['url'] ?? ''));
+                }
+            }
+            $extraNew = json_encode($extra, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        }
+        $changed = $extraNew !== (string) ($row['extra_links'] ?? '');
+        foreach ($fields as $field) {
+            $changed = $changed || $new[$field] !== (string) ($row[$field] ?? '');
+        }
+        if ($changed) {
+            migration_log("clean links v9: project {$row['id']} previous " . json_encode(array_intersect_key($row, array_flip(['title', 'extra_links', ...$fields])), JSON_UNESCAPED_UNICODE));
+            $update->execute([$new['url'], $new['github_url'], $new['appstore_url'], $new['playstore_url'], $new['bazaar_url'], $extraNew, $row['id']]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CLEAN_LINKS_V9_MIGRATION . "', '1')");
+}

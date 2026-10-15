@@ -99,11 +99,11 @@ function project_links(array $p): array {
         ['App Store', $p['appstore_url'] ?? ''],
         ['Google Play', $p['playstore_url'] ?? ''],
         ['Bazaar', $p['bazaar_url'] ?? ''],
-        ['Website', $p['url'] ?? ''],
+        ['Website', clean_link((string) ($p['url'] ?? ''))],
     ];
     foreach (json_decode((string) ($p['extra_links'] ?? ''), true) ?: [] as $link) {
         if (is_array($link)) {
-            $pairs[] = [trim((string) ($link['label'] ?? 'Link')), trim((string) ($link['url'] ?? ''))];
+            $pairs[] = [trim((string) ($link['label'] ?? 'Link')), clean_link((string) ($link['url'] ?? ''))];
         }
     }
     return array_values(array_filter($pairs, fn($l) => trim((string) $l[1]) !== ''));

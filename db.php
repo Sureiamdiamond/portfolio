@@ -126,6 +126,7 @@ function db(): PDO {
     run_english_titles_migration($pdo);
     run_ipaam_role_arsham_migration($pdo);
     run_store_links_skills_v8_migration($pdo);
+    run_clean_links_v9_migration($pdo);
     return $pdo;
 }
 
@@ -251,6 +252,15 @@ function loc(array $row, string $field, string $lang): string {
     return ($lang === 'fa' && $fa !== '') ? $fa : (string) ($row[$field] ?? '');
 }
 
+/** A link as it should be used: invisible characters (zero-width joiners, right-to-left marks, no-break spaces) that come with a paste are removed, and a bare domain gets https://. Anything else is returned without its outer spaces. */
+function clean_link(string $url): string {
+    $url = preg_replace('/[\p{Cf}\p{Zs}\p{Cc}]+/u', '', $url) ?? $url;
+    if ($url !== '' && preg_match('#^[a-z0-9-]+(\.[a-z0-9-]+)+(/|$)#i', $url)) {
+        $url = 'https://' . $url;
+    }
+    return $url;
+}
+
 /** Every external link a project card offers, as [label, url]: the fixed links first, then the extra links (a JSON list of {label, label_fa, url}) from the admin. One entry means a direct link; more open a small list. */
 function project_options(array $p, string $lang): array {
     // Store links are recognised by their host, so a store address filed under any field is labelled as that store.
@@ -264,7 +274,7 @@ function project_options(array $p, string $lang): array {
     ];
     $options = [];
     foreach ($fixed as $key => [$en, $faLabel]) {
-        $url = trim((string) ($p[$key] ?? ''));
+        $url = clean_link((string) ($p[$key] ?? ''));
         if (!preg_match('#^https?://#i', $url)) {
             continue;
         }
@@ -279,7 +289,8 @@ function project_options(array $p, string $lang): array {
     }
     $extra = json_decode((string) ($p['extra_links'] ?? ''), true);
     foreach (is_array($extra) ? $extra : [] as $link) {
-        $url = trim((string) ($link['url'] ?? ''));
+        // The admin stores the address under url; link and href are accepted too, in case the JSON was edited by hand
+        $url = clean_link((string) ($link['url'] ?? $link['link'] ?? $link['href'] ?? ''));
         if (!preg_match('#^https?://#i', $url)) {
             continue;
         }
