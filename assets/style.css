@@ -949,6 +949,19 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
 .media-date { font-size: .85rem; font-weight: 500; color: var(--muted); margin-inline-start: 6px; white-space: nowrap; }
 .media-rows .media-files { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: thin; margin-top: 6px; padding-bottom: 2px; }
 .media-rows .media-files a { flex: 0 0 auto; white-space: nowrap; min-height: 32px; direction: ltr; unicode-bidi: isolate; }
+/* Several files fold into one disclosure. It opens in the flow, not as an overlay, because the card clips overflow. */
+.paper-files { margin-top: 6px; }
+.paper-files summary { cursor: pointer; list-style: none; display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 500; color: var(--accent); }
+.paper-files summary::-webkit-details-marker { display: none; }
+.paper-files summary::after { content: "▾"; display: inline-block; transition: transform .18s ease-out; }
+.paper-files[open] summary::after { transform: rotate(180deg); }
+.paper-files summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+.paper-files ul { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.paper-files li a { display: flex; align-items: center; min-height: 40px; padding: 6px 10px; border-radius: 8px; color: var(--fg); background: var(--surface); text-decoration: none; font-size: .92rem; direction: ltr; unicode-bidi: isolate; }
+.paper-files li a:hover, .paper-files li a:focus-visible { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent); outline: none; }
+@media (prefers-reduced-motion: reduce) { .paper-files summary::after { transition: none; } }
+:root[data-mode="binary"] .paper-files summary, :root[data-mode="binary"] .paper-files li a { color: #39ff7a; }
+:root[data-mode="binary"] .paper-files li a { pointer-events: none; text-decoration: line-through; opacity: .55; }
 
 /* Personal mark (footer and section heading): the ink of p-mark.png is painted with the text colour, so it follows light and dark mode */
 .p-mark { display: inline-block; width: .95em; height: 1.3em; vertical-align: -0.25em; margin-inline-end: .4em; background: var(--fg); -webkit-mask: url("img/p-mark.png") center / contain no-repeat; mask: url("img/p-mark.png") center / contain no-repeat; }
