@@ -991,3 +991,9 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
   }
   .lang-list { border-color: var(--muted); box-shadow: 0 12px 26px -10px rgba(15, 23, 42, .5); }
 }
+
+/* The CV download buttons (hero and floating) have no shadow or halo, in light and dark mode, on phone and desktop */
+.cv-hero-btn, .cv-fab, .cv-hero-choices .btn-primary,
+html[data-glass="on"] .cv-hero-btn, html[data-glass="on"] .cv-fab, html[data-glass="on"] .cv-hero-choices .btn-primary {
+  box-shadow: none !important; filter: none !important; animation: none !important;
+}

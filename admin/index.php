@@ -86,23 +86,54 @@ const TYPES = [
 const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'location', 'location_fa', 'linkedin', 'github', 'skills', 'skills_fa', 'languages', 'languages_fa', 'meta_description', 'footer_text'];
 const PROFILE_LONG = ['about', 'about_fa', 'skills', 'skills_fa', 'languages', 'languages_fa', 'meta_description'];
 
-/** Skill lines (name | icon | parent:Name) that the other language list lacks, matched by name, appended to it. Both lists must have skills; an empty list keeps its fallback to the other language. */
-function sync_skill_languages(string $en, string $fa): array {
+/** The skill names of a list, in order (lowercase). */
+function skill_names_order(string $text): array {
+    $names = [];
+    foreach (preg_split('/\R/u', $text) ?: [] as $line) {
+        $name = strtolower(trim(explode('|', $line)[0]));
+        if ($name !== '') {
+            $names[] = $name;
+        }
+    }
+    return $names;
+}
+
+/** The slave list in the master's order: each master skill keeps the slave's line for it (or the master's line when the slave lacks it), then the slave's other skills follow. */
+function reorder_skill_lines(string $master, string $slave): string {
+    $slaveLines = [];
+    foreach (preg_split('/\R/u', $slave) ?: [] as $line) {
+        $name = strtolower(trim(explode('|', $line)[0]));
+        if (trim($line) !== '' && $name !== '' && !isset($slaveLines[$name])) {
+            $slaveLines[$name] = rtrim($line);
+        }
+    }
+    $out = [];
+    foreach (preg_split('/\R/u', $master) ?: [] as $line) {
+        $name = strtolower(trim(explode('|', $line)[0]));
+        if (trim($line) === '' || $name === '' || isset($out[$name])) {
+            continue;
+        }
+        $out[$name] = $slaveLines[$name] ?? rtrim($line);
+        unset($slaveLines[$name]);
+    }
+    return implode("\n", array_merge(array_values($out), array_values($slaveLines)));
+}
+
+/** Both language lists get the same skills in the same order. The list whose order changed since the last save is the master; the other follows it. Skills missing from a list are added at its end. */
+function sync_skill_languages(string $en, string $fa, string $prevEn = '', string $prevFa = ''): array {
     if (trim($en) === '' || trim($fa) === '') {
         return [$en, $fa];
     }
-    $namesOf = static function (string $text): array {
-        $names = [];
-        foreach (preg_split('/\R/u', $text) ?: [] as $line) {
-            $name = strtolower(trim(explode('|', $line)[0]));
-            if ($name !== '') {
-                $names[$name] = true;
-            }
+    if (skill_names_order($en) !== skill_names_order($prevEn)) {
+        $fa = reorder_skill_lines($en, $fa);
+    } else {
+        $en = reorder_skill_lines($fa, $en);
+    }
+    $missingFrom = static function (string $from, string $to): string {
+        $have = [];
+        foreach (skill_names_order($to) as $name) {
+            $have[$name] = true;
         }
-        return $names;
-    };
-    $missingFrom = static function (string $from, string $to) use ($namesOf): string {
-        $have = $namesOf($to);
         $extra = [];
         foreach (preg_split('/\R/u', $from) ?: [] as $line) {
             $name = strtolower(trim(explode('|', $line)[0]));
@@ -279,12 +310,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
 
             if ($action === 'profile') {
+                $prevSkills = (string) ($pdo->query("SELECT v FROM profile WHERE k = 'skills'")->fetchColumn() ?: '');
+                $prevSkillsFa = (string) ($pdo->query("SELECT v FROM profile WHERE k = 'skills_fa'")->fetchColumn() ?: '');
                 foreach (PROFILE_FIELDS as $field) {
                     $stmt = $pdo->prepare('INSERT OR REPLACE INTO profile (k, v) VALUES (?, ?)');
                     $stmt->execute([$field, trim($_POST[$field] ?? '')]);
                 }
                 // A skill added in one language's editor also appears in the other language's list
-                [$skillsEn, $skillsFa] = sync_skill_languages(trim($_POST['skills'] ?? ''), trim($_POST['skills_fa'] ?? ''));
+                [$skillsEn, $skillsFa] = sync_skill_languages(trim($_POST['skills'] ?? ''), trim($_POST['skills_fa'] ?? ''), $prevSkills, $prevSkillsFa);
                 $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skills', ?)")->execute([$skillsEn]);
                 $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skills_fa', ?)")->execute([$skillsFa]);
                 // Skill logos are kept per skill name, so an upload in either language's editor applies to both
@@ -604,11 +637,14 @@ if ($loggedIn) {
   .se-row input, .se-row select { width: 100%; }
   .se-row button { padding: 6px 8px; }
   .se-row .se-logo { grid-column: 1 / -1; }
+  .se-actions { display: flex; gap: 4px; justify-self: end; }
+  .se-actions button { min-width: 40px; min-height: 40px; padding: 6px 8px; }
+  .se-actions button:disabled { opacity: .35; cursor: default; }
   .se-logo { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 4px; font-size: 13px; }
   .se-logo .se-preview { width: 30px; height: 30px; object-fit: contain; border: 1px solid #d6e4ec; border-radius: 6px; }
   .se-logo .se-file { width: auto; max-width: 100%; }
   .se-logo .check { margin: 0; }
-  @media (max-width: 760px) { .se-row { grid-template-columns: 1fr 1fr; } .se-row .se-parent, .se-row .se-remove { grid-column: 1 / -1; } .se-row .se-remove { justify-self: start; } }
+  @media (max-width: 760px) { .se-row { grid-template-columns: 1fr 1fr; } .se-row .se-parent, .se-row .se-actions { grid-column: 1 / -1; } .se-row .se-actions { justify-self: start; } }
   @media (max-width: 760px) { .split { grid-template-columns: 1fr; } .preview { position: static; } }
 </style>
 <script>const ADMIN_T = <?= json_encode(['photo' => t('profile.photo_hint'), 'cv' => t('profile.cv_label'), 'kb' => 'KB', 'previewFailed' => t('theme.preview_failed')], JSON_HEX_TAG | JSON_UNESCAPED_UNICODE) ?>;</script>
@@ -856,7 +892,7 @@ if ($loggedIn) {
       <?php foreach (PROFILE_FIELDS as $field): ?>
         <label for="p-<?= $field ?>"><?= e(label($field)) ?></label>
         <?php if (in_array($field, ['skills', 'skills_fa'], true)): ?>
-          <div class="skill-editor" data-source="p-<?= $field ?>" data-labels="<?= e(json_encode(['name' => t('skills.name'), 'icon' => t('skills.icon'), 'parent' => t('skills.parent'), 'none' => t('skills.none'), 'remove' => t('skills.remove'), 'logo' => t('skills.logo'), 'logoRemove' => t('skills.logo_remove')], JSON_UNESCAPED_UNICODE)) ?>" data-logos="<?= e((string) ($profile['skill_logos'] ?? '{}')) ?>">
+          <div class="skill-editor" data-source="p-<?= $field ?>" data-labels="<?= e(json_encode(['name' => t('skills.name'), 'icon' => t('skills.icon'), 'parent' => t('skills.parent'), 'none' => t('skills.none'), 'remove' => t('skills.remove'), 'up' => t('skills.up'), 'down' => t('skills.down'), 'logo' => t('skills.logo'), 'logoRemove' => t('skills.logo_remove')], JSON_UNESCAPED_UNICODE)) ?>" data-logos="<?= e((string) ($profile['skill_logos'] ?? '{}')) ?>">
             <p class="muted"><?= e(t('skills.hint')) ?></p>
             <div class="se-rows"></div>
             <p><button type="button" class="se-add"><?= e(t('skills.add')) ?></button></p>
@@ -931,7 +967,7 @@ if ($loggedIn) {
               const el = document.createElement('div');
               el.className = 'se-row';
               const k = row.key;
-              el.innerHTML = '<input type="text" aria-label="' + L.name + '" class="se-name"><input type="text" aria-label="' + L.icon + '" class="se-icon" dir="ltr"><select aria-label="' + L.parent + '" class="se-parent"></select><button type="button" class="danger se-remove"></button>'
+              el.innerHTML = '<input type="text" aria-label="' + L.name + '" class="se-name"><input type="text" aria-label="' + L.icon + '" class="se-icon" dir="ltr"><select aria-label="' + L.parent + '" class="se-parent"></select><span class="se-actions"><button type="button" class="se-up" aria-label="' + L.up + '">▲</button><button type="button" class="se-down" aria-label="' + L.down + '">▼</button><button type="button" class="danger se-remove"></button></span>'
                 + '<div class="se-logo"><img class="se-preview" alt="" width="30" height="30" hidden><input type="file" class="se-file" accept=".png,.webp,.jpg,.jpeg,image/png,image/webp,image/jpeg" aria-label="' + L.logo + '" name="skill_logo_file_' + k + '"><label class="check se-clear-wrap" hidden><input type="checkbox" class="se-clear" name="skill_logo_clear_' + k + '"> ' + L.logoRemove + '</label><input type="hidden" class="se-logo-name" name="skill_logo_name_' + k + '"></div>';
               const logoName = el.querySelector('.se-logo-name'), preview = el.querySelector('.se-preview');
               const clearWrap = el.querySelector('.se-clear-wrap');
@@ -945,6 +981,13 @@ if ($loggedIn) {
               const nameIn = el.querySelector('.se-name'), iconIn = el.querySelector('.se-icon');
               const sel = el.querySelector('.se-parent'), del = el.querySelector('.se-remove');
               nameIn.value = row.name; iconIn.value = row.icon; del.textContent = L.remove;
+              // Up and down move the row past its nearest sibling (same parent), so a sub-skill stays under its parent
+              const siblingAt = (dir) => { for (let j = i + dir; j >= 0 && j < rows.length; j += dir) { if (rows[j].parent.trim() === row.parent.trim()) return j; } return -1; };
+              const up = el.querySelector('.se-up'), down = el.querySelector('.se-down');
+              up.disabled = siblingAt(-1) < 0; down.disabled = siblingAt(1) < 0;
+              const move = (dir) => { const j = siblingAt(dir); if (j < 0) return; [rows[i], rows[j]] = [rows[j], rows[i]]; commit(); render(); };
+              up.addEventListener('click', () => move(-1));
+              down.addEventListener('click', () => move(1));
               nameIn.addEventListener('input', () => {
                 const old = row.name.trim(), now = nameIn.value;
                 rows.forEach((r) => { if (old && r.parent === old) r.parent = now; });
