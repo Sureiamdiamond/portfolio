@@ -1935,3 +1935,35 @@ function run_markdown_skill_v16_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . MARKDOWN_SKILL_V16_MIGRATION . "', '1')");
 }
 
+const GOROUTER_SKILL_V17_MIGRATION = 'migration_gorouter_skill_v17';
+
+/** GoRouter is added under Flutter in both language lists, after the last Flutter sub-skill. Previous lists are logged. */
+function run_gorouter_skill_v17_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . GOROUTER_SKILL_V17_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    foreach (['skills', 'skills_fa'] as $key) {
+        $previous = (string) ($pdo->query("SELECT v FROM profile WHERE k = '$key'")->fetchColumn() ?: '');
+        $lines = preg_split('/\R/u', $previous) ?: [];
+        $names = array_map(fn($line) => strtolower(trim(explode('|', $line)[0])), $lines);
+        if (in_array('gorouter', $names, true)) {
+            continue;
+        }
+        $last = null;
+        foreach ($lines as $i => $line) {
+            if (stripos($line, 'parent:Flutter') !== false) {
+                $last = $i;
+            }
+        }
+        $new = 'GoRouter | gorouter | parent:Flutter';
+        if ($last === null) {
+            $lines[] = $new;
+        } else {
+            array_splice($lines, $last + 1, 0, [$new]);
+        }
+        migration_log("gorouter skill ($key): previous " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare("UPDATE profile SET v = ? WHERE k = ?")->execute([implode("\n", $lines), $key]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . GOROUTER_SKILL_V17_MIGRATION . "', '1')");
+}
+

@@ -134,6 +134,7 @@ function db(): PDO {
     run_swagger_bruno_icons_v14_migration($pdo);
     run_mysql_skill_v15_migration($pdo);
     run_markdown_skill_v16_migration($pdo);
+    run_gorouter_skill_v17_migration($pdo);
     return $pdo;
 }
 
