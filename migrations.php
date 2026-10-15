@@ -1815,3 +1815,46 @@ function run_api_tools_v12_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . API_TOOLS_V12_MIGRATION . "', '1')");
 }
 
+const API_GROUP_V13_MIGRATION = 'migration_api_group_v13';
+
+/** A new API group holds REST API, Postman, Swagger and Bruno. Previous lists are logged. */
+function run_api_group_v13_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . API_GROUP_V13_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $tools = ['postman', 'swagger', 'bruno'];
+    foreach (['skills', 'skills_fa'] as $key) {
+        $previous = (string) ($pdo->query("SELECT v FROM profile WHERE k = '$key'")->fetchColumn() ?: '');
+        $lines = preg_split('/\R/u', $previous) ?: [];
+        $names = array_map(fn($line) => strtolower(trim(explode('|', $line)[0])), $lines);
+        $at = array_search('rest api', $names, true);
+        if ($at === false) {
+            continue;
+        }
+        $out = [];
+        foreach ($lines as $i => $line) {
+            $parts = array_map('trim', explode('|', $line));
+            $name = strtolower($parts[0]);
+            if ($name === 'rest api' || in_array($name, $tools, true)) {
+                $parts = array_values(array_filter($parts, fn($part) => stripos($part, 'parent:') !== 0));
+                // The parent flag must sit in the third slot, so an empty icon slot is kept
+                while (count($parts) < 2) {
+                    $parts[] = '';
+                }
+                $parts[] = 'parent:API';
+                $line = implode(' | ', $parts);
+                if ($i === $at) {
+                    $out[] = 'API | api';
+                }
+            }
+            $out[] = $line;
+        }
+        if (in_array('api', $names, true)) {
+            continue;
+        }
+        migration_log("api group ($key): previous " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare("UPDATE profile SET v = ? WHERE k = ?")->execute([implode("\n", $out), $key]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . API_GROUP_V13_MIGRATION . "', '1')");
+}
+

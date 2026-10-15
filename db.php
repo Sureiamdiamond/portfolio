@@ -130,6 +130,7 @@ function db(): PDO {
     run_skill_logo_opts_v10_migration($pdo);
     run_rest_api_top_level_v11_migration($pdo);
     run_api_tools_v12_migration($pdo);
+    run_api_group_v13_migration($pdo);
     return $pdo;
 }
 
