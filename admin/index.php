@@ -154,6 +154,22 @@ const SECTION_SWITCHES = [
     'show_slides' => 'Slides',
 ];
 
+/** Days left until the HTTPS certificate of this site expires, read from the server itself. Null when it cannot be read. */
+function ssl_days_left(string $host, int $port = 443): ?array {
+    $ctx = stream_context_create(['ssl' => ['capture_peer_cert' => true, 'verify_peer' => false, 'verify_peer_name' => false, 'peer_name' => $host]]);
+    $client = @stream_socket_client('ssl://' . $host . ':' . $port, $errno, $errstr, 5, STREAM_CLIENT_CONNECT, $ctx);
+    if (!$client) {
+        return null;
+    }
+    $cert = stream_context_get_params($client)['options']['ssl']['peer_certificate'] ?? null;
+    fclose($client);
+    $info = $cert ? openssl_x509_parse($cert) : false;
+    if (!$info || empty($info['validTo_time_t'])) {
+        return null;
+    }
+    return ['days' => (int) floor(($info['validTo_time_t'] - time()) / 86400), 'expires' => gmdate('Y-m-d', (int) $info['validTo_time_t'])];
+}
+
 /** Human label for a field; Persian fields are marked so the admin knows where to type them. */
 function label(string $field): string {
     $key = 'field.' . $field;
@@ -887,6 +903,13 @@ if ($loggedIn) {
     </script>
   <?php elseif ($tab === 'password'): ?>
     <?php if (isset($_GET['changed'])): ?><div class="msg"><?= e(t('password.changed')) ?></div><?php endif; ?>
+    <?php $ssl = ssl_days_left(preg_replace('/:\d+$/', '', (string) ($_SERVER['HTTP_HOST'] ?? ''))); ?>
+    <h2><?= e(t('ssl.heading')) ?></h2>
+    <?php if ($ssl): ?>
+      <p class="<?= $ssl['days'] < 30 ? 'msg' : 'muted' ?>"><?= e(t('ssl.left', ['days' => $ssl['days']])) ?> <span dir="ltr">(<?= e($ssl['expires']) ?>)</span></p>
+    <?php else: ?>
+      <p class="muted"><?= e(t('ssl.unknown')) ?></p>
+    <?php endif; ?>
     <form method="post" autocomplete="off">
       <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
       <input type="hidden" name="action" value="password">
