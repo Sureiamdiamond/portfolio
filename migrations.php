@@ -1858,3 +1858,32 @@ function run_api_group_v13_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . API_GROUP_V13_MIGRATION . "', '1')");
 }
 
+const SWAGGER_BRUNO_ICONS_V14_MIGRATION = 'migration_swagger_bruno_icons_v14';
+
+/** Swagger and Bruno get their brand icons. Previous lists are logged. */
+function run_swagger_bruno_icons_v14_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SWAGGER_BRUNO_ICONS_V14_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $icons = ['swagger' => 'swagger', 'bruno' => 'bruno'];
+    foreach (['skills', 'skills_fa'] as $key) {
+        $previous = (string) ($pdo->query("SELECT v FROM profile WHERE k = '$key'")->fetchColumn() ?: '');
+        $lines = [];
+        foreach (preg_split('/\R/u', $previous) ?: [] as $line) {
+            $parts = array_map('trim', explode('|', $line));
+            $name = strtolower($parts[0]);
+            if (isset($icons[$name]) && ($parts[1] ?? '') === '') {
+                $parts[1] = $icons[$name];
+                $line = implode(' | ', $parts);
+            }
+            $lines[] = $line;
+        }
+        $next = implode("\n", $lines);
+        if ($next !== $previous) {
+            migration_log("swagger and bruno icons ($key): previous " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+            $pdo->prepare("UPDATE profile SET v = ? WHERE k = ?")->execute([$next, $key]);
+        }
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SWAGGER_BRUNO_ICONS_V14_MIGRATION . "', '1')");
+}
+
