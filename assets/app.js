@@ -481,13 +481,15 @@ sync.load.skills = (s) => {
       const open = !menu.classList.contains('is-open');
       closeAll(menu);
       setOpen(menu, open);
-      if (open) menu.querySelector('.pcard-menu-list a').focus();
+      // Only a keyboard open moves focus into the list. A touch or mouse open must not, since focusing a link can scroll the page under the finger
+      if (open && ev.detail === 0) menu.querySelector('.pcard-menu-list a').focus();
     });
     menu.addEventListener('keydown', (ev) => {
       if (ev.key === 'Escape') { setOpen(menu, false); btn.focus(); }
     });
+    // A tap on a link can leave focus with no new target (relatedTarget null). That is not leaving the menu, so only a focus move to another element closes it
     menu.addEventListener('focusout', (ev) => {
-      if (!menu.contains(ev.relatedTarget)) setOpen(menu, false);
+      if (ev.relatedTarget && !menu.contains(ev.relatedTarget)) setOpen(menu, false);
     });
   });
   document.addEventListener('click', (ev) => {
