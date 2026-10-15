@@ -1887,3 +1887,30 @@ function run_swagger_bruno_icons_v14_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SWAGGER_BRUNO_ICONS_V14_MIGRATION . "', '1')");
 }
 
+const MYSQL_SKILL_V15_MIGRATION = 'migration_mysql_skill_v15';
+
+/** MySQL is added to both language lists, after Firebase when it is listed there, otherwise at the end. Previous lists are logged. */
+function run_mysql_skill_v15_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . MYSQL_SKILL_V15_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    foreach (['skills', 'skills_fa'] as $key) {
+        $previous = (string) ($pdo->query("SELECT v FROM profile WHERE k = '$key'")->fetchColumn() ?: '');
+        $lines = preg_split('/\R/u', $previous) ?: [];
+        $names = array_map(fn($line) => strtolower(trim(explode('|', $line)[0])), $lines);
+        if (in_array('mysql', $names, true)) {
+            continue;
+        }
+        $at = array_search('firebase', $names, true);
+        $new = 'MySQL | mysql';
+        if ($at === false) {
+            $lines[] = $new;
+        } else {
+            array_splice($lines, $at + 1, 0, [$new]);
+        }
+        migration_log("mysql skill ($key): previous " . json_encode($previous, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare("UPDATE profile SET v = ? WHERE k = ?")->execute([implode("\n", $lines), $key]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . MYSQL_SKILL_V15_MIGRATION . "', '1')");
+}
+
