@@ -139,6 +139,7 @@ function db(): PDO {
     run_child_logo_sizes_v19_migration($pdo);
     run_mysql_logo_size_v20_migration($pdo);
     run_theme_light_default_v21_migration($pdo);
+    run_theme_system_default_v22_migration($pdo);
     return $pdo;
 }
 
