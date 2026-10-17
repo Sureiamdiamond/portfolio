@@ -684,9 +684,9 @@ const MATS={
   abs:{n:'ABS',rho:1.04,flow:12,vmax:Infinity,col:'#ffd23f',tNoz:245,tBed:100,fan:0},
   tpu:{n:'TPU',rho:1.21,flow:3.6,vmax:30,col:'#3ccf91',tNoz:225,tBed:50,fan:60},
 };
-// speeds mm/s. "cura" mirrors Cura's Creality defaults (speed_print 50, walls & top/bottom 25, first layer 20, accel 500, jerk 8).
+// speeds mm/s. "cura" mirrors Cura's Ender-3 V3 SE settings (walls, skin & support 90, infill 180, travel 250, first layer 20, accel 500, jerk 8).
 const PROFILES={
-  cura:{n:'پیش‌فرض',vOuter:25,vInner:25,vInfill:50,vSkin:25,vSupport:25,vIface:25,vFirst:20,vTravel:150,vTravel0:100,acc:500,jerk:8},
+  cura:{n:'پیش‌فرض',vOuter:90,vInner:90,vInfill:180,vSkin:90,vSupport:90,vIface:90,vFirst:20,vTravel:250,vTravel0:100,acc:500,jerk:8},
   mid:{n:'متوسط',vOuter:60,vInner:90,vInfill:120,vSkin:60,vSupport:80,vIface:60,vFirst:30,vTravel:200,vTravel0:120,acc:1500,jerk:8},
   fast:{n:'سریع',vOuter:100,vInner:150,vInfill:200,vSkin:120,vSupport:150,vIface:100,vFirst:50,vTravel:250,vTravel0:150,acc:2500,jerk:10},
 };
@@ -1202,7 +1202,7 @@ async function computeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S.sup
 // step around the model, thicken as they go down, and end on the bed (or on the model when allowed) ---
 async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S.supAng*Math.PI/180),gapL=Math.max(0,Math.round(S.supZ/S.lh)),ifL=S.supIface?Math.max(1,Math.round(S.supIfaceH/S.lh)):0,minA=S.supMinArea*SC*SC;
   const mv=Math.tan(S.treeAngle*Math.PI/180),grow=Math.tan(S.treeGrow*Math.PI/180),tip=Math.max(S.lw,S.treeTip)/2,spacing=Math.max(2.5,tip*5);
-  const TREE_GROW_MIN=0.11; // branches thicken at least this fast going down (Cura reaches about 5 mm diameter); no cap on the radius
+  const TREE_GROW_MIN=0.5,TREE_R_MAX=2.5; // branches thicken fast going down, reaching Cura's 5 mm diameter within a few layers
   const ov=new Array(N).fill(null).map(()=>[]);
   for(let j=1;j<N;j++){if(!O[j].length)continue;ov[j]=overhangAt(O,j,th[j]*tan,minA,S);if(shouldYield()){check();await nextFrame()}}
   const inside=(P,x,y)=>{let w=0;for(const p of P)if(CL.Clipper.PointInPolygon({X:Math.round(x*SC),Y:Math.round(y*SC)},p))w+=CL.Clipper.Orientation(p)?1:-1;return w>0};
@@ -1213,7 +1213,7 @@ async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S
       if(bd){for(let x=Math.ceil(bd.left/SC/G)*G;x<=bd.right/SC;x+=G)for(let y=Math.ceil(bd.top/SC/G)*G;y<=bd.bottom/SC;y+=G)if(inside(reg,x,y)){nodes.push({x,y,r:tip,tags:[nid++]});added++}}
       if(!added)for(const p of ov[sj]){const b=CL.JS.BoundsOfPaths([p]);if(CL.Clipper.Orientation(p))nodes.push({x:(b.left+b.right)/2/SC,y:(b.top+b.bottom)/2/SC,r:tip,tags:[nid++]})}}
     const coll=O[i].length?cOff(O[i],S.supXY+.5):[],step=mv*h;
-    for(const n of nodes){n.r+=h*Math.max(grow,TREE_GROW_MIN);let tx=0,ty=0,best=Infinity;for(const m of nodes){if(m===n)continue;const d=Math.hypot(m.x-n.x,m.y-n.y);if(d<best&&d<spacing*4){best=d;tx=m.x;ty=m.y}}
+    for(const n of nodes){n.r=Math.min(TREE_R_MAX,n.r+h*Math.max(grow,TREE_GROW_MIN));let tx=0,ty=0,best=Infinity;for(const m of nodes){if(m===n)continue;const d=Math.hypot(m.x-n.x,m.y-n.y);if(d<best&&d<spacing*4){best=d;tx=m.x;ty=m.y}}
       if(best<Infinity){const d=best,s=Math.min(step,d/2);n.x+=(tx-n.x)/d*s;n.y+=(ty-n.y)/d*s}
       if(coll.length&&inside(coll,n.x,n.y)){const q=nearestOut(coll,n.x,n.y);if(q&&q[2]<=step*3+n.r){const d=q[2]||1;n.x=q[0]+(q[0]-n.x)/d*.3;n.y=q[1]+(q[1]-n.y)/d*.3}}}
     // merge neighbours that touch
@@ -1314,7 +1314,7 @@ async function buildToolpaths(gen,onP){
       else for(let k=S.skirtLoops-1;k>=0;k--)loops(outerOnly(cOff(outer,S.skirtDist+lw/2+k*lw,JT.jtRound)),lw,hh,cap(S.vFirst,lw,hh),6,-1,li)}
     // supports
     if(SUP){const {body,iface}=SUP[li];
-      if(body.length){if(SUP.tree){loops(cOff(body,-lw/2),lw,hh,sp(S.vSupport),4,-2,li);const inner=cOff(body,-lw*1.5);if(inner.length)lines(fillSets('support-'+S.supPat,inner,lw,S.supDens/100,li,z),lw,hh,sp(S.vSupport),4,-2)}
+      if(body.length){if(SUP.tree){loops(cOff(body,-lw/2),lw,hh,sp(S.vSupport),4,-2,li)}
         else lines(fillSets('support-'+S.supPat,cOff(body,-lw/2),lw,S.supDens/100,li,z),lw,hh,sp(S.vSupport),4,-2)}
       if(iface.length)lines(fillSets('iface-'+S.supIfPat,cOff(iface,-lw/2),lw,S.supIfDens/100,li,z),lw,hh,sp(S.vIface),5,-3)}
     // skin coverage from the layers above and below
@@ -1336,7 +1336,7 @@ async function buildToolpaths(gen,onP){
         const R=cOff(pp,-(walls.length*lw));if(!R.length)continue;
         // skin runs 0.8 mm into the infill and has a wall line around it, as Cura does
         const sparse0=cover===null?R:cInter(R,cover),skin0=cover===null?[]:cDiff(R,sparse0),skin=skin0.length?cInter(R,cOff(skin0,0.8)):[],sparse=cover===null?R:cDiff(sparse0,skin);
-        if(skin.length)loops(cOff(skin,-lw/2),lw,hh,sp(S.vInner),1,pid,li);
+        if(skin.length)loops(cOff(skin,-lw/2),lw,hh,sp(S.vSkin),2,pid,li);
         if(skin.length)lines(fillSets('skin',cOff(skin,-lw*(.5-S.skinOverlap/100)),lw,1,li,z),lw,hh,sp(S.vSkin),2,pid);
         if(sparse.length&&S.inf>0)lines(fillSets(S.inf>=99?'skin':S.infPat,cOff(sparse,-lw*(.5-S.infOverlap/100)),lw,S.inf/100,li,z),lw,hh,sp(S.vInfill),3,pid);
         // ironing: a low-flow pass over skin that is exposed to the air above
