@@ -33,7 +33,7 @@
   --hot:#FF7A2F; --hot2:#ffb27a; --ok:#3ccf91; --bad:#ff5a5a; --warn:#f5b84a;
   --t-outer:#ff4d4d; --t-inner:#46d16a; --t-skin:#ffd23f; --t-fill:#ff9b2f; --t-sup:#3fc8d6; --t-iface:#5aa9ff; --t-skirt:#c58cff; --t-trav:#6b8cff;
   --glass:rgba(13,15,18,.8); --stage1:#1d2129; --stage2:#0b0c0f; --onbg:color-mix(in srgb,var(--hot) 12%,var(--panel));
-  --scene:#101216; --plate:#2a2b2f; --plategrid:rgba(255,255,255,.07); --plategrid2:rgba(255,255,255,.14); --engrave:dark; --logofx:drop-shadow(0 0 10px rgba(255,122,47,.35));
+  --scene:#101216; --plate:#2a2b2f; --plategrid:rgba(255,255,255,.07); --plategrid2:rgba(255,255,255,.14); --engrave:dark; --logofx:invert(1) hue-rotate(180deg);
   --display:"Vazirmatn",Tahoma,sans-serif; --body:"Vazirmatn",Tahoma,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
   color-scheme:dark;
 }
@@ -42,14 +42,14 @@
   --hot:#e8631b; --hot2:#b9500f; --ok:#16a06a; --bad:#d93a3a; --warn:#b97a06;
   --t-outer:#d93a3a; --t-inner:#16a06a; --t-skin:#c79a00; --t-fill:#e8631b; --t-sup:#1a9aa6; --t-iface:#2f7fd9; --t-skirt:#9a5ad6; --t-trav:#4a6ad9;
   --glass:rgba(255,255,255,.88); --stage1:#ffffff; --stage2:#f1f3f6; --onbg:color-mix(in srgb,var(--hot) 9%,var(--panel));
-  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:invert(1) brightness(.2);
+  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:none;
   color-scheme:light}}
 :root[data-theme="light"]{
   --bg:#f4f5f7; --panel:#ffffff; --panel2:#f3f4f6; --line:#e7e9ee; --fg:#0f1115; --muted:#9aa0aa; --text2:#3a3f48;
   --hot:#e8631b; --hot2:#b9500f; --ok:#16a06a; --bad:#d93a3a; --warn:#b97a06;
   --t-outer:#d93a3a; --t-inner:#16a06a; --t-skin:#c79a00; --t-fill:#e8631b; --t-sup:#1a9aa6; --t-iface:#2f7fd9; --t-skirt:#9a5ad6; --t-trav:#4a6ad9;
   --glass:rgba(255,255,255,.88); --stage1:#ffffff; --stage2:#f1f3f6; --onbg:color-mix(in srgb,var(--hot) 9%,var(--panel));
-  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:invert(1) brightness(.2);
+  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:none;
   color-scheme:light}
 /* accent palettes (dark values, then light) */
 :root[data-accent="black"]{--hot:#e9ebef;--hot2:#ffffff}:root[data-accent="blue"]{--hot:#4f8cff;--hot2:#9cc0ff}:root[data-accent="green"]{--hot:#2fbf71;--hot2:#8be0b0}:root[data-accent="purple"]{--hot:#a77bff;--hot2:#cdb6ff}:root[data-accent="pink"]{--hot:#ff5c9a;--hot2:#ffa8c9}:root[data-accent="teal"]{--hot:#22b8c7;--hot2:#8adfe8}
