@@ -730,7 +730,7 @@ Object.assign(key.shadow.camera,{left:-170,right:170,top:170,bottom:-170,near:10
 const rim=new THREE.DirectionalLight('#ff9a5a',.35);rim.position.set(-200,120,-180);scene.add(rim);
 const toThree=(x,y,z)=>[x-BED.x/2,z,-(y-BED.y/2)];
 
-const LOGO_IMG=document.querySelector('.brand img');
+const LOGO_IMG=new Image();LOGO_IMG.src='img/benchy-slicer-bed.png'; // engraved on the bed; separate from the header icon
 function tinted(img,color){const c=document.createElement('canvas');c.width=img.naturalWidth;c.height=img.naturalHeight;const g=c.getContext('2d');g.drawImage(img,0,0);g.globalCompositeOperation='source-in';g.fillStyle=color;g.fillRect(0,0,c.width,c.height);return c}
 const plateCanvas=document.createElement('canvas');plateCanvas.width=plateCanvas.height=2048;
 const plateTex=new THREE.CanvasTexture(plateCanvas);plateTex.encoding=THREE.sRGBEncoding;plateTex.anisotropy=8;
