@@ -1200,8 +1200,9 @@ async function computeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S.sup
   return out}
 // --- tree supports: tips under each overhang descend layer by layer, lean toward neighbours to merge,
 // step around the model, thicken as they go down, and end on the bed (or on the model when allowed) ---
-async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S.supAng*Math.PI/180),gapL=Math.max(0,Math.round(S.supZ/S.lh)),ifL=S.supIface?Math.max(1,Math.round(S.supIfaceH/S.lh)):0,minA=S.supMinArea*SC*SC;
+async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S.supAng*Math.PI/180),gapL=Math.max(0,Math.round(S.supZ/S.lh)),ifL=S.supIface?Math.max(1,Math.round(S.supIfaceH/S.lh)):0;
   const mv=Math.tan(S.treeAngle*Math.PI/180),grow=Math.tan(S.treeGrow*Math.PI/180),tip=Math.max(S.lw,S.treeTip)/2,spacing=Math.max(2.5,tip*5);
+  const minA=0; // tree supports keep every overhang, as Cura does with minimum support area 0
   const TREE_GROW_MIN=0.5,TREE_R_MIN=2.5,TREE_R_MAX=12.5,TREE_FLARE=Math.tan(7*Math.PI/180); // 5 mm minimum diameter reached fast, then ~7 degrees up to 25 mm
   const ov=new Array(N).fill(null).map(()=>[]);
   for(let j=1;j<N;j++){if(!O[j].length)continue;ov[j]=overhangAt(O,j,th[j]*tan,minA,S);if(shouldYield()){check();await nextFrame()}}
@@ -1335,7 +1336,7 @@ async function buildToolpaths(gen,onP){
         for(const k of order)loops(walls[k],lw,hh,sp(k===0?S.vOuter:S.vInner),k===0?0:1,pid,li);
         const R=cOff(pp,-(walls.length*lw));if(!R.length)continue;
         // skin runs 0.8 mm into the infill and has a wall line around it, as Cura does
-        const sparse0=cover===null?R:cInter(R,cover),skin0=cover===null?[]:cOff(cOff(cDiff(R,sparse0),-0.4),0.4),skin=skin0.length?cInter(R,cOff(skin0,0.8)):[],sparse=cover===null?R:cDiff(sparse0,skin);
+        const sparse0=cover===null?R:cInter(R,cover),skin0=cover===null?[]:cOff(cOff(cDiff(R,sparse0),-0.8),0.8),skin=skin0.length?cInter(R,cOff(skin0,0.8)):[],sparse=cover===null?R:cDiff(sparse0,skin);
         if(skin.length)loops(cOff(skin,-lw/2),lw,hh,sp(S.vSkin),2,pid,li);
         if(skin.length)lines(fillSets('skin',cOff(skin,-lw*(.5-S.skinOverlap/100)),lw,1,li,z),lw,hh,sp(S.vSkin),2,pid);
         if(sparse.length&&S.inf>0)lines(fillSets(S.inf>=99?'skin':S.infPat,cOff(sparse,-lw*(.5-S.infOverlap/100)),lw,S.inf/100,li,z),lw,hh,sp(S.vInfill),3,pid);
