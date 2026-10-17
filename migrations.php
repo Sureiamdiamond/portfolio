@@ -2018,3 +2018,15 @@ function run_mysql_logo_size_v20_migration(PDO $pdo): void {
     $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logo_opts', ?)")->execute([json_encode($opts, JSON_UNESCAPED_UNICODE)]);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . MYSQL_LOGO_SIZE_V20_MIGRATION . "', '1')");
 }
+
+const THEME_LIGHT_DEFAULT_V21_MIGRATION = 'migration_theme_light_default_v21';
+
+function run_theme_light_default_v21_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . THEME_LIGHT_DEFAULT_V21_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $previous = $pdo->query("SELECT v FROM profile WHERE k = 'theme_mode'")->fetchColumn();
+    migration_log('theme default: previous theme_mode ' . var_export($previous, true));
+    $pdo->exec("UPDATE profile SET v = 'light' WHERE k = 'theme_mode' AND v = 'system'");
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . THEME_LIGHT_DEFAULT_V21_MIGRATION . "', '1')");
+}

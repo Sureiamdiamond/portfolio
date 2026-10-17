@@ -767,7 +767,7 @@ if ($loggedIn) {
       <label for="t-mode"><?= e(t('theme.mode')) ?></label>
       <select id="t-mode" name="theme_mode">
         <?php foreach (['system' => t('theme.mode_system'), 'light' => t('theme.mode_light'), 'dark' => t('theme.mode_dark')] as $key => $label): ?>
-          <option value="<?= $key ?>" <?= $current['theme_mode'] === $key ? 'selected' : '' ?>><?= e($label . marker($key, $current['theme_mode'], 'system')) ?></option>
+          <option value="<?= $key ?>" <?= $current['theme_mode'] === $key ? 'selected' : '' ?>><?= e($label . marker($key, $current['theme_mode'], 'light')) ?></option>
         <?php endforeach; ?>
       </select>
       <label class="check"><input type="checkbox" name="theme_motion" value="on" <?= $current['theme_motion'] === 'on' ? 'checked' : '' ?>> <?= e(t('theme.motion')) ?></label>

@@ -39,7 +39,7 @@ const THEME_GLASS = [
 
 function theme_defaults(): array {
     return ['theme_preset' => 'electric', 'theme_primary' => '#0052FF', 'theme_accent' => '#4D7CFF',
-        'theme_radius' => 'soft', 'theme_density' => 'comfortable', 'theme_motion' => 'on', 'theme_mode' => 'system',
+        'theme_radius' => 'soft', 'theme_density' => 'comfortable', 'theme_motion' => 'on', 'theme_mode' => 'light',
         'theme_bg_preset' => 'blue', 'theme_bg_type' => 'radial', 'theme_bg_c1' => '#4D7CFF', 'theme_bg_c2' => '#0052FF',
         'theme_bg_c3' => '#0A2A8C', 'theme_bg_angle' => '135', 'theme_bg_x' => '50', 'theme_bg_y' => '42',
         'theme_bg_pattern' => 'none', 'theme_bg_image' => '',
