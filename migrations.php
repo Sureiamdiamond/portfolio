@@ -2080,3 +2080,93 @@ function run_benchy_slicer_github_v24_migration(PDO $pdo): void {
     $update->execute(['https://github.com/Sureiamdiamond/benchySlicer']);
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BENCHY_SLICER_GITHUB_V24_MIGRATION . "', '1')");
 }
+
+/** The Benchy Slicer project's main.dart: a Flutter shell that shows the slicer website in a WebView. Not compiled anywhere in the cloud. */
+const BENCHY_SLICER_MAIN_DART = <<<'DART'
+import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
+
+void main() {
+  runApp(const BenchySlicerApp());
+}
+
+class BenchySlicerApp extends StatelessWidget {
+  const BenchySlicerApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Benchy Slicer',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(colorSchemeSeed: const Color(0xFF0052FF), useMaterial3: true),
+      home: const SlicerPage(),
+    );
+  }
+}
+
+class SlicerPage extends StatefulWidget {
+  const SlicerPage({super.key});
+
+  @override
+  State<SlicerPage> createState() => _SlicerPageState();
+}
+
+class _SlicerPageState extends State<SlicerPage> {
+  static final Uri _slicerUrl = Uri.parse('https://parsabanitaba.ir/slicer/');
+  late final WebViewController _controller;
+  double _progress = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (progress) => setState(() => _progress = progress / 100),
+        ),
+      )
+      ..loadRequest(_slicerUrl);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Benchy Slicer'),
+        actions: [
+          IconButton(
+            tooltip: 'Reload',
+            icon: const Icon(Icons.refresh),
+            onPressed: () => _controller.reload(),
+          ),
+        ],
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2),
+          child: _progress < 1
+              ? LinearProgressIndicator(value: _progress, minHeight: 2)
+              : const SizedBox(height: 2),
+        ),
+      ),
+      body: WebViewWidget(controller: _controller),
+    );
+  }
+}
+DART;
+
+const BENCHY_SLICER_MAIN_V25_MIGRATION = 'migration_benchy_slicer_main_dart_v25';
+
+function run_benchy_slicer_main_v25_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . BENCHY_SLICER_MAIN_V25_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $project = $pdo->prepare("SELECT id FROM projects WHERE title = 'Benchy Slicer'");
+    $project->execute();
+    $id = $project->fetchColumn();
+    if ($id !== false) {
+        $pdo->prepare("DELETE FROM project_files WHERE project_id = ? AND path = 'main.dart'")->execute([$id]);
+        $pdo->prepare("INSERT INTO project_files (project_id, path, content) VALUES (?, 'main.dart', ?)")
+            ->execute([$id, BENCHY_SLICER_MAIN_DART]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BENCHY_SLICER_MAIN_V25_MIGRATION . "', '1')");
+}

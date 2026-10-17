@@ -142,6 +142,7 @@ function db(): PDO {
     run_theme_system_default_v22_migration($pdo);
     run_benchy_slicer_project_v23_migration($pdo);
     run_benchy_slicer_github_v24_migration($pdo);
+    run_benchy_slicer_main_v25_migration($pdo);
     return $pdo;
 }
 
