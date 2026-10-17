@@ -407,7 +407,16 @@ function downloadBinaryCv() {
       head.setAttribute('aria-expanded', String(open));
     }
 
-    head.addEventListener('click', () => setOpen(!card.classList.contains('is-open')));
+    head.addEventListener('click', () => {
+      const opening = !card.classList.contains('is-open');
+      // Only one group stays open in a list: opening this one closes the rest.
+      if (opening) {
+        card.parentElement.querySelectorAll('.skill-parent.is-open').forEach((other) => {
+          if (other !== card) other.querySelector('.skill-head').click();
+        });
+      }
+      setOpen(opening);
+    });
     card.addEventListener('keydown', (ev) => {
       if (ev.key === 'Escape' && card.classList.contains('is-open')) {
         setOpen(false);
