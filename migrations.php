@@ -1967,3 +1967,40 @@ function run_gorouter_skill_v17_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . GOROUTER_SKILL_V17_MIGRATION . "', '1')");
 }
 
+const MYSQL_LOGO_V18_MIGRATION = 'migration_mysql_logo_v18';
+
+/** The official MySQL logo (a transparent silhouette in assets/img) replaces the built-in icon, at the 120% size the built-in one had. Previous values are logged. */
+function run_mysql_logo_v18_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . MYSQL_LOGO_V18_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $logos = json_decode((string) ($pdo->query("SELECT v FROM profile WHERE k = 'skill_logos'")->fetchColumn() ?: '[]'), true);
+    $logos = is_array($logos) ? $logos : [];
+    $opts = json_decode((string) ($pdo->query("SELECT v FROM profile WHERE k = 'skill_logo_opts'")->fetchColumn() ?: '[]'), true);
+    $opts = is_array($opts) ? $opts : [];
+    migration_log('mysql logo: previous logo ' . json_encode($logos['mysql'] ?? null) . ', opts ' . json_encode($opts['mysql'] ?? null));
+    $logos['mysql'] = 'assets/img/skill-mysql.png';
+    $opts['mysql'] = ['size' => 120, 'invert' => true];
+    $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logos', ?)")->execute([json_encode($logos, JSON_UNESCAPED_UNICODE)]);
+    $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logo_opts', ?)")->execute([json_encode($opts, JSON_UNESCAPED_UNICODE)]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . MYSQL_LOGO_V18_MIGRATION . "', '1')");
+}
+
+const CHILD_LOGO_SIZES_V19_MIGRATION = 'migration_child_logo_sizes_v19';
+
+/** Uploaded logos of sub-skills under Flutter, AI and API grow 15%. Dio and REST API go from 107 to 123, Supabase from 100 to 115. Previous values are logged. */
+function run_child_logo_sizes_v19_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . CHILD_LOGO_SIZES_V19_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $opts = json_decode((string) ($pdo->query("SELECT v FROM profile WHERE k = 'skill_logo_opts'")->fetchColumn() ?: '[]'), true);
+    $opts = is_array($opts) ? $opts : [];
+    migration_log('child logo sizes: previous ' . json_encode($opts, JSON_UNESCAPED_UNICODE));
+    foreach (['dio' => 123, 'rest api' => 123] as $name => $size) {
+        $opts[$name] = array_merge($opts[$name] ?? [], ['size' => $size]);
+    }
+    $opts['supabase'] = array_merge($opts['supabase'] ?? [], ['size' => 115]);
+    $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logo_opts', ?)")->execute([json_encode($opts, JSON_UNESCAPED_UNICODE)]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CHILD_LOGO_SIZES_V19_MIGRATION . "', '1')");
+}
+

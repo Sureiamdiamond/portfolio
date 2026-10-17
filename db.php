@@ -135,6 +135,8 @@ function db(): PDO {
     run_mysql_skill_v15_migration($pdo);
     run_markdown_skill_v16_migration($pdo);
     run_gorouter_skill_v17_migration($pdo);
+    run_mysql_logo_v18_migration($pdo);
+    run_child_logo_sizes_v19_migration($pdo);
     return $pdo;
 }
 

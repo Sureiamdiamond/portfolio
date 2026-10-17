@@ -774,6 +774,7 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 .skill-parent.is-open .skill-child { opacity: 1; transform: none; transition: opacity .3s ease, transform .3s cubic-bezier(.2,.7,.2,1); transition-delay: calc(var(--i, 0) * 45ms + 140ms); }
 .skill-child .skill-icon-sm { width: 22px; height: 22px; }
 .skill-child .skill-icon-sm .skill-svg { width: 18px; height: 18px; }
+.skill-parent .skill-child .skill-svg { transform: scale(1.15); }
 .skill-child .skill-initials { font-size: .62rem; }
 /* Narrow screens have no room beside the card: the panel reveals downwards inside the card. */
 @media (max-width: 560px) {
