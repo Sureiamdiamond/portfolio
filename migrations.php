@@ -2042,3 +2042,30 @@ function run_theme_system_default_v22_migration(PDO $pdo): void {
     $pdo->exec("UPDATE profile SET v = 'system' WHERE k = 'theme_mode' AND v = 'light'");
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . THEME_SYSTEM_DEFAULT_V22_MIGRATION . "', '1')");
 }
+
+const BENCHY_SLICER_PROJECT_V23_MIGRATION = 'migration_benchy_slicer_project_v23';
+
+function run_benchy_slicer_project_v23_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . BENCHY_SLICER_PROJECT_V23_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $exists = $pdo->prepare('SELECT 1 FROM projects WHERE title = ?');
+    $exists->execute(['Benchy Slicer']);
+    if (!$exists->fetchColumn()) {
+        $sort = (int) $pdo->query('SELECT COALESCE(MAX(sort), 0) + 1 FROM projects')->fetchColumn();
+        $insert = $pdo->prepare('INSERT INTO projects (title, title_fa, kind, summary, summary_fa, tags, url, icon, sort)
+            VALUES (:title, :title_fa, :kind, :summary, :summary_fa, :tags, :url, :icon, :sort)');
+        $insert->execute([
+            'title' => 'Benchy Slicer',
+            'title_fa' => 'Benchy Slicer',
+            'kind' => 'work',
+            'summary' => "A 3D-printing slicer that runs in the browser. Load STL, 3MF or OBJ files, arrange and orient models, and export G-code for the Creality Ender-3 V3 SE and other printers. Files never leave your device: nothing is uploaded and there is no server. Includes layer preview, supports, a cut tool and a price estimate.",
+            'summary_fa' => "اسلایسر وب برای پرینت سه‌بعدی که مستقیم در مرورگر اجرا می‌شود. فایل STL، 3MF یا OBJ را بارگذاری کنید، مدل‌ها را بچینید و جهت دهید، و G-code را برای Creality Ender-3 V3 SE و پرینترهای دیگر بگیرید. فایل‌ها هرگز از دستگاه شما خارج نمی‌شوند: چیزی بارگذاری نمی‌شود و سروری در کار نیست. شامل پیش‌نمایش لایه‌ها، ساپورت، ابزار برش و برآورد قیمت است.",
+            'tags' => 'JavaScript, Three.js, 3D printing, G-code',
+            'url' => 'https://parsabanitaba.ir/slicer/',
+            'icon' => 'slicer/img/benchy-slicer-icon.png',
+            'sort' => $sort,
+        ]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BENCHY_SLICER_PROJECT_V23_MIGRATION . "', '1')");
+}
