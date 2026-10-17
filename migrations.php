@@ -2170,3 +2170,14 @@ function run_benchy_slicer_main_v25_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BENCHY_SLICER_MAIN_V25_MIGRATION . "', '1')");
 }
+
+const BENCHY_SLICER_ICON_V26_MIGRATION = 'migration_benchy_slicer_card_icon_v26';
+
+/** The project card uses the same one-colour icon as the slicer header. */
+function run_benchy_slicer_icon_v26_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . BENCHY_SLICER_ICON_V26_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $pdo->prepare("UPDATE projects SET icon = 'slicer/img/benchy-slicer-header.png' WHERE title = 'Benchy Slicer'")->execute();
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BENCHY_SLICER_ICON_V26_MIGRATION . "', '1')");
+}
