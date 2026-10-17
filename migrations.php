@@ -2069,3 +2069,14 @@ function run_benchy_slicer_project_v23_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BENCHY_SLICER_PROJECT_V23_MIGRATION . "', '1')");
 }
+
+const BENCHY_SLICER_GITHUB_V24_MIGRATION = 'migration_benchy_slicer_github_v24';
+
+function run_benchy_slicer_github_v24_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . BENCHY_SLICER_GITHUB_V24_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $update = $pdo->prepare("UPDATE projects SET github_url = ? WHERE title = 'Benchy Slicer' AND (github_url IS NULL OR github_url = '')");
+    $update->execute(['https://github.com/Sureiamdiamond/benchySlicer']);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BENCHY_SLICER_GITHUB_V24_MIGRATION . "', '1')");
+}

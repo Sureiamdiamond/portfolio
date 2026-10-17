@@ -599,10 +599,10 @@ img.ptile-img[src*="techblog"] { transform: scale(1.11); transform-origin: left 
 /* TechBlog's mark is drawn on a transparent background. On dark it is a white silhouette: the filter also covers the element's own background, so that is cleared here, otherwise it turns into a white box. */
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); } }
 html[data-theme="dark"] img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); }
-/* Benchy Slicer: the logo is transparent with a dark boat, so it turns light on dark cards */
-img.ptile-img[src*="benchy-slicer"] { background: transparent; }
-@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="benchy-slicer"] { filter: invert(1) hue-rotate(180deg); } }
-html[data-theme="dark"] img.ptile-img[src*="benchy-slicer"] { filter: invert(1) hue-rotate(180deg); }
+/* Benchy Slicer: the logo has a white boat, so it turns dark on light cards and stays as it is on dark ones */
+img.ptile-img[src*="benchy-slicer"] { background: transparent; filter: invert(1) hue-rotate(180deg); }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="benchy-slicer"] { filter: none; } }
+html[data-theme="dark"] img.ptile-img[src*="benchy-slicer"] { filter: none; }
 .pcard > .ptile { margin-bottom: 12px; }
 .ptile.sm { width: 18px; height: 18px; border-radius: 5px; font-size: 8px; box-shadow: none; vertical-align: middle; }
 .it .ptile.sm { margin-inline-end: 4px; }
