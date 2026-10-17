@@ -2004,3 +2004,17 @@ function run_child_logo_sizes_v19_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . CHILD_LOGO_SIZES_V19_MIGRATION . "', '1')");
 }
 
+
+const MYSQL_LOGO_SIZE_V20_MIGRATION = 'migration_mysql_logo_size_v20';
+
+function run_mysql_logo_size_v20_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . MYSQL_LOGO_SIZE_V20_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $opts = json_decode((string) ($pdo->query("SELECT v FROM profile WHERE k = 'skill_logo_opts'")->fetchColumn() ?: '[]'), true);
+    $opts = is_array($opts) ? $opts : [];
+    migration_log('mysql logo size: previous ' . json_encode($opts['mysql'] ?? null, JSON_UNESCAPED_UNICODE));
+    $opts['mysql'] = array_merge($opts['mysql'] ?? [], ['size' => 108]);
+    $pdo->prepare("INSERT OR REPLACE INTO profile (k, v) VALUES ('skill_logo_opts', ?)")->execute([json_encode($opts, JSON_UNESCAPED_UNICODE)]);
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . MYSQL_LOGO_SIZE_V20_MIGRATION . "', '1')");
+}
