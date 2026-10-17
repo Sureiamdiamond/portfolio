@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="اسلایسر آنلاین Benchy Print: پیش‌نمایش، G-code، زمان، فیلامنت و قیمت سفارش">
-<link rel="icon" type="image/png" href="img/benchy-slicer-favicon.png">
+<link rel="icon" type="image/png" href="img/benchy-slicer-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="parsabanitaba.ir">
 <meta property="og:title" content="اسلایسر Benchy Print">
@@ -42,14 +42,14 @@
   --hot:#e8631b; --hot2:#b9500f; --ok:#16a06a; --bad:#d93a3a; --warn:#b97a06;
   --t-outer:#d93a3a; --t-inner:#16a06a; --t-skin:#c79a00; --t-fill:#e8631b; --t-sup:#1a9aa6; --t-iface:#2f7fd9; --t-skirt:#9a5ad6; --t-trav:#4a6ad9;
   --glass:rgba(255,255,255,.88); --stage1:#ffffff; --stage2:#f1f3f6; --onbg:color-mix(in srgb,var(--hot) 9%,var(--panel));
-  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:invert(1) hue-rotate(180deg);
+  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:none;
   color-scheme:light}}
 :root[data-theme="light"]{
   --bg:#f4f5f7; --panel:#ffffff; --panel2:#f3f4f6; --line:#e7e9ee; --fg:#0f1115; --muted:#9aa0aa; --text2:#3a3f48;
   --hot:#e8631b; --hot2:#b9500f; --ok:#16a06a; --bad:#d93a3a; --warn:#b97a06;
   --t-outer:#d93a3a; --t-inner:#16a06a; --t-skin:#c79a00; --t-fill:#e8631b; --t-sup:#1a9aa6; --t-iface:#2f7fd9; --t-skirt:#9a5ad6; --t-trav:#4a6ad9;
   --glass:rgba(255,255,255,.88); --stage1:#ffffff; --stage2:#f1f3f6; --onbg:color-mix(in srgb,var(--hot) 9%,var(--panel));
-  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:invert(1) hue-rotate(180deg);
+  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:none;
   color-scheme:light}
 /* accent palettes (dark values, then light) */
 :root[data-accent="black"]{--hot:#e9ebef;--hot2:#ffffff}:root[data-accent="blue"]{--hot:#4f8cff;--hot2:#9cc0ff}:root[data-accent="green"]{--hot:#2fbf71;--hot2:#8be0b0}:root[data-accent="purple"]{--hot:#a77bff;--hot2:#cdb6ff}:root[data-accent="pink"]{--hot:#ff5c9a;--hot2:#ffa8c9}:root[data-accent="teal"]{--hot:#22b8c7;--hot2:#8adfe8}
@@ -70,7 +70,7 @@ html[dir="ltr"] .legend2{left:auto;right:10px}
 /* header */
 .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;color:var(--fg)}
-.brand img{width:52px;height:auto;filter:var(--logofx)}
+.brand img{width:52px;height:auto;filter:var(--logofx);background:#0b0f16;border-radius:10px}
 .brand b{display:block;font-size:15px;font-weight:900;color:var(--fg);direction:ltr;text-align:start;unicode-bidi:isolate;letter-spacing:-.2px}
 .ig{display:inline-flex;align-items:center;gap:6px;color:var(--fg);text-decoration:none;font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
 .ig:hover{border-color:var(--hot)}
