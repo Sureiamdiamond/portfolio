@@ -686,7 +686,7 @@ const MATS={
 };
 // speeds mm/s. "cura" mirrors Cura's Ender-3 V3 SE settings (walls, skin & support 90, infill 180, travel 250, first layer 20, accel 500, jerk 8).
 const PROFILES={
-  cura:{n:'پیش‌فرض',vOuter:90,vInner:90,vInfill:180,vSkin:90,vSupport:90,vIface:90,vFirst:20,vTravel:250,vTravel0:100,acc:500,jerk:8},
+  cura:{n:'پیش‌فرض',vOuter:90,vInner:90,vInfill:180,vSkin:90,vSupport:90,vIface:90,vFirst:20,vTravel:250,vTravel0:100,acc:500,jerk:8,skinOverlap:10},
   mid:{n:'متوسط',vOuter:60,vInner:90,vInfill:120,vSkin:60,vSupport:80,vIface:60,vFirst:30,vTravel:200,vTravel0:120,acc:1500,jerk:8},
   fast:{n:'سریع',vOuter:100,vInner:150,vInfill:200,vSkin:120,vSupport:150,vIface:100,vFirst:50,vTravel:250,vTravel0:150,acc:2500,jerk:10},
 };
@@ -725,7 +725,7 @@ const DEF={mat:'pla',prof:'cura',lh:0.2,lh0:0.2,lw:0.4,walls:2,wallOrder:'inner'
   retract:true,retDist:0.8,retSpeed:40,retMin:1.5,comb:true,zhop:0,
   fan:100,fanLayer:3,minLayerTime:10,minSpeed:10,
   sup:false,supType:'normal',supWhere:'all',supAng:45,supPat:'zigzag',supDens:20,supZ:0.2,supXY:0.8,supIface:true,supIfaceH:0.8,supIfDens:33,supIfPat:'grid',supMinArea:1.5,treeAngle:40,treeTip:0.8,treeGrow:5,
-  ironing:false,ironFlow:10,ironSpacing:0.1,ironSpeed:30,fuzzy:false,fuzzyT:0.3,fuzzyD:0.8,slowLayers:2,tNoz0:0,tBed0:0,flow0:100,infOverlap:10,skinOverlap:5,noHoles:false,raftGap:0.3,retLayer:false,fan0:0,
+  ironing:false,ironFlow:10,ironSpacing:0.1,ironSpeed:30,fuzzy:false,fuzzyT:0.3,fuzzyD:0.8,slowLayers:2,tNoz0:0,tBed0:0,flow0:100,infOverlap:10,skinOverlap:10,noHoles:false,raftGap:0.3,retLayer:false,fan0:0,
   printer:'ender3v3se',bx:220,by:220,bz:250,nozzle:0.4,cAcc:2500,cVmax:250,cFlavor:'marlin',cName:'',col:'',xyOff:0,holeOff:0,keepTol:true,tolGap:0.2,adh:'skirt',skirtLoops:3,skirtDist:5,brimW:8,raftMargin:3,vase:false,startG:START_G,endG:END_G,
   priceK:1200,elecK:2,wearK:15,laborPct:20,setupK:0,packK:10,fail:10,profit:40,tax:0,round:5000,kf:1};
 let cfg={...DEF};
@@ -1375,8 +1375,8 @@ async function buildToolpaths(gen,onP){
         const order=S.wallOrder==='outer'?walls.map((w,k)=>k):walls.map((w,k)=>walls.length-1-k);
         for(const k of order)loops(walls[k],lw,hh,sp(k===0?S.vOuter:S.vInner),k===0?0:1,pid,li);
         const R=cOff(pp,-(walls.length*lw));if(!R.length)continue;
-        // skin runs 0.8 mm into the infill and has a wall line around it, as Cura does
-        const sparse0=cover===null?R:cInter(R,cover),skin0=cover===null?[]:cOff(cOff(cDiff(R,sparse0),-0.4),0.4),skin=skin0.length?cInter(R,cOff(skin0,0.8)):[],sparse=cover===null?R:cDiff(sparse0,skin);
+        // skin expands 0.8 mm into the infill, then is opened by 0.8 mm (preshrink) and clipped to the inner area, as skin.cpp does
+        const sparse0=cover===null?R:cInter(R,cover),skin0=cover===null?[]:cDiff(R,sparse0),skinE=skin0.length?cOff(skin0,0.8):[],skin=skinE.length?cInter(R,cOff(cOff(skinE,-0.4),0.4)):[],sparse=cover===null?R:cDiff(sparse0,skin);
         if(skin.length)loops(cOff(skin,-lw/2),lw,hh,sp(S.vSkin),2,pid,li);
         if(skin.length)lines(fillSets('skin',cOff(skin,-lw*(.5-S.skinOverlap/100)),lw,1,li,z),lw,hh,sp(S.vSkin),2,pid);
         if(sparse.length&&S.inf>0)lines(fillSets(S.inf>=99?'skin':S.infPat,cOff(sparse,-lw*(.5-S.infOverlap/100)),lw,S.inf/100,li,z),lw,hh,sp(S.vInfill),3,pid);
