@@ -33,7 +33,7 @@
   --hot:#FF7A2F; --hot2:#ffb27a; --ok:#3ccf91; --bad:#ff5a5a; --warn:#f5b84a;
   --t-outer:#ff4d4d; --t-inner:#46d16a; --t-skin:#ffd23f; --t-fill:#ff9b2f; --t-sup:#3fc8d6; --t-iface:#5aa9ff; --t-skirt:#c58cff; --t-trav:#6b8cff;
   --glass:rgba(13,15,18,.8); --stage1:#1d2129; --stage2:#0b0c0f; --onbg:color-mix(in srgb,var(--hot) 12%,var(--panel));
-  --scene:#101216; --plate:#2a2b2f; --plategrid:rgba(255,255,255,.07); --plategrid2:rgba(255,255,255,.14); --engrave:dark; --logofx:none;
+  --scene:#101216; --plate:#2a2b2f; --plategrid:rgba(255,255,255,.07); --plategrid2:rgba(255,255,255,.14); --engrave:dark; --logofx:none;--logobg:#0b0f16;
   --display:"Vazirmatn",Tahoma,sans-serif; --body:"Vazirmatn",Tahoma,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
   color-scheme:dark;
 }
@@ -42,14 +42,14 @@
   --hot:#e8631b; --hot2:#b9500f; --ok:#16a06a; --bad:#d93a3a; --warn:#b97a06;
   --t-outer:#d93a3a; --t-inner:#16a06a; --t-skin:#c79a00; --t-fill:#e8631b; --t-sup:#1a9aa6; --t-iface:#2f7fd9; --t-skirt:#9a5ad6; --t-trav:#4a6ad9;
   --glass:rgba(255,255,255,.88); --stage1:#ffffff; --stage2:#f1f3f6; --onbg:color-mix(in srgb,var(--hot) 9%,var(--panel));
-  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:none;
+  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:invert(1) hue-rotate(180deg);--logobg:#000;
   color-scheme:light}}
 :root[data-theme="light"]{
   --bg:#f4f5f7; --panel:#ffffff; --panel2:#f3f4f6; --line:#e7e9ee; --fg:#0f1115; --muted:#9aa0aa; --text2:#3a3f48;
   --hot:#e8631b; --hot2:#b9500f; --ok:#16a06a; --bad:#d93a3a; --warn:#b97a06;
   --t-outer:#d93a3a; --t-inner:#16a06a; --t-skin:#c79a00; --t-fill:#e8631b; --t-sup:#1a9aa6; --t-iface:#2f7fd9; --t-skirt:#9a5ad6; --t-trav:#4a6ad9;
   --glass:rgba(255,255,255,.88); --stage1:#ffffff; --stage2:#f1f3f6; --onbg:color-mix(in srgb,var(--hot) 9%,var(--panel));
-  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:none;
+  --scene:#f1f3f6; --plate:#ffffff; --plategrid:rgba(15,17,21,.16); --plategrid2:rgba(15,17,21,.26); --engrave:light; --logofx:invert(1) hue-rotate(180deg);--logobg:#000;
   color-scheme:light}
 /* accent palettes (dark values, then light) */
 :root[data-accent="black"]{--hot:#e9ebef;--hot2:#ffffff}:root[data-accent="blue"]{--hot:#4f8cff;--hot2:#9cc0ff}:root[data-accent="green"]{--hot:#2fbf71;--hot2:#8be0b0}:root[data-accent="purple"]{--hot:#a77bff;--hot2:#cdb6ff}:root[data-accent="pink"]{--hot:#ff5c9a;--hot2:#ffa8c9}:root[data-accent="teal"]{--hot:#22b8c7;--hot2:#8adfe8}
@@ -70,7 +70,7 @@ html[dir="ltr"] .legend2{left:auto;right:10px}
 /* header */
 .top{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;color:var(--fg)}
-.brand img{width:52px;height:auto;filter:var(--logofx);background:#0b0f16;border-radius:10px}
+.brand img{width:52px;height:auto;filter:var(--logofx);background:var(--logobg);border-radius:10px}
 .brand b{display:block;font-size:15px;font-weight:900;color:var(--fg);direction:ltr;text-align:start;unicode-bidi:isolate;letter-spacing:-.2px}
 .ig{display:inline-flex;align-items:center;gap:6px;color:var(--fg);text-decoration:none;font-size:12.5px;font-weight:700;padding:6px 10px;border-radius:10px;border:1px solid var(--line);background:var(--panel)}
 .ig:hover{border-color:var(--hot)}
@@ -444,7 +444,7 @@ details.cat .row label{flex:1}
     <canvas id="gl"></canvas>
     <div class="hud">
       <div class="mode" role="group" aria-label="حالت نمایش"><button type="button" id="mPrep" aria-pressed="true">آماده‌سازی</button><button type="button" id="mPrev" aria-pressed="false" disabled>پیش‌نمایش G-code</button></div>
-      <div class="views" role="group" aria-label="نما"><button type="button" data-view="iso">سه‌بعدی</button><button type="button" data-view="front">جلو</button><button type="button" data-view="center">وسط</button><button type="button" data-view="back">پشت</button><button type="button" data-view="top">بالا</button><button type="button" data-view="bottom">پایین</button><button type="button" data-view="left">چپ</button><button type="button" data-view="right">راست</button></div>
+      <div class="views" role="group" aria-label="نما"><button type="button" data-view="iso">سه‌بعدی</button><button type="button" data-view="front">جلو</button><button type="button" data-view="center">وسط</button><button type="button" data-view="back">پشت</button><button type="button" data-view="top">بالا</button><button type="button" data-view="left">چپ</button><button type="button" data-view="right">راست</button></div>
       <div class="chips"><span class="chip" id="fitChip">—</span><span class="chip ok" id="tolChip" hidden></span></div>
     </div>
     <div class="rail" id="rail" role="toolbar" aria-label="ابزارها">
@@ -900,8 +900,10 @@ function pick(e){const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.lef
   if(mode!=='prep')return null;const hits=ray.intersectObjects(objs.map(o=>o.mesh),true);return hits[0]||null}
 function bedPoint(e){const r=canvas.getBoundingClientRect();ndc.set((e.clientX-r.left)/r.width*2-1,-(e.clientY-r.top)/r.height*2+1);ray.setFromCamera(ndc,camera);const p=new THREE.Vector3();return ray.ray.intersectPlane(bedPlane,p)?p:null}
 const ptr=new Map();let pinch0=0,drag=null;
+canvas.addEventListener('contextmenu',e=>e.preventDefault());
 canvas.addEventListener('pointerdown',e=>{canvas.setPointerCapture(e.pointerId);ptr.set(e.pointerId,{x:e.clientX,y:e.clientY,x0:e.clientX,y0:e.clientY});
   if(ptr.size===2){drag=null;const [a,b]=[...ptr.values()];pinch0=Math.hypot(a.x-b.x,a.y-b.y);return}
+  if(e.button===2){drag={kind:'pan'};return}
   if(e.button!==0)return;if(tool==='cut'&&mode==='prep'){drag=startCut(e);return}
   if(tool==='rotate'&&mode==='prep'){const d=startRing(e);if(d){drag=d;return}}
   if(tool==='block'&&mode==='prep'){blockerClick(e);drag=null;return}
@@ -923,6 +925,7 @@ canvas.addEventListener('pointermove',e=>{
   if(drag.kind==='ring'){moveRing(drag,e);return}
   if(drag.kind==='handle'){moveHandle(drag,e);return}
   if(drag.kind==='orbit'){view.th-=dx*.006;view.ph=clamp(view.ph-dy*.006,.08,1.52)}
+  else if(drag.kind==='pan'){const k=view.r/canvas.clientHeight*.8,c=Math.cos(view.th),s=Math.sin(view.th);view.tx-=(dx*c)*k;view.tz-=(-dx*s)*k;view.ty=clamp(view.ty+dy*k,0,BED.z)}
   else if(drag.kind==='move'){const q=bedPoint(e);if(q){const o=drag.o;o.px=q.x+BED.x/2+drag.dx;o.py=BED.y/2-q.z+drag.dy;placeMesh(o);refreshObjs()}}
   else if(drag.kind==='scale'){drag.f=clamp(Math.exp(-(e.clientY-p.y0)*.005),.05,20);drag.o.mesh.scale.setScalar(drag.f);fillScalePanel([drag.f,drag.f,drag.f]);canvas.style.cursor='ns-resize'}
   else if(drag.kind==='rotate'){let a=(e.clientX-p.x0)*.012;if(!e.shiftKey)a=Math.round(a/(Math.PI/12))*(Math.PI/12);drag.a=a;drag.o.mesh.rotation.y=a}});
@@ -1468,8 +1471,9 @@ $('accBtn').onclick=e=>{e.stopPropagation();const open=$('accents').hidden;$('ac
 document.addEventListener('click',e=>{if(!e.target.closest('.accwrap')){$('accents').hidden=true;$('accBtn').setAttribute('aria-expanded',false)}});
 
 // ================= CAMERA PRESETS =================
-const VIEWS={iso:[-0.55,1.05],front:[0,Math.PI/2-.001],center:[0,Math.PI/2-.001],back:[Math.PI,Math.PI/2-.001],left:[-Math.PI/2,Math.PI/2-.001],right:[Math.PI/2,Math.PI/2-.001],top:[0,.001],bottom:[0,Math.PI-.001]};
-document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{defaultView();const [th,ph]=VIEWS[b.dataset.view];view.th=th;view.ph=ph;if(b.dataset.view==='bottom'||b.dataset.view==='top'||b.dataset.view==='center')view.ty=objs.length?sceneBounds().z/2:20});
+const VIEWS={iso:[-0.55,1.05],front:[0,Math.PI/2-.001],center:[0,Math.PI/2-.001],back:[Math.PI,Math.PI/2-.001],left:[-Math.PI/2,Math.PI/2-.001],right:[Math.PI/2,Math.PI/2-.001],top:[0,.001]};
+document.querySelectorAll('[data-view]').forEach(b=>b.onclick=()=>{defaultView();const [th,ph]=VIEWS[b.dataset.view];view.th=th;view.ph=ph;if(b.dataset.view==='top')view.ty=objs.length?sceneBounds().z/2:20;
+  if(b.dataset.view==='center')view.ty=(objs.length?sceneBounds().z/2:20)+.4*view.r*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))});
 
 // ================= PIECES: SPLIT, CONNECTORS, CROP, BASE =================
 // A piece shares its parent's baked mesh and adds masks applied to every sliced layer (parent-local mm):
