@@ -932,7 +932,8 @@ canvas.addEventListener('pointermove',e=>{
   if(drag.kind==='cut'){moveCut(drag,e);return}
   if(drag.kind==='ring'){moveRing(drag,e);return}
   if(drag.kind==='handle'){moveHandle(drag,e);return}
-  if(drag.kind==='orbit'){view.th-=dx*.006;view.ph=clamp(view.ph-dy*.006,.08,1.52)}
+  // polar angle may go all the way under the bed; it stops just short of the pole so the camera never flips
+  if(drag.kind==='orbit'){view.th-=dx*.006;view.ph=clamp(view.ph-dy*.006,.08,Math.PI-.08)}
   else if(drag.kind==='pan'){const k=view.r/canvas.clientHeight*.8,c=Math.cos(view.th),s=Math.sin(view.th);view.tx-=(dx*c)*k;view.tz-=(-dx*s)*k;view.ty=clamp(view.ty+dy*k,0,BED.z)}
   else if(drag.kind==='move'){const q=bedPoint(e);if(q){const o=drag.o;o.px=q.x+BED.x/2+drag.dx;o.py=BED.y/2-q.z+drag.dy;placeMesh(o);refreshObjs()}}
   else if(drag.kind==='scale'){drag.f=clamp(Math.exp(-(e.clientY-p.y0)*.005),.05,20);drag.o.mesh.scale.setScalar(drag.f);fillScalePanel([drag.f,drag.f,drag.f]);canvas.style.cursor='ns-resize'}
