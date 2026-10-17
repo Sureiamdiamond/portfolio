@@ -1309,9 +1309,12 @@ async function buildToolpaths(gen,onP){
     const slow=raft?0:S.slowLayers;const sp=v=>cap(li<slow?S.vFirst+(v-S.vFirst)*li/slow:(first?S.vFirst:v),lw,hh);flowMul=li===0&&!raft?S.flow0/100:1;
     if(S.retract&&S.retLayer&&li>0&&!retr){ops.push({k:'R'});retr=true}
     // first-layer adhesion
-    if(li===0&&!raft&&(S.adh==='skirt'||S.adh==='brim')){let base=O[0];if(SUP)base=cUnion(base,cUnion(SUP[0].body,SUP[0].iface));
-      const outer=outerOnly(cUnion(base));
-      if(S.adh==='brim'){const n=Math.max(1,Math.round(S.brimW/lw));for(let k=n-1;k>=0;k--)loops(outerOnly(cOff(outer,lw/2+k*lw,JT.jtRound)),lw,hh,cap(S.vFirst,lw,hh),6,-1,li)}
+    if(li===0&&!raft&&(S.adh==='skirt'||S.adh==='brim')){const sup0=SUP?cUnion(SUP[0].body,SUP[0].iface):[];
+      const outer=outerOnly(cUnion(S.adh==='brim'?O[0]:cUnion(O[0],sup0)));
+      if(S.adh==='brim'){const n=Math.max(1,Math.round(S.brimW/lw));for(let k=n-1;k>=0;k--)loops(outerOnly(cOff(outer,lw/2+k*lw,JT.jtRound)),lw,hh,cap(S.vFirst,lw,hh),6,-1,li);
+        // bed-touching supports get their own 4 mm brim (Cura's support brim), kept clear of the model brim
+        const sb=sup0.length?cDiff(sup0,cOff(outer,S.brimW)):[];
+        if(sb.length)for(let k=Math.max(1,Math.round(4/lw))-1;k>=0;k--)loops(outerOnly(cOff(sb,lw/2+k*lw,JT.jtRound)),lw,hh,cap(S.vFirst,lw,hh),6,-1,li)}
       else for(let k=S.skirtLoops-1;k>=0;k--)loops(outerOnly(cOff(outer,S.skirtDist+lw/2+k*lw,JT.jtRound)),lw,hh,cap(S.vFirst,lw,hh),6,-1,li)}
     // supports
     if(SUP){const {body,iface}=SUP[li];
