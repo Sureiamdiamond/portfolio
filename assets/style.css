@@ -775,6 +775,8 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 .skill-child .skill-icon-sm { width: 22px; height: 22px; }
 .skill-child .skill-icon-sm .skill-svg { width: 18px; height: 18px; }
 .skill-parent .skill-child .skill-svg { transform: scale(1.15); }
+/* Desktop: sub-skill icons 15% larger again. The scale property stacks on top of the transform, and phones keep the size above. */
+@media (min-width: 761px) { .skill-parent .skill-child .skill-svg, .skill-parent .skill-child .skill-logo { scale: 1.15; } }
 .skill-child .skill-initials { font-size: .62rem; }
 /* Narrow screens have no room beside the card: the panel reveals downwards inside the card. */
 @media (max-width: 560px) {
