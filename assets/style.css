@@ -600,7 +600,7 @@ img.ptile-img[src*="techblog"] { transform: scale(1.11); transform-origin: left 
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); } }
 html[data-theme="dark"] img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); }
 /* Benchy Slicer: the logo has a white boat, so it turns dark on light cards and stays as it is on dark ones */
-img.ptile-img[src*="benchy-slicer"] { background: transparent; filter: invert(1) hue-rotate(180deg); }
+img.ptile-img[src*="benchy-slicer"] { background: transparent; filter: invert(1) hue-rotate(180deg); width: 51px; height: 51px; }
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="benchy-slicer"] { filter: none; } }
 html[data-theme="dark"] img.ptile-img[src*="benchy-slicer"] { filter: none; }
 .pcard > .ptile { margin-bottom: 12px; }
