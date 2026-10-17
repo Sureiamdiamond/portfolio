@@ -197,6 +197,87 @@ const PLATFORM_FILES = [
     'ios/Podfile' => "# " . PLATFORM_NOTE . "\nplatform :ios, '13.0'\ntarget 'Runner' do\n  use_frameworks!\n  use_modular_headers!\n  flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))\nend\n",
 ];
 
+/** The root lib/main.dart: a small animated welcome screen, not the source of any project. */
+const ROOT_MAIN_DART = <<<'DART'
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(const PortfolioApp());
+}
+
+class PortfolioApp extends StatelessWidget {
+  const PortfolioApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(colorSchemeSeed: const Color(0xFF0052FF), useMaterial3: true),
+      home: const HelloPage(),
+    );
+  }
+}
+
+class HelloPage extends StatefulWidget {
+  const HelloPage({super.key});
+
+  @override
+  State<HelloPage> createState() => _HelloPageState();
+}
+
+class _HelloPageState extends State<HelloPage> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(seconds: 2),
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Scaffold(
+      body: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [scheme.primary, scheme.tertiary],
+          ),
+        ),
+        child: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ScaleTransition(
+                scale: Tween<double>(begin: 0.95, end: 1.05).animate(
+                  CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
+                ),
+                child: const Icon(Icons.auto_awesome, size: 72, color: Colors.white),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Hi, I am Parsa',
+                style: TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w700),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Flutter developer · AI · always learning',
+                style: TextStyle(color: Colors.white70, fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+DART;
+
 /** Root app files: a generated overview of the layout. Not real source code. */
 /** The fonts shown in the IDE's assets folder, as they appear in the pubspec overview. */
 const ROOT_FONTS_YAML = "    - family: Calistoga\n      fonts:\n        - asset: assets/fonts/calistoga-latin-400-normal.woff2\n"
@@ -214,7 +295,7 @@ function root_entries(string $lang): array {
         'assets/fonts/inter-latin-600-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/inter-latin-600-normal.woff2'],
         'assets/fonts/jetbrains-mono-latin-500-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/jetbrains-mono-latin-500-normal.woff2'],
         'assets/fonts/vazirmatn-arabic-400-normal.woff2' => ['kind' => 'binary', 'lang' => 'font', 'src' => 'assets/fonts/vazirmatn-arabic-400-normal.woff2'],
-        'lib/main.dart' => ['kind' => 'text', 'content' => "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n", 'notice' => true],
+        'lib/main.dart' => ['kind' => 'text', 'content' => ROOT_MAIN_DART, 'notice' => true],
         'android/app/build.gradle' => ['kind' => 'text', 'content' => PLATFORM_FILES['android/app/build.gradle'], 'notice' => false],
         'android/app/src/main/AndroidManifest.xml' => ['kind' => 'text', 'content' => PLATFORM_FILES['android/app/src/main/AndroidManifest.xml'], 'notice' => false],
         'android/gradle.properties' => ['kind' => 'text', 'content' => PLATFORM_FILES['android/gradle.properties'], 'notice' => false],
