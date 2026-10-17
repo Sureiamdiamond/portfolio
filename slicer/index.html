@@ -1368,7 +1368,9 @@ function simulate(B){const S=B.S;let total=0;const byT=new Float64Array(8);let p
   for(const L of B.layers){if(prevEnd&&L.ops.length){const f=L.ops.find(o=>o.k==='T'||o.k==='E');if(f)L.ops.unshift({k:'T',x:prevEnd[0],y:prevEnd[1],virt:1})}
     let r=simLayer(L,S,1);L.mul=1;
     if(r.t<S.minLayerTime&&!L.spiral){const te=r.byT.slice(0,7).reduce((s,v)=>s+v,0),other=r.t-te,need=S.minLayerTime-other;if(te>0&&need>te){L.mul=te/need;r=simLayer(L,S,L.mul)}}
-    if(L.ops[0]&&L.ops[0].virt)L.ops.shift();L.t=r.t;total+=r.t;for(let i=0;i<8;i++)byT[i]+=r.byT[i];prevEnd=r.end}
+    // still shorter than the minimum layer time at the slowest speed: Cura pauses the head for the rest (extra_time_)
+    const pause=!L.spiral&&r.t<S.minLayerTime?S.minLayerTime-r.t:0;
+    if(L.ops[0]&&L.ops[0].virt)L.ops.shift();L.t=r.t+pause;total+=r.t+pause;for(let i=0;i<8;i++)byT[i]+=r.byT[i];prevEnd=r.end}
   return {total,byT}}
 
 // ================= G-CODE WRITER =================
