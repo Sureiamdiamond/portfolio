@@ -877,7 +877,9 @@ function orientSearch(o){if(o.piece)return null;const b=o.base,e=o.rot.elements,
   return best}
 // ================= INTERACTION =================
 let tool='move';
-document.querySelectorAll('#rail [data-tool]').forEach(b=>b.onclick=()=>setTool(b.dataset.tool));
+// The move panel starts closed; tapping the move tool opens it (tapping it again closes it)
+let movOpen=false;
+document.querySelectorAll('#rail [data-tool]').forEach(b=>b.onclick=()=>{if(b.dataset.tool==='move')movOpen=tool==='move'?!movOpen:true;setTool(b.dataset.tool)});
 function setTool(t){tool=t;document.querySelectorAll('#rail [data-tool]').forEach(b=>b.setAttribute('aria-pressed',b.dataset.tool===t));
   $('tip').firstElementChild.textContent={move:tr('روی مدل کلیک کنید و بکشید تا جابه‌جا شود. روی فضای خالی بکشید تا دید بچرخد.'),scale:tr('دستگیره‌های رنگی را بکشید تا مدل در همان محور بزرگ یا کوچک شود (قرمز X، سبز Y، آبی Z). اندازه و درصد دقیق در پنل کنار ابزار است.'),rotate:tr('یکی از حلقه‌ها را بگیرید و بچرخانید: قرمز X، سبز Y، آبی Z. زاویهٔ دقیق را در پنل کنار ابزار وارد کنید.'),block:tr('روی جایی از مدل بزنید که ساپورت نمی‌خواهید؛ یک جعبهٔ قرمز گذاشته می‌شود.'),face:tr('روی سطحی از مدل کلیک کنید تا آن سطح روی بستر بخوابد.'),cut:tr('در نمای بالا، روی مدل از یک طرف به طرف دیگر بکشید تا خط برش رسم شود.')}[t];
   if(t==='cut'){defaultView();view.th=0;view.ph=.001}
@@ -1877,7 +1879,7 @@ addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key.toL
 
 <script>
 // ================= MOVE PANEL (Cura-style) =================
-function fillMovePanel(){const show=tool==='move'&&mode==='prep';$('movPanel').hidden=!show;if(!show)return;const o=selMat();
+function fillMovePanel(){const show=tool==='move'&&mode==='prep'&&movOpen;$('movPanel').hidden=!show;if(!show)return;const o=selMat();
   ['mx','my','mz','movLock'].forEach(id=>$(id).disabled=!o);$('mz').disabled=!o||$('movDrop').checked;if(!o)return;
   const f=(id,v)=>{if(document.activeElement!==$(id))$(id).value=v};f('mx',o.px.toFixed(1));f('my',o.py.toFixed(1));f('mz',(o.z||0).toFixed(1));$('movLock').checked=!!o.locked}
 $('mx').addEventListener('change',()=>{const o=selMat(),v=parseFloat($('mx').value);if(!o||!isFinite(v)||o.locked)return fillMovePanel();o.px=v;placeMesh(o);refreshObjs();changed()});
