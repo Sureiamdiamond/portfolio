@@ -1685,7 +1685,10 @@ async function splitObj(o){const src=asPieceSrc(o),{style,size,count,tol,pinShap
     const good=[];for(let v=lo;v<=hi;v+=Math.max(.5,size/4))if(cover(v)>.5)good.push(v);
     const n=count||Math.max(1,Math.floor(((good.length?good[good.length-1]-good[0]:0))/(size*2.6))+1);
     let vs=[];if(good.length){const g0=good[0],g1=good[good.length-1];for(let k=0;k<n;k++){const target=g0+(k+.5)*(g1-g0)/n;vs.push(good.reduce((b,v)=>Math.abs(v-target)<Math.abs(b-target)?v:b,good[0]))}}
-    if(style==='dowel'){const cands=[];face.zs.forEach((z,i)=>{for(const [a,b] of face.iv[i])for(let v=a+r+1.5;v<=b-r-1.5;v+=Math.max(.5,r/2)){const ok=face.zs.every((z2,j)=>Math.abs(z2-z)>r+1.5||face.iv[j].some(([a2,b2])=>v>=a2+r+1&&v<=b2-r-1));if(ok)cands.push([v,z])}});
+    if(style==='dowel'){const cands=[];
+      // a dowel hole runs pd deep on both sides of the cut, so a spot must also be solid material at those depths (or it breaks out of a rounded surface)
+      const nrm=[-t[1],t[0]],faces=[face,await cutFace(src,[C[0]+nrm[0]*pd,C[1]+nrm[1]*pd],t),await cutFace(src,[C[0]-nrm[0]*pd,C[1]-nrm[1]*pd],t)];
+      face.zs.forEach((z,i)=>{for(const [a,b] of face.iv[i])for(let v=a+r+1.5;v<=b-r-1.5;v+=Math.max(.5,r/2)){const ok=faces.every(F=>F.zs.every((z2,j)=>Math.abs(z2-z)>r+1.5||F.iv[j].some(([a2,b2])=>v>=a2+r+1&&v<=b2-r-1)));if(ok)cands.push([v,z])}});
       const spots=multiHoles(pickSpots(cands,count||clamp(Math.round(cands.length/60),1,4),2*r+3),sp,pinN),d=pd,P=cutProfile(C,t,[],'flat',size);
       mA=[{t:'v',poly:P,keep:'in'}];mB=[{t:'v',poly:P,keep:'out'}];
       for(const [v,z] of spots){const h={t:'hole',C,dir:t,v,zc:z,r:r+tol/2,d,shape:pinShape};mA.push(h);mB.push(h)}if(spots.length)pins=[spots.length,r,2*d-1,pinShape]}
