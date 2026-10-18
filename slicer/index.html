@@ -1637,7 +1637,8 @@ async function cutFace(src,C,t,nz=24){const H=src.size[2],zs=[];for(let i=0;i<nz
 function pickSpots(cands,n,minD){if(!cands.length)return [];const cx=cands.reduce((s,p)=>s+p[0],0)/cands.length,cy=cands.reduce((s,p)=>s+p[1],0)/cands.length;
   const ch=[cands.reduce((b,p)=>Math.hypot(p[0]-cx,p[1]-cy)<Math.hypot(b[0]-cx,b[1]-cy)?p:b,cands[0])];
   while(ch.length<n){let best=null,bd=-1;for(const p of cands){const d=Math.min(...ch.map(q=>Math.hypot(p[0]-q[0],p[1]-q[1])));if(d>bd){bd=d;best=p}}if(bd<minD)break;ch.push(best)}return ch}
-async function pegSpots(src,c,r,count){const s=await sections(src,[c-.15,c+.15]);const reg=cInter(s[0],s[1]),E=cOff(reg,-(r+1.5));if(!E.length)return [];
+async function pegSpots(src,c,r,count){const s=await sections(src,[c-.15,c+.15]);const reg=cInter(s[0],s[1]);let E=cOff(reg,-(r+1.5));if(!E.length)E=cOff(reg,-(r+.3)); // thin legs: fall back to a tighter margin
+  if(!E.length)return [];
   const bd=CL.JS.BoundsOfPaths(E),pts=[],st=Math.max(1,r/2)*SC;
   for(let x=bd.left;x<=bd.right;x+=st)for(let y=bd.top;y<=bd.bottom;y+=st){let w=0;for(const p of E)if(CL.Clipper.PointInPolygon({X:Math.round(x),Y:Math.round(y)},p))w+=CL.Clipper.Orientation(p)?1:-1;if(w>0)pts.push([x/SC,y/SC])}
   return pickSpots(pts,count||clamp(Math.round(areaOf(reg)/600),1,4),2*r+2)}
@@ -1697,7 +1698,7 @@ async function splitObj(o){const src=asPieceSrc(o),{style,size,count,tol,pinShap
   const okA=await buildPieceGeo(A),okB=await buildPieceGeo(B);if(!okA||!okB)return null;
   for(const P of [A,B]){P.px=o.px+(P.off[0]-src.off[0]);P.py=o.py+(P.off[1]-src.off[1])}
   if(sep==='z'){B.px=A.px+A.size[0]/2+B.size[0]/2+8;B.py=A.py}else{A.px-=sep[0]*5;A.py-=sep[1]*5;B.px+=sep[0]*5;B.py+=sep[1]*5}
-  dropObj(o);mountPiece(A);mountPiece(B);sel=A.id;if(pins)addPins(...pins);return [A,B]}
+  dropObj(o);mountPiece(A);mountPiece(B);sel=A.id;if(pins){addPins(...pins);arrange()}else if(!(style==='pegs'&&mA[0]&&mA[0].pegs&&mA[0].pegs.length)&&style!=='flat'&&style!=='key'&&style!=='jigsaw'&&style!=='dovetail')toast(tr('جای کانکتور پیدا نشد؛ قطر یا طول پین را کم کنید یا برش را جابه‌جا کنید.'));return [A,B]}
 // n holes per dowel connector, side by side along the cut face (spacing sp mm), centred on each spot
 function multiHoles(spots,sp,n){if(n<=1)return spots;const out=[];for(const [a,b] of spots)for(let k=0;k<n;k++)out.push([a+(k-(n-1)/2)*sp,b]);return out}
 async function cropObj(o,f){const src=asPieceSrc(o),x0=src.off[0]-src.size[0]/2,y0=src.off[1]-src.size[1]/2;
