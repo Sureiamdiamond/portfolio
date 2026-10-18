@@ -1263,7 +1263,7 @@ async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S
   const out=[];
   for(let i=0;i<N;i++){const cs=(per[i]||[]).filter(n=>!n.tags.some(t=>dropped.has(t)));let body=cs.length?cUnion(cs.map(n=>circlePath(n.x,n.y,n.r,18))):[];
     if(body.length)body=cDiff(body,cOff(O[i],S.supXY));let iface=[];
-    if(ifL){let band=[];for(let k=1;k<=ifL;k++){const j=i+k+gapL;if(j<N&&ov[j].length)band=band.concat(ov[j])}if(band.length)iface=cDiff(cUnion(band),cOff(O[i],S.supXY))}
+    if(ifL){let band=[];for(let k=1;k<=ifL;k++){const j=i+k+gapL;if(j<N&&ov[j].length)band=band.concat(ov[j])}if(band.length)iface=cDiff(cUnion(band),cOff(O[i],S.supXY)).filter(p=>Math.abs(CL.Clipper.Area(p))>=10*SC*SC)} // Cura minimum_interface_area 10 mm²
     out.push({body,iface})}
   out.tree=true;return out}
 // --- fill patterns (scaled coordinates) ---
