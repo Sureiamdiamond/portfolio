@@ -1378,7 +1378,7 @@ async function buildToolpaths(gen,onP){
         // skin expands 0.8 mm into the infill, then is opened by 0.8 mm (preshrink) and clipped to the inner area, as skin.cpp does
         const sparse0=cover===null?R:cInter(R,cover),skin0=cover===null?[]:cDiff(R,sparse0),skinE=skin0.length?cOff(skin0,0.8):[],skin=skinE.length?cInter(R,cOff(cOff(skinE,-0.4),0.4)):[],sparse=cover===null?R:cDiff(sparse0,skin);
         if(skin.length)loops(cOff(skin,-lw/2),lw,hh,sp(S.vSkin),2,pid,li);
-        if(skin.length)lines(fillSets('skin',cOff(skin,-lw*(.5-S.skinOverlap/100)),lw,1,li,z),lw,hh,sp(S.vSkin),2,pid);
+        if(skin.length)lines(fillSets('skin',cOff(skin,-lw*(1.5-S.skinOverlap/100)),lw,1,li,z),lw,hh,sp(S.vSkin),2,pid);
         if(sparse.length&&S.inf>0)lines(fillSets(S.inf>=99?'skin':S.infPat,cOff(sparse,-lw*(.5-S.infOverlap/100)),lw,S.inf/100,li,z),lw,hh,sp(S.vInfill),3,pid);
         // ironing: a low-flow pass over skin that is exposed to the air above
         if(S.ironing&&skin.length){const up=li+1<N?cDiff(skin,O[li+1]):skin,reg=cOff(up,-lw*.5);
