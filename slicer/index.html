@@ -1389,7 +1389,7 @@ async function buildToolpaths(gen,onP){
 
 // ================= MOTION SIMULATION =================
 // Trapezoid profile per move, junction speed limited by jerk, look-ahead with backward/forward passes (like Marlin's planner).
-function simLayer(L,S,mul){const a=S.acc,J=S.jerk,vt=L.first?S.vTravel0:S.vTravel;let x=null,y=null,t=0;const byT=new Float64Array(8);
+function simLayer(L,S,cap){const a=S.acc,J=S.jerk,vt=L.first?S.vTravel0:S.vTravel;let x=null,y=null,t=0;const byT=new Float64Array(8);
   const seg=[];const flush=()=>{const n=seg.length;if(!n)return;const ent=new Float64Array(n+1);
     for(let i=0;i<n;i++){if(i===0){ent[0]=0;continue}const p=seg[i-1],q=seg[i],cos=p.ux*q.ux+p.uy*q.uy,s2=Math.sqrt(Math.max(0,(1-cos)/2));ent[i]=Math.min(p.v,q.v,s2<1e-6?Infinity:J/(2*s2))}
     ent[n]=0;for(let i=n-1;i>=0;i--)ent[i]=Math.min(ent[i],Math.sqrt(ent[i+1]*ent[i+1]+2*a*seg[i].L));
@@ -1399,12 +1399,23 @@ function simLayer(L,S,mul){const a=S.acc,J=S.jerk,vt=L.first?S.vTravel0:S.vTrave
       t+=dt;byT[s.ty]+=dt}seg.length=0};
   for(const o of L.ops){
     if(o.k==='R'||o.k==='U'){flush();const dt=S.retDist/S.retSpeed+(S.zhop>0?S.zhop/10:0);t+=dt;byT[7]+=dt;continue}
-    if(o.k==='T'||o.k==='E'){if(x!==null){const dx=o.x-x,dy=o.y-y,Ld=Math.hypot(dx,dy);if(Ld>1e-6){const v=o.k==='T'?vt:Math.max(Math.min(o.v,S.minSpeed),o.v*mul);seg.push({L:Ld,v,ux:dx/Ld,uy:dy/Ld,ty:o.k==='T'?7:o.ty})}}x=o.x;y=o.y}}
+    if(o.k==='T'||o.k==='E'){if(x!==null){const dx=o.x-x,dy=o.y-y,Ld=Math.hypot(dx,dy);if(Ld>1e-6){const v=o.k==='T'?vt:Math.min(o.v,Math.max(cap,S.minSpeed));seg.push({L:Ld,v,ux:dx/Ld,uy:dy/Ld,ty:o.k==='T'?7:o.ty})}}x=o.x;y=o.y}}
   flush();const dz=L.h/10;t+=dz;byT[7]+=dz;return {t,byT,end:[x,y]}}
+function naiveTimes(L,S,cap){let x=null,y=null,tt=0,te=0;const vt=L.first?S.vTravel0:S.vTravel;
+  for(const o of L.ops){if(o.k==='R'||o.k==='U'){tt+=S.retDist/S.retSpeed+(S.zhop>0?S.zhop/10:0);continue}
+    if(o.k==='T'||o.k==='E'){if(x!==null){const Ld=Math.hypot(o.x-x,o.y-y);if(Ld>1e-6){if(o.k==='T')tt+=Ld/vt;else te+=Ld/Math.min(o.v,Math.max(cap,S.minSpeed))}}x=o.x;y=o.y}}
+  return {tt,te}}
 function simulate(B){const S=B.S;let total=0;const byT=new Float64Array(8);let prevEnd=null;
   for(const L of B.layers){if(prevEnd&&L.ops.length){const f=L.ops.find(o=>o.k==='T'||o.k==='E');if(f)L.ops.unshift({k:'T',x:prevEnd[0],y:prevEnd[1],virt:1})}
-    let r=simLayer(L,S,1);L.mul=1;
-    if(r.t<S.minLayerTime&&!L.spiral){const te=r.byT.slice(0,7).reduce((s,v)=>s+v,0),other=r.t-te,need=S.minLayerTime-other;if(te>0&&need>te){L.mul=te/need;r=simLayer(L,S,L.mul)}}
+    // CuraEngine forceMinimalLayerTime: naive times (length / speed, no acceleration). If the layer is shorter than
+    // cool_min_layer_time, one speed cap is applied to all extrusion moves (travel untouched, never below cool_min_speed)
+    // so the naive extrusion time reaches the target; the real time is then recomputed with acceleration.
+    L.cap=Infinity;let r=simLayer(L,S,Infinity);
+    const nv=naiveTimes(L,S,Infinity);
+    if(nv.tt+nv.te<S.minLayerTime&&!L.spiral){const target=S.minLayerTime-nv.tt;
+      if(nv.te>0&&target>nv.te){const lo=S.minSpeed,hi=1000,fl=c=>naiveTimes(L,S,c).te;
+        if(target>=fl(lo))L.cap=lo;else{let a=lo,b=hi;for(let i=0;i<40;i++){const m=(a+b)/2;if(fl(m)>target)a=m;else b=m}L.cap=(a+b)/2}
+        r=simLayer(L,S,L.cap)}}
     if(L.ops[0]&&L.ops[0].virt)L.ops.shift();L.t=r.t;total+=r.t;for(let i=0;i<8;i++)byT[i]+=r.byT[i];prevEnd=r.end}
   return {total,byT}}
 
@@ -1425,7 +1436,7 @@ function writeGcode(B,sim,name){const S=B.S,out=[],k=cfg.kf||1;let F=0,E=0,fanCu
     if(!L.spiral){out.push(`G0 F600 Z${fz(L.z)}`);F=600;z=L.z}
     for(const o of L.ops){
       if(o.k==='T'){out.push(`G0${F!==vt?` F${vt}`:''} X${fz(o.x)} Y${fz(o.y)}`);F=vt}
-      else if(o.k==='E'){if(o.ty!==type){out.push(`;TYPE:${TYPES[o.ty]}`);type=o.ty}const v=Math.round(Math.max(Math.min(o.v,S.minSpeed),o.v*(L.mul||1))*60);
+      else if(o.k==='E'){if(o.ty!==type){out.push(`;TYPE:${TYPES[o.ty]}`);type=o.ty}const v=Math.round(Math.min(o.v,Math.max(L.cap,S.minSpeed))*60);
         out.push(`G1${F!==v?` F${v}`:''} X${fz(o.x)} Y${fz(o.y)}${o.z!=null?` Z${fz(o.z)}`:''} E${fe(o.e)}`);F=v;E+=o.e;if(o.z!=null)z=o.z}
       else if(o.k==='R'){out.push(`G1 F${S.retSpeed*60} E-${S.retDist}`);F=S.retSpeed*60;if(S.zhop>0){out.push(`G0 F600 Z${fz(z+S.zhop)}`);F=600}}
       else if(o.k==='U'){if(S.zhop>0){out.push(`G0 F600 Z${fz(z)}`);F=600}out.push(`G1 F${S.retSpeed*60} E${S.retDist}`);F=S.retSpeed*60}}
