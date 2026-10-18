@@ -623,7 +623,7 @@ details.cat .row label{flex:1}
           <div class="row" style="display:block" id="spHoleRow" hidden><span class="lb">تعداد سوراخ پین در هر کانکتور</span><div class="seg" id="spHoles" style="margin-top:6px"></div></div>
           <div class="row"><label for="spTol">لقی اتصال</label><span><input class="num" type="number" id="spTol" value="0.2" min="0" max="1" step="0.05"> <span class="hint">mm</span></span></div>
         </div>
-        <div class="tools"><button class="btn pri" type="button" id="doSplit">برش به دو قطعه</button></div>
+        <div class="tools"><button class="btn pri" type="button" id="doSplit">برش به دو قطعه</button><button class="btn" type="button" id="exportParts">دانلود ZIP قطعه‌ها</button></div>
         <div class="tools"><button class="btn sm" type="button" id="splitFit">تقسیم خودکار برای جا شدن در بستر</button></div>
         <p class="hint">کانکتور پازلی، دم‌چلچله و زبانه روی خود قطعه‌ها چاپ می‌شوند. «دوبل» در هر دو قطعه سوراخ می‌زند و پین‌های جدا را هم به بستر اضافه می‌کند.</p>
               </div>
@@ -865,7 +865,7 @@ function refreshObjs(){
   $('pieceNote').hidden=!(selMat()&&selMat().piece);if(typeof updateHelpers==='function')updateHelpers();if(typeof updateGizmo==='function')updateGizmo();
   renderStats();renderObjOverlay()}
 function addObject(base,name,opts={}){
-  const o={id:++objSeq,file:opts.file||name,name,base,rot:opts.rot?opts.rot.clone():new THREE.Matrix3(),scale:opts.scale?opts.scale.slice():[1,1,1],px:BED.x/2,py:BED.y/2};
+  const o={id:++objSeq,file:opts.file||name,name,base,pin:!!opts.pin,rot:opts.rot?opts.rot.clone():new THREE.Matrix3(),scale:opts.scale?opts.scale.slice():[1,1,1],px:BED.x/2,py:BED.y/2};
   bakeObj(o);
   if(!opts.scale){const [dx,dy,dz]=o.size;
     if(Math.max(dx,dy,dz)<1){o.scale=[25.4,25.4,25.4];bakeObj(o)} // tiny model: exported in inches
@@ -1661,7 +1661,7 @@ async function buildPieceGeo(o){const b=o.pb;let H=0;for(let i=2;i<b.length;i+=3
 function pieceFrom(src,masks,name){return {id:++objSeq,file:src.file,piece:true,pb:src.pb,masks,name,px:src.px,py:src.py,rot:src.rot,scale:src.scale.slice(),s0:src.s0,base:src.base,off:[0,0],zOff:0,size:[1,1,1]}}
 function mountPiece(o){o.mesh=new THREE.Mesh(o.geo,modelMaterial());o.mesh.castShadow=o.mesh.receiveShadow=true;o.mesh.userData.obj=o;scene.add(o.mesh);if(o.basePlate)buildBaseMesh(o);placeMesh(o);objs.push(o)}
 function dropObj(o){scene.remove(o.mesh);if(!o.piece)o.mesh.geometry.dispose();objs=objs.filter(x=>x!==o)}
-function addPins(n,r,len,shape){for(let i=0;i<n;i++)addObject(pinGeo(shape,r,len),tr('پین اتصال'),{noArrange:true,scale:[1,1,1]})}
+function addPins(n,r,len,shape){for(let i=0;i<n;i++)addObject(pinGeo(shape,r,len),tr('پین اتصال'),{noArrange:true,scale:[1,1,1],pin:true})}
 function vcut(o,src){ // cut line in the piece's local frame: point C and unit direction t
   if(SPL.axis==='line'&&SPL.line){const dx=o.px-src.off[0],dy=o.py-src.off[1],L=SPL.line,C=[L.x0-dx,L.y0-dy],tx=L.x1-L.x0,ty=L.y1-L.y0,l=Math.hypot(tx,ty)||1;return {C,t:[tx/l,ty/l]}}
   const f=SPL.pos/100;if(SPL.axis==='y')return {C:[src.off[0],src.off[1]-src.size[1]/2+f*src.size[1]],t:[1,0]};
@@ -1806,6 +1806,29 @@ async function saveFile(name,text,zipIt){let dl=null;try{if(window.claude&&typeo
       await dl.save({filename:fn,data});return 'saved'}catch(e){return e&&e.code==='declined'?'declined':'failed'}}
   if(window.claude)return 'failed';
   const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500);return 'direct'}
+
+// ================= STL EXPORT: one ZIP with every part and the pins that touch it, in print coordinates =================
+// scene → print: x stays, scene z (toward the viewer) becomes −y, scene y (up) becomes z; the bed corner is the origin
+function partGeo(o){o.mesh.updateMatrixWorld(true);const P=new THREE.Matrix4().set(1,0,0,BED.x/2, 0,0,-1,BED.y/2, 0,1,0,0, 0,0,0,1);
+  const g=o.mesh.geometry.clone();g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(P,o.mesh.matrixWorld));g.computeBoundingBox();return {g,box:g.boundingBox.clone()}}
+function stlBinary(geos){let n=0;for(const g of geos)n+=(g.index?g.index.count:g.attributes.position.count)/3;
+  const dv=new DataView(new ArrayBuffer(84+50*n));dv.setUint32(80,n,true);let off=84;
+  const a=new THREE.Vector3(),b=new THREE.Vector3(),c=new THREE.Vector3(),e1=new THREE.Vector3(),e2=new THREE.Vector3(),nr=new THREE.Vector3();
+  for(const g of geos){const pos=g.attributes.position,idx=g.index,cnt=idx?idx.count:pos.count;
+    for(let t=0;t<cnt;t+=3){const ia=idx?idx.getX(t):t,ib=idx?idx.getX(t+1):t+1,ic=idx?idx.getX(t+2):t+2;
+      a.fromBufferAttribute(pos,ia);b.fromBufferAttribute(pos,ib);c.fromBufferAttribute(pos,ic);
+      nr.crossVectors(e1.subVectors(b,a),e2.subVectors(c,a)).normalize();
+      [nr.x,nr.y,nr.z,a.x,a.y,a.z,b.x,b.y,b.z,c.x,c.y,c.z].forEach((v,k)=>{dv.setFloat32(off+4*k,Number.isFinite(v)?v:0,true)});
+      off+=50}}
+  return dv.buffer}
+async function exportParts(){const parts=objs.filter(o=>!o.pin&&o.mesh).map(partGeo),pins=objs.filter(o=>o.pin&&o.mesh).map(partGeo);
+  if(!parts.length)return toast(tr('مدلی برای خروجی نیست.'));
+  const files=parts.map((p,i)=>{const grow=p.box.clone().expandByScalar(.5),set=[p.g];pins.forEach(q=>{if(grow.intersectsBox(q.box))set.push(q.g)});return {name:`part-${i+1}.stl`,geos:set}});
+  files.push({name:'all.stl',geos:[...parts,...pins].map(x=>x.g)});
+  const z=new JSZip();files.forEach(f=>z.file(f.name,stlBinary(f.geos)));
+  const blob=await z.generateAsync({type:'blob',compression:'DEFLATE'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='parts.zip';document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1500)}
+$('exportParts').onclick=()=>exportParts().catch(e=>toast(tr('خروجی ناموفق بود: ')+e.message));
 
 // ================= CONFIG PROFILES =================
 const PROF_SKIP=new Set([...PRICE_KEYS]);
