@@ -1262,7 +1262,9 @@ async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S
     // merge neighbours that touch
     const merged=[],used=new Set();for(let a=0;a<nodes.length;a++){if(used.has(a))continue;const n=nodes[a];for(let b=a+1;b<nodes.length;b++){if(used.has(b))continue;const m=nodes[b];
         if(Math.hypot(m.x-n.x,m.y-n.y)<Math.max(n.r,m.r)){const wa=n.r*n.r,wb=m.r*m.r;n.x=(n.x*wa+m.x*wb)/(wa+wb);n.y=(n.y*wa+m.y*wb)/(wa+wb);n.r=Math.min(Math.sqrt(wa+wb),Math.max(n.r,m.r)+.5);n.tags=n.tags.concat(m.tags);used.add(b)}}merged.push(n)}
-    nodes=[];for(const n of merged){if(coll.length&&inside(coll,n.x,n.y)){if(S.supWhere==='bed')n.tags.forEach(t=>dropped.add(t));continue}nodes.push(n)}
+    nodes=[];for(const n of merged){if(coll.length&&inside(coll,n.x,n.y)){
+      if(bedOnly){if(i===0)n.tags.forEach(t=>dropped.add(t)); else nodes.push(n)} // still walking out of the model: keep it; only one that never reached the bed is dropped
+      continue}nodes.push(n)}
     const flare=3.75*Math.max(0,1-i*S.lh/3); // foot flares to 7.5 mm diameter within 3 mm of the bed
     per[i]=nodes.map(n=>({x:n.x,y:n.y,r:Math.max(n.r,flare),tags:n.tags}));if(shouldYield()){check();await nextFrame()}}
   const out=[];
