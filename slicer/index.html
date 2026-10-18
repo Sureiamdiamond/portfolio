@@ -686,7 +686,7 @@ const MATS={
 };
 // speeds mm/s. "cura" mirrors Cura's Ender-3 V3 SE settings (walls, skin & support 90, infill 180, travel 250, first layer 20, accel 500, jerk 8).
 const PROFILES={
-  cura:{n:'پیش‌فرض',vOuter:90,vInner:90,vInfill:180,vSkin:90,vSupport:90,vIface:90,vFirst:20,vTravel:250,vTravel0:100,acc:500,jerk:8,skinOverlap:10},
+  cura:{n:'پیش‌فرض',vOuter:90,vInner:90,vInfill:180,vSkin:90,vSupport:90,vIface:90,vFirst:20,vTravel:250,vTravel0:100,acc:500,jerk:8,skinOverlap:10,infOverlap:30},
   mid:{n:'متوسط',vOuter:60,vInner:90,vInfill:120,vSkin:60,vSupport:80,vIface:60,vFirst:30,vTravel:200,vTravel0:120,acc:1500,jerk:8},
   fast:{n:'سریع',vOuter:100,vInner:150,vInfill:200,vSkin:120,vSupport:150,vIface:100,vFirst:50,vTravel:250,vTravel0:150,acc:2500,jerk:10},
 };
@@ -725,7 +725,7 @@ const DEF={mat:'pla',prof:'cura',lh:0.2,lh0:0.2,lw:0.4,walls:2,wallOrder:'inner'
   retract:true,retDist:0.8,retSpeed:40,retMin:1.5,comb:true,zhop:0,
   fan:100,fanLayer:3,minLayerTime:10,minSpeed:10,
   sup:false,supType:'normal',supWhere:'all',supAng:45,supPat:'zigzag',supDens:20,supZ:0.2,supXY:0.8,supIface:true,supIfaceH:0.8,supIfDens:33,supIfPat:'grid',supMinArea:1.5,treeAngle:40,treeTip:0.8,treeGrow:5,
-  ironing:false,ironFlow:10,ironSpacing:0.1,ironSpeed:30,fuzzy:false,fuzzyT:0.3,fuzzyD:0.8,slowLayers:2,tNoz0:0,tBed0:0,flow0:100,infOverlap:10,skinOverlap:10,noHoles:false,raftGap:0.3,retLayer:false,fan0:0,
+  ironing:false,ironFlow:10,ironSpacing:0.1,ironSpeed:30,fuzzy:false,fuzzyT:0.3,fuzzyD:0.8,slowLayers:2,tNoz0:0,tBed0:0,flow0:100,infOverlap:30,skinOverlap:10,noHoles:false,raftGap:0.3,retLayer:false,fan0:0,
   printer:'ender3v3se',bx:220,by:220,bz:250,nozzle:0.4,cAcc:2500,cVmax:250,cFlavor:'marlin',cName:'',col:'',xyOff:0,holeOff:0,keepTol:true,tolGap:0.2,adh:'skirt',skirtLoops:3,skirtDist:5,brimW:8,raftMargin:3,vase:false,startG:START_G,endG:END_G,
   priceK:1200,elecK:2,wearK:15,laborPct:20,setupK:0,packK:10,fail:10,profit:40,tax:0,round:5000,kf:1};
 let cfg={...DEF};
@@ -1282,7 +1282,7 @@ function fillSets(kind,region,lw,dens,li,z){ // → [{ang,lines}] clipped to reg
   else if(kind==='lines')sets=[{ang:li%2?135:45,lines:hatch(bd,li%2?135:45,lw/d)}];
   else if(kind==='grid')sets=[45,135].map(a=>({ang:a,lines:hatch(bd,a,2*lw/d)}));
   else if(kind==='triangles')sets=[0,60,120].map(a=>({ang:a,lines:hatch(bd,a,3*lw/d)}));
-  else if(kind==='cubic')sets=[0,60,120].map((a,i)=>({ang:a,lines:hatch(bd,a,3*lw/d,(z*1.2247*(i===1?-1:1))%(3*lw/d))}));
+  else if(kind==='cubic'){const sp3=3*lw/d,ph=(z*Math.SQRT1_2)%sp3;sets=[45,165,285].map(a=>({ang:a%180,lines:hatch(bd,a,sp3,ph)}))} // CuraEngine cubic: three line sets at 45°+120°·k, shifted by z/√2
   else if(kind==='gyroid'){const ax=li%2===0;sets=[{ang:ax?0:90,lines:waves(bd,ax,1.15*lw/d,z)}]}
   else if(kind==='support-lines'||kind==='support-zigzag')sets=[{ang:90,lines:hatch(bd,90,lw/d)}];
   else if(kind==='support-grid')sets=[0,90].map(a=>({ang:a,lines:hatch(bd,a,2*lw/d)}));
@@ -1379,7 +1379,7 @@ async function buildToolpaths(gen,onP){
         const sparse0=cover===null?R:cInter(R,cover),skin0=cover===null?[]:cDiff(R,sparse0),skinE=skin0.length?cOff(skin0,0.8):[],skin=skinE.length?cInter(R,cOff(cOff(skinE,-0.4),0.4)):[],sparse=cover===null?R:cDiff(sparse0,skin);
         if(skin.length)loops(cOff(skin,-lw/2),lw,hh,sp(S.vSkin),2,pid,li);
         if(skin.length)lines(fillSets('skin',cOff(skin,-lw*(1-S.skinOverlap/100)),lw,1,li,z),lw,hh,sp(S.vSkin),2,pid);
-        if(sparse.length&&S.inf>0)lines(fillSets(S.inf>=99?'skin':S.infPat,cOff(sparse,-lw*(.5-S.infOverlap/100)),lw,S.inf/100,li,z),lw,hh,sp(S.vInfill),3,pid);
+        if(sparse.length&&S.inf>0)lines(fillSets(S.inf>=99?'skin':S.infPat,cOff(sparse,lw*S.infOverlap/100),lw,S.inf/100,li,z),lw,hh,sp(S.vInfill),3,pid); // infill area = inner wall edge grown by infill_overlap (CuraEngine FffGcodeWriter infill_area.offset(overlap))
         // ironing: a low-flow pass over skin that is exposed to the air above
         if(S.ironing&&skin.length){const up=li+1<N?cDiff(skin,O[li+1]):skin,reg=cOff(up,-lw*.5);
           if(reg.length&&areaOf(reg)>1){const fl=flowMul;flowMul=S.ironFlow/100;lines([{ang:li%2?45:135,lines:cClipLines(hatch(CL.JS.BoundsOfPaths(reg),li%2?45:135,S.ironSpacing),reg)}],lw,hh,cap(S.ironSpeed,lw,hh),2,pid);flowMul=fl}}}}
