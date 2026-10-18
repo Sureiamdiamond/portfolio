@@ -1389,7 +1389,13 @@ async function buildToolpaths(gen,onP){
         // at 135° (bridge angle for cubic), 60% flow and skin_support_speed; that area gets no sparse infill
         let supBelow=[];
         if(S.skinSupport&&S.inf>0&&S.inf<40&&sparse.length&&li>0){const above=skinOf(li+1);
-          if(above.length){const bs=cOff(cOff(cInter(cDiff(above,skinOf(li-1)),sparse),-lw),lw).filter(p=>Math.abs(CL.Clipper.Area(p))>25*lw*lw*SC*SC);
+          if(above.length){const sand=cInter(above,skinOf(li-1));
+            let bs=cOff(cOff(cInter(cDiff(above,skinOf(li-1)),sparse),-lw),lw).filter(p=>Math.abs(CL.Clipper.Area(p))>25*lw*lw*SC*SC);
+            // bridge expansion (CuraEngine makeBridgeOverInfillPrintable): the unsupported area grows across the gaps between
+            // infill lines below, up to the infill contour without the sandwiched area. Approximated as a dilation by half
+            // the infill line distance (Cura extends each edge until it meets a supporting line)
+            const spacing=3*lw/Math.max(S.inf/100,.01);
+            if(bs.length)bs=cInter(cOff(bs,spacing/2),cDiff(cOff(sparse,lw*S.infOverlap/100),sand));
             if(bs.length){supBelow=bs;const reg=cOff(bs,-lw/2);if(reg.length){const fl=flowMul;flowMul=S.skinSupFlow/100;
               lines([{ang:135,lines:cClipLines(hatch(CL.JS.BoundsOfPaths(reg),135,lw),reg)}],lw,hh,cap(S.skinSupSpeed,lw,hh),3,pid);flowMul=fl}}}}
         const infRegion=supBelow.length?cDiff(sparse,supBelow):sparse;
