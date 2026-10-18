@@ -1238,7 +1238,7 @@ async function computeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S.sup
 // --- tree supports: tips under each overhang descend layer by layer, lean toward neighbours to merge,
 // step around the model, thicken as they go down, and end on the bed (or on the model when allowed) ---
 async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S.supAng*Math.PI/180),gapL=Math.max(0,Math.round(S.supZ/S.lh)),ifL=S.supIface?Math.max(1,Math.round(S.supIfaceH/S.lh)):0;
-  const mv=Math.tan(S.treeAngle*Math.PI/180),grow=Math.tan(S.treeGrow*Math.PI/180),tip=Math.max(S.lw,S.treeTip)/2,spacing=Math.max(1.2,tip*3); // tip grid spacing: denser tips on overhangs, closer to Cura's tip density
+  const mv=Math.tan(S.treeAngle*Math.PI/180),grow=Math.tan(S.treeGrow*Math.PI/180),tip=Math.max(S.lw,S.treeTip)/2,spacing=Math.max(2.5,tip*5);
   const minA=0; // tree supports keep every overhang, as Cura does with minimum support area 0
   const TREE_GROW_MIN=0.5,TREE_R_MIN=2.5,TREE_R_MAX=12.5,TREE_FLARE=Math.tan(7*Math.PI/180); // 5 mm minimum diameter reached fast, then ~7 degrees up to 25 mm
   const ov=new Array(N).fill(null).map(()=>[]);
