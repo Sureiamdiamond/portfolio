@@ -1246,14 +1246,19 @@ async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S
   const inside=(P,x,y)=>{let w=0;for(const p of P)if(CL.Clipper.PointInPolygon({X:Math.round(x*SC),Y:Math.round(y*SC)},p))w+=CL.Clipper.Orientation(p)?1:-1;return w>0};
   const nearestOut=(P,x,y)=>{let best=null,bd=Infinity;for(const p of P){const n=p.length;for(let i=0;i<n;i++){const a=p[i],b=p[(i+1)%n],ax=a.X/SC,ay=a.Y/SC,bx=b.X/SC,by=b.Y/SC,dx=bx-ax,dy=by-ay,L2=dx*dx+dy*dy||1,t=clamp(((x-ax)*dx+(y-ay)*dy)/L2),px=ax+t*dx,py=ay+t*dy,d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best=[px,py,d]}}}return best};
   let nodes=[],nid=0;const per=new Array(N),dropped=new Set();
+  // touching build plate: a branch must reach the bed, so it avoids every layer of the model below it (Cura's to_buildplate avoidance)
+  const bedAvoid=new Array(N);
+  if(S.supWhere==='bed'){let acc=[];for(let i=0;i<N;i++){if(O[i].length)acc=acc.length?cUnion(acc,cOff(O[i],S.supXY+.5)):cOff(O[i],S.supXY+.5);bedAvoid[i]=acc;if(shouldYield()){check();await nextFrame()}}}
   for(let i=N-2;i>=0;i--){const h=th[i];
     const sj=i+1+gapL+ifL;if(sj<N&&ov[sj].length){const reg=cOff(ov[sj],-tip),bd=reg.length?CL.JS.BoundsOfPaths(reg):null,G=spacing;let added=0;
       if(bd){for(let x=Math.ceil(bd.left/SC/G)*G;x<=bd.right/SC;x+=G)for(let y=Math.ceil(bd.top/SC/G)*G;y<=bd.bottom/SC;y+=G)if(inside(reg,x,y)){nodes.push({x,y,r:tip,tags:[nid++]});added++}}
       if(!added)for(const p of ov[sj]){const b=CL.JS.BoundsOfPaths([p]);if(CL.Clipper.Orientation(p))nodes.push({x:(b.left+b.right)/2/SC,y:(b.top+b.bottom)/2/SC,r:tip,tags:[nid++]})}}
-    const coll=O[i].length?cOff(O[i],S.supXY+.5):[],step=mv*h;
+    const bedOnly=S.supWhere==='bed',coll=bedOnly?(bedAvoid[i]||[]):(O[i].length?cOff(O[i],S.supXY+.5):[]),step=mv*h;
     for(const n of nodes){n.r=n.r<TREE_R_MIN?Math.min(TREE_R_MIN,n.r+h*TREE_GROW_MIN):Math.min(TREE_R_MAX,n.r+h*Math.max(grow,TREE_FLARE));let tx=0,ty=0,best=Infinity;for(const m of nodes){if(m===n)continue;const d=Math.hypot(m.x-n.x,m.y-n.y);if(d<best&&d<spacing*4){best=d;tx=m.x;ty=m.y}}
       if(best<Infinity){const d=best,s=Math.min(step,d/2);n.x+=(tx-n.x)/d*s;n.y+=(ty-n.y)/d*s}
-      if(coll.length&&inside(coll,n.x,n.y)){const q=nearestOut(coll,n.x,n.y);if(q&&q[2]<=step*3+n.r){const d=q[2]||1;n.x=q[0]+(q[0]-n.x)/d*.3;n.y=q[1]+(q[1]-n.y)/d*.3}}}
+      if(coll.length&&inside(coll,n.x,n.y)){const q=nearestOut(coll,n.x,n.y);if(q&&(bedOnly||q[2]<=step*3+n.r)){const d=q[2]||1;
+        if(bedOnly){const s=Math.min(d,step);n.x+=(q[0]-n.x)/d*s;n.y+=(q[1]-n.y)/d*s} // lateral move limited to the branch angle per layer, so the branch walks around the model to the bed
+        else{n.x=q[0]+(q[0]-n.x)/d*.3;n.y=q[1]+(q[1]-n.y)/d*.3}}}}
     // merge neighbours that touch
     const merged=[],used=new Set();for(let a=0;a<nodes.length;a++){if(used.has(a))continue;const n=nodes[a];for(let b=a+1;b<nodes.length;b++){if(used.has(b))continue;const m=nodes[b];
         if(Math.hypot(m.x-n.x,m.y-n.y)<Math.max(n.r,m.r)){const wa=n.r*n.r,wb=m.r*m.r;n.x=(n.x*wa+m.x*wb)/(wa+wb);n.y=(n.y*wa+m.y*wb)/(wa+wb);n.r=Math.min(Math.sqrt(wa+wb),Math.max(n.r,m.r)+.5);n.tags=n.tags.concat(m.tags);used.add(b)}}merged.push(n)}
