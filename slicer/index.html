@@ -1394,8 +1394,10 @@ async function buildToolpaths(gen,onP){
             // bridge expansion (CuraEngine makeBridgeOverInfillPrintable): the unsupported area grows across the gaps between
             // infill lines below, up to the infill contour without the sandwiched area. Approximated as a dilation by half
             // the infill line distance (Cura extends each edge until it meets a supporting line)
-            const spacing=3*lw/Math.max(S.inf/100,.01);
-            if(bs.length)bs=cInter(cOff(bs,spacing/2),cDiff(cOff(sparse,lw*S.infOverlap/100),sand));
+            // Cura extends each edge in the bridge direction (bridge angle + 90°, i.e. 45° for cubic), not in every direction
+            const spacing=3*lw/Math.max(S.inf/100,.01),shift=(P,t)=>P.map(q=>q.map(v=>({X:v.X+Math.round(t*Math.SQRT1_2*SC),Y:v.Y+Math.round(t*Math.SQRT1_2*SC)})));
+            if(bs.length){let grown=bs;for(let t=lw/2;t<=spacing/2+1e-9;t+=lw/2)grown=cUnion(grown.concat(shift(bs,t),shift(bs,-t)));
+              bs=cInter(grown,cDiff(cOff(sparse,lw*S.infOverlap/100),sand))}
             if(bs.length){supBelow=bs;const reg=cOff(bs,-lw/2);if(reg.length){const fl=flowMul;flowMul=S.skinSupFlow/100;
               lines([{ang:135,lines:cClipLines(hatch(CL.JS.BoundsOfPaths(reg),135,lw),reg)}],lw,hh,cap(S.skinSupSpeed,lw,hh),3,pid);flowMul=fl}}}}
         const infRegion=supBelow.length?cDiff(sparse,supBelow):sparse;
