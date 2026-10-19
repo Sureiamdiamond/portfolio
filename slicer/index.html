@@ -1373,7 +1373,8 @@ async function buildToolpaths(gen,onP){
     // supports
     if(SUP){const {body,iface}=SUP[li];
       if(body.length){if(SUP.tree){loops(cOff(body,-lw/2),lw,hh,sp(S.vSupport),4,-2,li)}
-        else{loops(cOff(body,-lw/2),lw,hh,sp(S.vSupport),4,-2,li);lines(fillSets('support-'+S.supPat,cOff(body,-lw),lw,S.supDens/100,li,z),lw,hh,sp(S.vSupport),4,-2)}}
+        else if(S.supPat==='grid'){loops(cOff(body,-lw/2),lw,hh,sp(S.vSupport),4,-2,li);lines(fillSets('support-grid',cOff(body,-lw),lw,S.supDens/100,li,z),lw,hh,sp(S.vSupport),4,-2)}
+        else lines(fillSets('support-'+S.supPat,cOff(body,-lw/2),lw,S.supDens/100,li,z),lw,hh,sp(S.vSupport),4,-2)}
       if(iface.length)lines(fillSets('iface-'+S.supIfPat,cOff(iface,-lw/2),lw,S.supIfDens/100,li,z),lw,hh,sp(S.vIface),5,-3)}
     // skin coverage from the layers above and below
     const cA=S.top?(li+S.top>=N?[]:interAll(li+1,li+S.top)):null,cB=S.bottom?(li-S.bottom<0?[]:interAll(li-S.bottom,li-1)):null;
