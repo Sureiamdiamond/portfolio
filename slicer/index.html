@@ -1263,7 +1263,7 @@ async function computeTreeSupports(O,th,S,check){const N=O.length,tan=Math.tan(S
         if(d<=step){n.x=q[0]+(q[0]-n.x)/d*.3;n.y=q[1]+(q[1]-n.y)/d*.3}else{n.x+=(q[0]-n.x)/d*step;n.y+=(q[1]-n.y)/d*step}}}}
     // merge neighbours that touch
     const merged=[],used=new Set();for(let a=0;a<nodes.length;a++){if(used.has(a))continue;const n=nodes[a];for(let b=a+1;b<nodes.length;b++){if(used.has(b))continue;const m=nodes[b];
-        if(Math.hypot(m.x-n.x,m.y-n.y)<Math.max(n.r,m.r)){const wa=n.r*n.r,wb=m.r*m.r;n.x=(n.x*wa+m.x*wb)/(wa+wb);n.y=(n.y*wa+m.y*wb)/(wa+wb);/* Cura: a merged branch keeps the summed cross-section area, capped at the max diameter */n.r=Math.min(TREE_R_MAX,Math.sqrt(wa+wb));n.tags=n.tags.concat(m.tags);used.add(b)}}merged.push(n)}
+        if(Math.hypot(m.x-n.x,m.y-n.y)<Math.max(n.r,m.r)){const wa=n.r*n.r,wb=m.r*m.r;n.x=(n.x*wa+m.x*wb)/(wa+wb);n.y=(n.y*wa+m.y*wb)/(wa+wb);n.r=Math.min(Math.sqrt(wa+wb),Math.max(n.r,m.r)+.5);n.tags=n.tags.concat(m.tags);used.add(b)}}merged.push(n)}
     nodes=[];for(const n of merged){if(coll.length&&inside(coll,n.x,n.y)){
       if(i===0){if(bedOnly)n.tags.forEach(t=>dropped.add(t)); else nodes.push(n)} // no path to the bed: touching-bed mode drops it; everywhere keeps it resting on the model
       else nodes.push(n); // still walking out: keep it
