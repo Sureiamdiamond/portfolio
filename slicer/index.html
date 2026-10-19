@@ -1219,7 +1219,7 @@ async function sliceMesh(P,mids,check,onP,clean=true){
 
 // overhang of layer j: the band of layer j outside layer j−1, kept only where it is wider than the allowed step d
 // (a morphological opening, so the whole band is kept and stacked bands leave no gaps); support blockers remove it
-function overhangAt(O,j,d,minA,S){const band=cDiff(O[j],O[j-1]);if(!band.length)return [];let ov=cOff(cOff(band,-d/2),d/2+.01);ov=cInter(ov,band);
+function overhangAt(O,j,d,minA,S){const band=cDiff(O[j],O[j-1]);if(!band.length)return [];let ov=band;
   if(S.blocks&&S.blocks.length){const z=S.zmid[j],bl=S.blocks.filter(b=>z>=b.z0&&z<=b.z1).map(b=>rectPath(b.x0,b.y0,b.x1,b.y1));if(bl.length)ov=cDiff(ov,bl)}
   return ov.length?cUnion(ov.filter(p=>Math.abs(CL.Clipper.Area(p))>minA)):[]}
 // --- supports, computed layer by layer like Cura: overhang = part of a layer not resting on the layer below (within the overhang angle);
