@@ -78,7 +78,7 @@ function login_succeeded(string $ip): void {
 }
 
 const TYPES = [
-    'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'extra_links', 'sort'], 'long' => ['summary', 'summary_fa', 'extra_links'], 'files' => []],
+    'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'github_url', 'owner', 'owner_fa', 'appstore_url', 'playstore_url', 'bazaar_url', 'extra_links', 'sort'], 'long' => ['summary', 'summary_fa', 'extra_links'], 'files' => []],
     'papers' => ['label' => 'Research', 'fields' => ['title', 'title_fa', 'venue', 'year', 'doi', 'sort'], 'long' => [], 'files' => ['pdf']],
     'presentations' => ['label' => 'Slides', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
     'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'city', 'city_fa', 'period', 'period_fa', 'website', 'bullets', 'bullets_fa', 'details', 'details_fa', 'sort'], 'long' => ['bullets', 'bullets_fa', 'details', 'details_fa'], 'files' => []],
@@ -689,11 +689,15 @@ if ($loggedIn) {
   .se-logo .check { margin: 0; }
   @media (max-width: 760px) { .se-row { grid-template-columns: 1fr 1fr; } .se-row .se-parent, .se-row .se-actions { grid-column: 1 / -1; } .se-row .se-actions { justify-self: start; } }
   @media (max-width: 760px) { .split { grid-template-columns: 1fr; } .preview { position: static; } }
+  /* Item forms: two columns of fields on desktop, long text and files take the full width, one column on phones */
+  .fields { display: grid; grid-template-columns: minmax(0, 1fr); column-gap: 18px; }
+  .fld { min-width: 0; }
+  @media (min-width: 900px) { .fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } .fld-wide { grid-column: 1 / -1; } }
 </style>
 <script>const ADMIN_T = <?= json_encode(['photo' => t('profile.photo_hint'), 'cv' => t('profile.cv_label'), 'kb' => 'KB', 'previewFailed' => t('theme.preview_failed')], JSON_HEX_TAG | JSON_UNESCAPED_UNICODE) ?>;</script>
 </head>
 <body>
-<main class="<?= in_array($tab, ['theme', 'profile'], true) ? 'wide' : '' ?>">
+<main class="wide">
 <?php if (!$loggedIn): ?>
   <nav class="lang-nav" aria-label="<?= e(t('lang.label')) ?>"><?= admin_lang_links() ?></nav>
   <h1><?= e(t('login.title')) ?></h1>
@@ -1308,14 +1312,18 @@ if ($loggedIn) {
       <input type="hidden" name="type" value="<?= e($tab) ?>">
       <input type="hidden" name="id" value="<?= (int) ($edit['id'] ?? 0) ?>">
       <h3><?= $edit ? e(t('item.edit')) : e(t('item.add')) ?></h3>
-      <?php foreach ($spec['fields'] as $field): ?>
+      <div class="fields">
+      <?php foreach ($spec['fields'] as $field): $isLong = in_array($field, $spec['long'], true); ?>
+        <div class="fld<?= $isLong ? ' fld-wide' : '' ?>">
         <label for="f-<?= $field ?>"><?= e(label($field)) ?></label>
-        <?php if (in_array($field, $spec['long'], true)): ?>
+        <?php if ($isLong): ?>
           <textarea id="f-<?= $field ?>" name="<?= $field ?>"><?= e($edit[$field] ?? '') ?></textarea>
         <?php else: ?>
           <input id="f-<?= $field ?>" name="<?= $field ?>"<?= ltr_attr($field) ?> value="<?= e((string) ($edit[$field] ?? '')) ?>">
         <?php endif; ?>
+        </div>
       <?php endforeach; ?>
+      </div>
       <?php foreach ($spec['files'] as $ext): ?>
         <label for="f-<?= $ext ?>"><?= e(t('common.file_of', ['ext' => strtoupper($ext)])) ?></label>
         <input id="f-<?= $ext ?>" type="file" name="file_<?= $ext ?>" accept=".<?= $ext ?>">
