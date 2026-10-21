@@ -170,10 +170,11 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 /* Floating CV button: appears after the hero, bottom-right; visible without JS */
 .cv-choices { position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: 84px; z-index: 21; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
 .cv-choices[hidden] { display: none; }
-.cv-hero { position: relative; display: inline-flex; }
-.cv-hero-choices { position: absolute; top: calc(100% + 8px); inset-inline-start: 0; z-index: 5; display: flex; flex-direction: column; gap: 8px; min-width: 100%; }
+.cv-hero { position: relative; z-index: 10; display: inline-flex; }
+.cv-hero-choices { position: absolute; top: calc(100% + 8px); inset-inline-start: 0; z-index: 20; display: flex; flex-direction: column; gap: 8px; min-width: 100%; padding: 8px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
 .cv-hero-choices[hidden] { display: none; }
 .cv-hero-choices .btn { min-height: 44px; background: var(--surface); }
+.cv-hero .cv-hero-choices .btn { background-color: var(--surface); }
 .cv-choices .btn { min-height: 44px; background: var(--surface); }
 .cv-fab {
   position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 20;
@@ -600,7 +601,7 @@ img.ptile-img[src*="techblog"] { transform: scale(1.11); transform-origin: left 
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); } }
 html[data-theme="dark"] img.ptile-img[src*="techblog"] { background: transparent; filter: brightness(0) invert(1); }
 /* Benchy Slicer: the logo has a white boat, so it turns dark on light cards and stays as it is on dark ones */
-img.ptile-img[src*="benchy-slicer"] { background: transparent; filter: invert(1) hue-rotate(180deg); width: 51px; height: 51px; }
+img.ptile-img[src*="benchy-slicer"] { background: transparent; filter: invert(1) hue-rotate(180deg); }
 @media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="benchy-slicer"] { filter: none; } }
 html[data-theme="dark"] img.ptile-img[src*="benchy-slicer"] { filter: none; }
 .pcard > .ptile { margin-bottom: 12px; }
@@ -1037,8 +1038,6 @@ h2 { letter-spacing: -.02em; }
 .media-date { font-variant-numeric: tabular-nums; }
 .btn, .tool, .to-top, .cc, .skill-head { transition: transform .16s var(--ease-out-strong), background-color .2s var(--ease-out-strong), border-color .2s var(--ease-out-strong), color .2s var(--ease-out-strong); }
 .btn:active, .tool:active, .to-top:active { transform: scale(.97); }
-.skill-grid { grid-template-columns: repeat(auto-fit, minmax(196px, 1fr)); }
-.skill-grid > :last-child:nth-child(5n+1) { grid-column: 1 / -1; }
 .js .reveal { transition: opacity .55s var(--ease-out-strong), transform .55s var(--ease-out-strong); transform: translateY(16px); }
 @media (hover: hover) and (pointer: fine) {
   .skill:hover, .skill-head:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
@@ -1092,3 +1091,10 @@ h2 { font-size: clamp(2.1rem, 4.4vw, 3.1rem); letter-spacing: -.025em; }
 /* Press feedback on the hero CTAs, from Emil's rules: scale on :active only, no hover movement on touch */
 .hero .btn-primary:active { transform: scale(.97); }
 :root[data-mode="binary"] .hero-art::before { display: none; }
+
+/* Phones: the hero CV chooser is opaque and sits above the location line beneath it */
+@media (max-width: 760px) {
+  .cv-hero-choices { background: var(--surface); border-color: var(--muted); box-shadow: 0 12px 26px -10px rgba(15, 23, 42, .5); }
+}
+/* The hero buttons and their CV chooser stack above the location line beneath them */
+.hero-text .actions { position: relative; z-index: 10; }
