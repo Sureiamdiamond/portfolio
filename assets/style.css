@@ -168,17 +168,18 @@ main { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
 .node-edu .period { font-size: .9rem; font-weight: 600; }
 .node-exp strong { font-size: 1.05rem; }
 /* Floating CV button: appears after the hero, bottom-right; visible without JS */
-.cv-choices { position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: 84px; z-index: 21; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+/* The floating CV button and its chooser share one fixed dock, so the chooser pills are as wide as the button they belong to */
+.cv-dock { position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 20; display: flex; flex-direction: column; align-items: stretch; gap: 8px; }
+.cv-choices { display: flex; flex-direction: column; gap: 8px; }
 .cv-choices[hidden] { display: none; }
 .cv-hero { position: relative; z-index: 10; display: inline-flex; }
 .cv-hero-choices { position: absolute; top: calc(100% + 8px); inset-inline-start: 0; z-index: 20; display: flex; flex-direction: column; gap: 8px; min-width: 100%; padding: 8px; border-radius: 16px; background: var(--surface); border: 1px solid var(--border); box-shadow: var(--shadow); }
 .cv-hero-choices[hidden] { display: none; }
 .cv-hero-choices .btn { min-height: 44px; background: var(--surface); }
 .cv-hero .cv-hero-choices .btn { background-color: var(--surface); }
-.cv-choices .btn { min-height: 44px; background: var(--surface); }
+.cv-choices .btn { min-height: 44px; width: 100%; background: var(--surface); justify-content: center; }
 .cv-fab {
-  position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: max(24px, env(safe-area-inset-bottom)); z-index: 20;
-  border-radius: 999px; box-shadow: 0 10px 22px -8px rgba(0, 82, 255, .6); isolation: isolate;
+  position: relative; border-radius: 999px; box-shadow: 0 10px 22px -8px rgba(0, 82, 255, .6); isolation: isolate;
   transition: opacity .25s var(--ease), transform .25s var(--ease);
 }
 .js .cv-fab { opacity: 0; transform: translateY(12px); pointer-events: none; }
@@ -531,7 +532,8 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
   .pt-window .it { font-size: 15px; }
 }
 @media (max-width: 760px) {
-  .cv-fab { right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); min-height: 48px; padding: 10px 18px; }
+  .cv-dock { right: max(16px, env(safe-area-inset-right)); bottom: max(16px, env(safe-area-inset-bottom)); }
+  .cv-fab { min-height: 48px; padding: 10px 18px; }
 }
 @media (max-width: 560px) {
   .contact-cards .cc-value { font-size: .92rem; }
