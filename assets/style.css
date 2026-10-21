@@ -1027,3 +1027,15 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
 html[data-glass="on"] .cv-hero-btn, html[data-glass="on"] .cv-fab, html[data-glass="on"] .cv-hero-choices .btn-primary {
   box-shadow: none !important; filter: none !important; animation: none !important;
 }
+
+/* ---- Visual polish pass: press feedback, calmer hover, no sideways drift on desktop ---- */
+html { overflow-x: clip; }
+.btn, .tool, .to-top, .cc, .skill-head { transition: transform .18s var(--ease), background-color .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease), color .2s var(--ease); }
+.btn:active, .tool:active, .to-top:active { transform: scale(.97); }
+@media (hover: hover) {
+  .skill:hover, .skill-head:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
+  .btn-outline:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .btn:active, .tool:active, .to-top:active { transform: none; }
+}
