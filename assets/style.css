@@ -1119,3 +1119,8 @@ h2 { font-size: clamp(2.1rem, 4.4vw, 3.1rem); letter-spacing: -.025em; }
   .media-rows .paper-files { margin-top: 0; }
   .media-rows .media-body .links { padding-top: 6px; }
 }
+
+/* Helm's icon is a black mark on a transparent background. It turns white in dark mode, and it has no tile behind it. */
+img.ptile-img[src*="helm-icon"] { background: transparent; }
+@media (prefers-color-scheme: dark) { html:not([data-theme="light"]) img.ptile-img[src*="helm-icon"] { filter: invert(1); } }
+html[data-theme="dark"] img.ptile-img[src*="helm-icon"] { filter: invert(1); }
