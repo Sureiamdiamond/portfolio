@@ -975,8 +975,12 @@ summary.it.is-focus { outline: 2px solid var(--accent); outline-offset: -2px; }
 .paper-files[open] summary::after { transform: rotate(180deg); }
 .paper-files summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 .paper-files ul { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
-/* Desktop: the list hugs its own start edge under the button (right in Persian, left in English) */
-@media (min-width: 761px) { .paper-files ul { align-items: flex-start; } }
+/* Desktop: the files wrap into a row of chips under the button, so a long list stays short. Phones keep one file per line. */
+@media (min-width: 761px) {
+  .paper-files ul { flex-direction: row; flex-wrap: wrap; align-items: flex-start; gap: 8px; }
+  .paper-files li { display: flex; max-width: 100%; }
+  .paper-files li a { min-height: 36px; padding: 6px 12px; border: 1px solid var(--border); }
+}
 .paper-files li a { display: flex; align-items: center; min-height: 40px; padding: 6px 10px; border-radius: 8px; color: var(--fg); background: var(--surface); text-decoration: none; font-size: .92rem; direction: ltr; unicode-bidi: isolate; }
 .paper-files li a:hover, .paper-files li a:focus-visible { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent); outline: none; }
 @media (prefers-reduced-motion: reduce) { .paper-files summary::after { transition: none; } }
