@@ -1062,7 +1062,7 @@ h2 { letter-spacing: -.02em; }
   .hero-text .loc { justify-content: flex-start; }
   .hero-text h1 { font-size: clamp(3.4rem, 7.4vw, 6.2rem); line-height: 1.02; letter-spacing: -.03em; margin-top: 26px; }
   .hero-art::before {
-    content: ""; position: absolute; inset-block: 6% -7.8%; inset-inline-end: -10%; width: 78%; border-radius: 36px; z-index: 0;
+    content: ""; position: absolute; inset-block: 6% -4.2%; inset-inline-end: -10%; width: 78%; border-radius: 36px; z-index: 0;
     background: var(--accent-2); opacity: .92;
   }
   .hero-art .portrait { width: min(420px, 92%); }
