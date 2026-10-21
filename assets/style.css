@@ -235,7 +235,8 @@ html.lang-arrive main, html.lang-arrive header.topbar { animation: lang-fade-in 
 }
 .pcard-menu-list a { padding: 8px 10px; border-radius: 8px; color: var(--fg); text-decoration: none; font-size: .92rem; }
 .pcard-menu-list a:hover, .pcard-menu-list a:focus-visible { background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent); outline: none; }
-.pcard.menu-open { z-index: 30; }
+/* An open links list stays above the cards but below the sticky header (z-index 30), so it never paints over the header */
+.pcard.menu-open { z-index: 25; }
 .pcard-ext { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; font-size: .9rem; }
 .pcard-ext:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
 .pcard-shot { margin: 0 0 14px; }
