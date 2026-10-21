@@ -144,6 +144,7 @@ function db(): PDO {
     run_benchy_slicer_github_v24_migration($pdo);
     run_benchy_slicer_main_v25_migration($pdo);
     run_benchy_slicer_icon_v26_migration($pdo);
+    run_helm_project_v27_migration($pdo);
     return $pdo;
 }
 

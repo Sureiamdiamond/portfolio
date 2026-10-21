@@ -2181,3 +2181,32 @@ function run_benchy_slicer_icon_v26_migration(PDO $pdo): void {
     $pdo->prepare("UPDATE projects SET icon = 'slicer/img/benchy-slicer-header.png' WHERE title = 'Benchy Slicer'")->execute();
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . BENCHY_SLICER_ICON_V26_MIGRATION . "', '1')");
 }
+
+const HELM_PROJECT_V27_MIGRATION = 'migration_helm_project_v27';
+
+/** Helm: a project Parsa contributed to (the repo belongs to its author). The card and the IDE folder lib/projects/helm read these fields. */
+function run_helm_project_v27_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . HELM_PROJECT_V27_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $exists = $pdo->prepare('SELECT 1 FROM projects WHERE title = ?');
+    $exists->execute(['Helm']);
+    if (!$exists->fetchColumn()) {
+        $sort = (int) $pdo->query('SELECT COALESCE(MAX(sort), 0) + 1 FROM projects')->fetchColumn();
+        $insert = $pdo->prepare('INSERT INTO projects (title, title_fa, kind, summary, summary_fa, tags, url, github_url, icon, sort)
+            VALUES (:title, :title_fa, :kind, :summary, :summary_fa, :tags, :url, :github_url, :icon, :sort)');
+        $insert->execute([
+            'title' => 'Helm',
+            'title_fa' => 'Helm',
+            'kind' => 'work',
+            'summary' => "Helm is a live dashboard and job tracker for projects built with Claude Code. It reads each project's docs/tasks.json, shows the phases and open tasks, lists the jobs Claude is running, and shows plan usage and token limits. It runs on a Mac with Python's standard library only. Parsa Banitaba is a contributor to the project.",
+            'summary_fa' => "Helm یک داشبورد زنده و ردیاب کار برای پروژه‌هایی است که با Claude Code ساخته می‌شوند. فایل docs/tasks.json هر پروژه را می‌خواند، فازها و کارهای باقی‌مانده را نشان می‌دهد، کارهایی را که Claude الان اجرا می‌کند فهرست می‌کند و مصرف پلن و محدودیت توکن را نشان می‌دهد. روی مک و فقط با کتابخانهٔ استاندارد پایتون اجرا می‌شود. پارسا بنی‌طبا مشارکت‌کننده در این پروژه است.",
+            'tags' => 'Python, Claude Code, Developer tools',
+            'url' => '',
+            'github_url' => 'https://github.com/alisinaee/helm',
+            'icon' => 'assets/img/projects/helm-icon.png',
+            'sort' => $sort,
+        ]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . HELM_PROJECT_V27_MIGRATION . "', '1')");
+}
