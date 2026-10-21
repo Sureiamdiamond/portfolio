@@ -1028,11 +1028,17 @@ html[data-glass="on"] .cv-hero-btn, html[data-glass="on"] .cv-fab, html[data-gla
   box-shadow: none !important; filter: none !important; animation: none !important;
 }
 
-/* ---- Visual polish pass: press feedback, calmer hover, no sideways drift on desktop ---- */
-html { overflow-x: clip; }
-.btn, .tool, .to-top, .cc, .skill-head { transition: transform .18s var(--ease), background-color .2s var(--ease), border-color .2s var(--ease), box-shadow .2s var(--ease), color .2s var(--ease); }
+/* ---- Visual polish pass: press feedback, calmer hover, browser surfaces, empty research thumbnails ---- */
+:root { --ease-out-strong: cubic-bezier(.23, 1, .32, 1); }
+html { overflow-x: clip; scrollbar-color: var(--border) transparent; }
+h1, h2, h3 { text-wrap: balance; }
+::selection { background: color-mix(in srgb, var(--accent) 24%, transparent); color: inherit; }
+.media-date { font-variant-numeric: tabular-nums; }
+.btn, .tool, .to-top, .cc, .skill-head { transition: transform .16s var(--ease-out-strong), background-color .2s var(--ease-out-strong), border-color .2s var(--ease-out-strong), color .2s var(--ease-out-strong); }
 .btn:active, .tool:active, .to-top:active { transform: scale(.97); }
-@media (hover: hover) {
+:root:not([data-mode="binary"]) .media-thumb:empty { display: grid; place-items: center; min-height: 120px; background: color-mix(in srgb, var(--accent) 6%, var(--surface)); }
+:root:not([data-mode="binary"]) .media-thumb:empty::after { content: "PDF"; font: 600 .75rem var(--sans); letter-spacing: .08em; color: var(--muted); }
+@media (hover: hover) and (pointer: fine) {
   .skill:hover, .skill-head:hover { border-color: color-mix(in srgb, var(--accent) 45%, var(--border)); }
   .btn-outline:hover { border-color: color-mix(in srgb, var(--accent) 40%, var(--border)); }
 }
