@@ -298,19 +298,18 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
         <div class="media-body">
           <h3><?= e(loc($paper, 'title', $lang)) ?><?php if (trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? '')) !== ''): ?> <span class="media-date"><?= e(trim(($paper['venue'] ?? '') . ' ' . ($paper['year'] ?? ''))) ?></span><?php endif; ?></h3>
           <?php
-            // The PDF and the uploaded files are one list. One item shows as a plain link; more fold into a "Files" disclosure.
+            // The PDF and the uploaded files are one list, always shown in a "Files" disclosure, even with one item.
             $fileList = [];
             if ($paper['pdf']) $fileList[] = ['label' => 'PDF', 'href' => $paper['pdf'], 'download' => false];
             foreach ($files as $file) $fileList[] = ['label' => $file['label'], 'href' => $file['path'], 'download' => true];
-            $folded = count($fileList) > 1;
+            $folded = $fileList !== [];
           ?>
           <div class="links media-files">
-            <?php if (!$folded && $fileList): $one = $fileList[0]; ?><a href="<?= e($one['href']) ?>" <?= $one['download'] ? 'download' : 'target="_blank" rel="noopener"' ?>><?= e($one['label']) ?></a><?php endif; ?>
             <?php if ($paper['doi']): ?><a href="https://doi.org/<?= e($paper['doi']) ?>" target="_blank" rel="noopener">DOI</a><?php endif; ?>
           </div>
           <?php if ($folded): ?>
           <details class="paper-files">
-            <summary><?= $lang === 'fa' ? 'فایل‌ها' : 'Files' ?> (<?= count($fileList) ?>)</summary>
+            <summary><?= $lang === 'fa' ? 'فایل‌ها' : 'Files' ?></summary>
             <ul>
               <?php foreach ($fileList as $item): ?>
               <li><a href="<?= e($item['href']) ?>" <?= $item['download'] ? 'download' : 'target="_blank" rel="noopener"' ?>><?= e($item['label']) ?></a></li>
