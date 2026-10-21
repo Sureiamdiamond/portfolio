@@ -44,7 +44,7 @@ function db(): PDO {
         SQL);
     // Backward-compatible migration: add Persian columns to existing databases.
     $persianColumns = [
-        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'icon', 'extra_links'],
+        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'icon', 'extra_links', 'owner'],
         'papers' => ['title_fa'],
         'presentations' => ['title_fa'],
         'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa', 'city', 'city_fa', 'website', 'logo', 'bullets', 'bullets_fa'],
@@ -145,6 +145,7 @@ function db(): PDO {
     run_benchy_slicer_main_v25_migration($pdo);
     run_benchy_slicer_icon_v26_migration($pdo);
     run_helm_project_v27_migration($pdo);
+    run_helm_text_owner_v28_migration($pdo);
     return $pdo;
 }
 

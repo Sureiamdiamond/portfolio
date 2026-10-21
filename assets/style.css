@@ -1104,3 +1104,6 @@ h2 { font-size: clamp(2.1rem, 4.4vw, 3.1rem); letter-spacing: -.025em; }
 }
 /* The hero buttons and their CV chooser stack above the location line beneath them */
 .hero-text .actions { position: relative; z-index: 10; }
+
+/* The owner line under a project title: small and muted, in both languages */
+.pcard-owner { margin: -.3em 0 .7em; font-size: .85rem; color: var(--muted); }

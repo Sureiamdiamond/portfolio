@@ -58,7 +58,11 @@ function project_generated_files(array $p, string $lang, string $slug): array {
     $links = project_links($p);
     $kind = $h[$p['kind']] ?? $p['kind'];
 
+    $owner = trim((string) ($p['owner'] ?? ''));
     $readme = "# $title\n\n";
+    if ($owner !== '') {
+        $readme .= ($fa ? "توسط $owner" : "by $owner") . "\n\n";
+    }
     $readme .= "{$h['kind']}: $kind\n\n";
     $readme .= ($summary !== '' ? "$summary\n" : "{$h['nodesc']}\n");
     if ($tags) {

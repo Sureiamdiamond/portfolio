@@ -2210,3 +2210,29 @@ function run_helm_project_v27_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . HELM_PROJECT_V27_MIGRATION . "', '1')");
 }
+
+const HELM_TEXT_OWNER_V28_MIGRATION = 'migration_helm_text_owner_v28';
+
+/** Helm's card drops the Claude Code-only wording and names its owner; the TechBlog card names its owner too. Previous values are logged. */
+function run_helm_text_owner_v28_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . HELM_TEXT_OWNER_V28_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $helm = $pdo->query("SELECT id, summary, summary_fa, owner FROM projects WHERE title = 'Helm' LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($helm) {
+        migration_log("helm text owner: project {$helm['id']} previous " . json_encode($helm, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE projects SET summary = ?, summary_fa = ?, owner = ? WHERE id = ?')->execute([
+            "Helm is a live dashboard and task tracker for software projects. It reads each project's docs/tasks.json, shows the phases and open tasks, lists the jobs running now, and shows plan usage and token limits. It runs on a Mac with Python's standard library only. Parsa Banitaba is a contributor to the project.",
+            "Helm یک داشبورد زنده و ردیاب کار برای پروژه‌های نرم‌افزاری است. فایل docs/tasks.json هر پروژه را می‌خواند، فازها و کارهای باقی‌مانده را نشان می‌دهد، جاب‌های در حال اجرا را فهرست می‌کند و مصرف پلن و محدودیت توکن را نشان می‌دهد. روی مک و فقط با کتابخانهٔ استاندارد پایتون اجرا می‌شود. پارسا بنی‌طبا مشارکت‌کننده در این پروژه است.",
+            'alisinaee',
+            $helm['id'],
+        ]);
+        $pdo->prepare('UPDATE projects SET tags = ? WHERE id = ?')->execute(['Python, Developer tools, Dashboard', $helm['id']]);
+    }
+    $techblog = $pdo->query("SELECT id, owner FROM projects WHERE LOWER(TRIM(title)) = 'techblog' ORDER BY id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($techblog) {
+        migration_log("techblog owner: project {$techblog['id']} previous " . json_encode($techblog, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE projects SET owner = ? WHERE id = ?')->execute(['sasansafari', $techblog['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . HELM_TEXT_OWNER_V28_MIGRATION . "', '1')");
+}
