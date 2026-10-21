@@ -1107,3 +1107,14 @@ h2 { font-size: clamp(2.1rem, 4.4vw, 3.1rem); letter-spacing: -.025em; }
 
 /* The owner line under a project title: small and muted, in both languages */
 .pcard-owner { margin: -.4em 0 .7em; font-size: .72rem; color: color-mix(in srgb, var(--muted) 56%, var(--bg)); }
+
+/* Research rows: the thumbnail runs the full height of the row, and the row is only as tall as its content needs */
+.media-rows .media-card { align-items: stretch; }
+.media-rows .media-cover { align-self: stretch; height: auto; min-height: 100%; aspect-ratio: auto; }
+@media (min-width: 761px) {
+  .media-rows .media-cover { width: 78px; flex: 0 0 78px; }
+  .media-rows .media-body { padding: 12px 18px; justify-content: center; gap: 2px; }
+  .media-rows .paper-files summary { min-height: 32px; }
+  .media-rows .paper-files { margin-top: 0; }
+  .media-rows .media-body .links { padding-top: 6px; }
+}
