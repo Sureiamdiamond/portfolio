@@ -78,7 +78,7 @@ function project_generated_files(array $p, string $lang, string $slug): array {
 
     $dartTitle = str_replace(['\\', "'"], ['\\\\', "\\'"], $title);
     $main = "// Generated stub from this project's stored data. Not the real source code.\n"
-        . "// " . t('private_code', $lang) . "\n// " . t('private_code_more', $lang) . "\n"
+        . "// " . t('private_code', $lang) . "\n"
         . "import 'package:flutter/material.dart';\n\n"
         . "void main() {\n"
         . "  runApp(const MaterialApp(\n"
