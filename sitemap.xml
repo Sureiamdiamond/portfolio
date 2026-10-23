@@ -14,4 +14,8 @@
     <xhtml:link rel="alternate" hreflang="fa" href="https://parsabanitaba.ir/?lang=fa"/>
     <xhtml:link rel="alternate" hreflang="x-default" href="https://parsabanitaba.ir/"/>
   </url>
+  <url>
+    <loc>https://parsabanitaba.ir/english/</loc>
+    <lastmod>2026-10-23</lastmod>
+  </url>
 </urlset>
