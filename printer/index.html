@@ -851,7 +851,7 @@ new ResizeObserver(resize).observe(canvas.parentElement);
 // ================= PRINTERS SECTION (Creality / Bambu Lab) =================
 const BAMBU='#00ae42',CREA='#2f7bff';
 const PR=[
-{id:'a1mini',br:'bambu',name:'Bambu Lab A1 mini',tag:'Bambu Lab · ۲۰۲۳',type:'open',tower:'single',W:330,D:320,H:370,bv:[180,180],gy:215,ams:'lite',screen:1,cam:1,body:'#3b3f47',acc:BAMBU,
+{id:'a1mini',br:'bambu',name:'Bambu Lab A1 mini',tag:'Bambu Lab · ۲۰۲۳',type:'open',tower:'single',W:330,D:320,H:350,bv:[180,180],gy:300,ams:'lite',screen:1,cam:1,body:'#3b3f47',acc:BAMBU,
  d:'کوچک‌ترین و ارزان‌ترین پرینتر Bambu؛ بستر متحرک، کالیبراسیون خودکار و راه‌اندازی سریع.',
  pos:'دروازه‌ی ورود به پرینت سه‌بعدی: انتخاب شماره‌ی یک مبتدی‌ها، کلاس‌ها، هدیه و میزهای کوچک.',
  url:'https://us.store.bambulab.com/products/a1-mini',
@@ -862,7 +862,7 @@ const PR=[
     ['hot','هات‌اند ۳۰۰°C','head','نازل تا ۳۰۰ درجه؛ برای PLA، PETG و TPU کاملاً مناسب است.'],
     ['cam','دوربین','cam','دیدن زنده‌ی پرینت و تایم‌لپس از طریق اپ.'],
     ['quiet','حالت بی‌صدا','frame','در حالت بی‌صدا زیر ۴۸ دسی‌بل کار می‌کند.']]},
-{id:'a1',br:'bambu',name:'Bambu Lab A1',tag:'Bambu Lab · ۲۰۲۳',type:'open',tower:'single',W:400,D:410,H:430,bv:[256,256],gy:285,ams:'lite',screen:1,cam:0,body:'#3b3f47',acc:BAMBU,
+{id:'a1',br:'bambu',name:'Bambu Lab A1',tag:'Bambu Lab · ۲۰۲۳',type:'open',tower:'single',W:400,D:410,H:420,bv:[256,256],gy:360,ams:'lite',screen:1,cam:0,body:'#3b3f47',acc:BAMBU,
  d:'نسخه‌ی بزرگ‌تر A1 mini با بستر ۲۵۶ و همان سادگی؛ قاب باز و سبک.',
  pos:'نقطه‌ی تعادل برای بیشتر هابیست‌ها: بستر بزرگ، سرعت خوب و کار با PLA، PETG و TPU بدون پیچیدگی.',
  url:'https://us.store.bambulab.com/products/a1',
@@ -977,11 +977,11 @@ function buildPrinter(c){const G=new THREE.Group(),P={},body=pm(c.body),dark=pm(
   bedG.position.y=34;G.add(bedG);pbx(bedG,P,'bed',bw+30,10,bd+30,0,5,0,bedm);pbx(bedG,P,'bed',bw,2,bd,0,11,0,pei,false);
   const gy=c.gy,tz=-D/2+40;
   if(c.tower==='portal'){[-1,1].forEach(s=>pbx(G,P,'towers',34,H,40,s*(W/2-24),H/2,tz,body));pbx(G,P,'towers',W-20,26,40,0,H-13,tz,body);pbx(G,P,'motion',W-60,20,26,0,gy,tz+30,metal)}
-  else{pbx(G,P,'frame',48,H,60,-(W/2-30),H/2,tz+10,body);pbx(G,P,'motion',W-50,22,30,-10,gy,tz+40,metal)}
+  else{const th=gy+30;pbx(G,P,'frame',50,th,64,-(W/2-30),th/2,tz+10,body);pbx(G,P,'frame',50,10,64,-(W/2-30),th+5,tz+10,accm);pbx(G,P,'motion',W-60,22,30,-6,gy,tz+42,metal);pbx(G,P,'frame',W*.62,6,D*.55,10,34+3,D*.14,pm('#2b2e34'),false)}
   headG.position.set(0,gy-12,tz+78);G.add(headG);pbx(headG,P,'head',46,54,44,0,-20,0,dark);pbx(headG,P,'head',40,14,48,0,-46,0,accm);
   const n=new THREE.Mesh(new THREE.ConeGeometry(5,14,16),brass);n.rotation.x=Math.PI;n.position.set(0,-60,0);headG.add(n);(P.head=P.head||[]).push(n);
   anim.head={g:headG,a:bw*.28,s:.9};anim.bed={g:bedG,a:bd*.16,s:.9,axis:'z'};
-  if(c.ams==='lite'){const ay=H+10;pbx(G,P,'ams',300,8,76,0,ay,tz+30,body);pbx(G,P,'ams',8,40,60,-146,ay+24,tz+30,body);spoolRow(G,P,'ams',0,ay+52,tz+30,4,68,38)}
+  if(c.ams==='lite'){const ay=gy+36;pbx(G,P,'ams',300,8,76,0,ay,tz+30,body);pbx(G,P,'ams',8,40,60,-146,ay+24,tz+30,body);spoolRow(G,P,'ams',0,ay+52,tz+30,4,68,38)}
   if(c.spool){pcy(G,P,'spool',58,32,W/2-24,H+46,tz+60,pm('#ff6b3d',{roughness:.7,metalness:.05}),Math.PI/2);pcy(G,P,'spool',16,40,W/2-24,H+46,tz+60,pm('#222'),Math.PI/2)}
  } else {
   const bh=44,lh=18;pbx(G,P,'frame',W,bh,D,0,bh/2,0,body);pbx(G,P,'frame',W,lh,D,0,H-lh/2,0,body);
@@ -999,6 +999,7 @@ function buildPrinter(c){const G=new THREE.Group(),P={},body=pm(c.body),dark=pm(
   if(c.laser)pbx(headG,P,'laser',24,56,24,34,-6,0,pm('#e0453a',{roughness:.5}));
   anim.head={g:headG,a:bw*.3,s:1};anim.rail={g:railG,a:bd*.14,s:.7,axis:'z'};anim.bed={g:bedG,a:18,s:.35,axis:'y',b:bedG.position.y};
   if(c.heated){const hm=pm('#ff7a2f',{emissive:'#ff5a1a',emissiveIntensity:.5,transparent:true,opacity:.5,depthWrite:false});pbx(G,P,'heater',W-60,H-bh-lh-60,3,0,(H+bh-lh)/2,-D/2+12,hm,false)}
+  pbx(G,P,'enclosure',90,10,10,0,(H+bh-lh)/2+40,D/2+6,pm('#d9dce2'));pbx(G,P,'frame',W*.5,6,4,0,bh-8,D/2+2,pm(c.acc,{emissive:c.acc,emissiveIntensity:.8}),false);
   if(c.cam)pcy(G,P,'cam',8,8,0,H-lh-12,D/2-26,pm('#0b0d12',{emissive:c.acc,emissiveIntensity:.3}),Math.PI/2);
   if(c.screen)pbx(G,P,'screen',100,62,8,W/2-90,26,D/2+4,pm('#0b1220',{emissive:c.acc,emissiveIntensity:.2}));
   if(c.filter)pbx(G,P,'filter',80,36,56,W/2-70,H+18,-D/2+50,pm('#5b6270'));
