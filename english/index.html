@@ -17,13 +17,15 @@
 @font-face{font-family:"Vazirmatn";src:url(fonts/Vazirmatn-Bold.woff2) format("woff2");font-weight:700;font-display:swap}
 @font-face{font-family:"Vazirmatn";src:url(fonts/Vazirmatn-Black.woff2) format("woff2");font-weight:800;font-display:swap}
 @font-face{font-family:"JetBrains Mono";src:url(fonts/jetbrains-mono-latin-500-normal.woff2) format("woff2");font-weight:500;font-display:swap}
-html{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+[hidden]{display:none!important}
 body{margin:0}
+img{max-width:100%}
 
 /* Layout: a CEFR staircase picks the level; lesson list on the side, lesson + practice in the main column (RTL). */
 :root{
   --bg:#F3F5F9; --surface:#FFFFFF; --ink:#151C2E; --muted:#5A6377; --line:#DCE1EB; --soft:#EBEEF5;
   --a1:#2A8352; --a2:#0E7F84; --b1:#2D63C8; --b2:#7446C2; --c1:#B93A64; --c2:#8C6410;
+  --hero:#0F1A35; --hero-ink:#F2F5FF; --hero-mut:#A9B4D0; --hero-line:rgb(255 255 255 / .18); --shadow:0 1px 2px rgb(20 28 46 / .06),0 8px 24px rgb(20 28 46 / .07);
   --ok:#1E8A4B; --ok-bg:#E3F4EA; --bad:#C0392B; --bad-bg:#FBE7E4; --tip-bg:#FFF6DD; --tip-line:#E3B341;
   --fa:"Vazirmatn",Tahoma,"Segoe UI",sans-serif;
   --en:Georgia,"Iowan Old Style","Times New Roman",serif;
@@ -33,18 +35,60 @@ body{margin:0}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
   --bg:#0F1320; --surface:#171C2B; --ink:#E7EAF2; --muted:#9AA3B7; --line:#2A3146; --soft:#1F2537;
   --a1:#4FBF7F; --a2:#3CBFC3; --b1:#6D9BF2; --b2:#A884F0; --c1:#EC7BA0; --c2:#E0B24C;
+  --hero:#0A0F1E; --shadow:0 1px 2px rgb(0 0 0 / .4),0 8px 24px rgb(0 0 0 / .3);
   --ok:#5BD08C; --ok-bg:#16301F; --bad:#F07A6C; --bad-bg:#3A1C1A; --tip-bg:#2E2814; --tip-line:#C99A2E; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0F1320; --surface:#171C2B; --ink:#E7EAF2; --muted:#9AA3B7; --line:#2A3146; --soft:#1F2537;
   --a1:#4FBF7F; --a2:#3CBFC3; --b1:#6D9BF2; --b2:#A884F0; --c1:#EC7BA0; --c2:#E0B24C;
+  --hero:#0A0F1E; --shadow:0 1px 2px rgb(0 0 0 / .4),0 8px 24px rgb(0 0 0 / .3);
   --ok:#5BD08C; --ok-bg:#16301F; --bad:#F07A6C; --bad-bg:#3A1C1A; --tip-bg:#2E2814; --tip-line:#C99A2E; color-scheme:dark}
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--ink);font-family:var(--fa);font-size:16px;line-height:1.85;direction:rtl}
-.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:24px 64px}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0 40px}
 .en,bdi.en{font-family:var(--en);direction:ltr;unicode-bidi:isolate}
-header.top{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between;margin-bottom:20px}
-h1{font-size:clamp(1.6rem,4vw,2.3rem);font-weight:800;line-height:1.3;margin:0;text-wrap:balance}
-.sub{color:var(--muted);margin:4px 0 0;max-width:46ch}
+.hero{background:var(--hero);color:var(--hero-ink);position:relative;overflow:hidden;padding-top:max(14px,env(safe-area-inset-top,0px));padding-bottom:30px}
+.hero-in,.foot-in{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:28px}
+.brand{display:inline-flex;align-items:center;gap:10px;color:var(--hero-ink);text-decoration:none;font-weight:700;direction:ltr}
+.brand .mark{width:32px;height:32px;border-radius:9px;display:grid;place-items:center;background:var(--hero-ink);color:var(--hero);font-family:var(--mono);font-size:.82rem}
+.brand .t{opacity:.85;font-size:.92rem;font-family:var(--mono);font-weight:500}
+.tbtn{font:inherit;display:grid;place-items:center;width:38px;height:38px;border-radius:50%;border:1px solid var(--hero-line);background:transparent;color:var(--hero-ink);cursor:pointer}
+.tbtn:hover{background:rgb(255 255 255 / .1)}
+.tbtn svg{width:18px;height:18px;fill:currentColor}
+h1{font-size:clamp(2rem,5.6vw,3.5rem);font-weight:800;line-height:1.25;margin:0;text-wrap:balance;color:inherit}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--a1),var(--b1) 40%,var(--b2) 70%,var(--c1));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--hero-mut);margin:12px 0 0;max-width:54ch}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
+.chips span{border:1px solid var(--hero-line);border-radius:999px;padding:2px 14px;font-size:.88rem;color:var(--hero-mut)}
+.chips b{color:var(--hero-ink);font-family:var(--mono);font-weight:500;margin-inline-end:6px}
+.today{margin-top:24px;max-width:660px;border:1px solid var(--hero-line);border-radius:14px;padding:14px 16px 12px;background:rgb(255 255 255 / .06);display:grid;gap:4px}
+.today-l{display:flex;gap:8px;align-items:center;color:var(--hero-mut);font-size:.82rem;flex-wrap:wrap}
+.today-e{font-family:var(--en);font-size:clamp(1.1rem,2.6vw,1.4rem);direction:ltr;text-align:left;line-height:1.5}
+.today-f{color:var(--hero-mut);font-size:.95rem}
+.today-b{display:flex;gap:8px;align-items:center;margin-top:6px}
+.today .say{background:transparent;border-color:var(--hero-line);color:var(--hero-ink)}
+.btn2{font:inherit;font-size:.85rem;border:1px solid var(--hero-line);background:transparent;color:var(--hero-ink);border-radius:999px;padding:3px 14px;cursor:pointer}
+.btn2:hover{background:rgb(255 255 255 / .1)}
+.hero-bg{position:absolute;left:0;bottom:0;display:flex;align-items:flex-end;gap:6px;direction:ltr;padding-left:14px;z-index:0;pointer-events:none}
+.hero-bg i{display:block;width:clamp(22px,4vw,56px);height:var(--h);background:var(--c);opacity:.32;border-radius:8px 8px 0 0}
+@media (max-width:700px){.hero-bg{opacity:.55;transform:scale(.7);transform-origin:left bottom}}
+.toolbar{display:flex;flex-wrap:wrap;gap:12px 24px;align-items:center;justify-content:space-between;margin:22px 0 12px}
+.hero :focus-visible,.site-foot :focus-visible{outline:2.5px solid var(--hero-ink);outline-offset:2px}
+.site-foot{background:var(--hero);color:var(--hero-ink);margin-top:28px;padding-top:36px;padding-bottom:max(22px,env(safe-area-inset-bottom,0px))}
+.foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1.2fr;gap:28px}
+@media (max-width:760px){.foot-grid{grid-template-columns:minmax(0,1fr)}}
+.site-foot h4{margin:0 0 10px;font-size:.82rem;color:var(--hero-mut);letter-spacing:.04em;font-weight:700}
+.site-foot p{margin:0;color:var(--hero-mut);font-size:.92rem;max-width:42ch}
+.foot-t{font-size:1.25rem;font-weight:800;margin-bottom:6px}
+.fl{display:flex;flex-wrap:wrap;gap:8px}
+.fl button{font:inherit;font-size:.88rem;border:1px solid var(--hero-line);background:transparent;color:var(--hero-ink);border-radius:8px;padding:1px 12px;cursor:pointer}
+.fl button:hover{border-color:var(--hero-ink)}
+.fl button.lvb{font-family:var(--mono);font-weight:500;border-color:var(--c)}
+.foot-bot{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px 20px;margin-top:28px;padding-top:16px;border-top:1px solid var(--hero-line);color:var(--hero-mut);font-size:.85rem}
+.foot-bot a{color:var(--hero-ink)}
+.pgroup{margin-top:16px}
+.ptitle{font-weight:800;margin:0 0 8px;display:flex;gap:8px;align-items:center}
+.ptitle .lvtag{font-weight:500}
 .modes{display:flex;gap:6px;background:var(--soft);padding:4px;border-radius:12px}
 .modes button{font:inherit;font-weight:700;border:0;background:transparent;color:var(--muted);padding:6px 16px;border-radius:9px;cursor:pointer}
 .modes button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgb(0 0 0 / .12)}
@@ -91,7 +135,7 @@ aside.list{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);backgro
 .list .dot{flex:none;width:18px;height:18px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:.7rem;color:#fff}
 .list .dot.done{background:var(--lv);border-color:var(--lv)}
 /* lesson */
-article.lesson{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,3.5vw,36px);min-width:0}
+article.lesson{background:var(--surface);border:1px solid var(--line);border-top:3px solid var(--lv);box-shadow:var(--shadow);border-radius:16px;padding:clamp(18px,3.5vw,36px);min-width:0}
 .eyebrow{display:flex;gap:10px;align-items:center;font-size:.82rem;color:var(--muted);margin-bottom:6px}
 .lvtag{font-family:var(--mono);color:#fff;background:var(--lv);border-radius:6px;padding:1px 8px;font-size:.8rem;direction:ltr}
 .lesson h2{font-size:clamp(1.4rem,3.4vw,1.9rem);font-weight:800;margin:0;line-height:1.4;text-wrap:balance}
@@ -145,24 +189,46 @@ ul.uses{margin:0;padding-inline-start:20px;display:flex;flex-direction:column;ga
 </head>
 <body>
 <noscript><p style="padding:24px;font-family:sans-serif">برای استفاده از این صفحه جاوااسکریپت را فعال کنید.</p></noscript>
+<header class="hero">
+  <div class="hero-bg" aria-hidden="true"><i style="--h:34px;--c:var(--a1)"></i><i style="--h:56px;--c:var(--a2)"></i><i style="--h:78px;--c:var(--b1)"></i><i style="--h:100px;--c:var(--b2)"></i><i style="--h:122px;--c:var(--c1)"></i><i style="--h:144px;--c:var(--c2)"></i></div>
+  <div class="hero-in">
+    <div class="hero-top">
+      <a class="brand" href="https://parsabanitaba.ir/"><span class="mark">PB</span><span class="t">parsabanitaba.ir</span></a>
+      <button class="tbtn" id="theme" aria-label="تغییر تم روشن و تاریک" title="تم روشن / تاریک"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a9 9 0 1 0 9 9c0-.5 0-.9-.1-1.3A6 6 0 0 1 13.3 3.1 9 9 0 0 0 12 3z"/></svg></button>
+    </div>
+    <h1>نردبان <em>گرامر انگلیسی</em></h1>
+    <p class="sub">از A1 تا C2، پله‌پله. درس‌های ساده با فرمول و مثال صوتی، کلمه و idiom هر سطح، و جمله‌های آماده برای خرید، سفر، اداره، سر کار و بقیه‌ی موقعیت‌های واقعی.</p>
+    <div class="chips"><span><b id="st-g"></b>درس گرامر</span><span><b id="st-s"></b>موقعیت</span><span><b id="st-w"></b>کلمه و idiom</span><span><b id="st-p"></b>جمله‌ی کاربردی</span></div>
+    <div class="today" aria-live="polite">
+      <div class="today-l"><span>جمله‌ی امروز</span><span class="lvtag" id="tdLv"></span><span id="tdSit"></span></div>
+      <div class="today-e" id="tdEn"></div>
+      <div class="today-f" id="tdFa"></div>
+      <div class="today-b"><button class="say" id="tdSay" aria-label="پخش تلفظ"></button><button class="btn2" id="tdNext">جمله‌ی دیگر</button></div>
+    </div>
+  </div>
+</header>
 <div class="wrap">
-  <header class="top">
-    <div>
-      <h1>نردبان گرامر انگلیسی</h1>
-      <p class="sub">۵۴ درس گرامر از A1 تا C2 با توضیح ساده، فرمول، مثال صوتی و تمرین، به‌علاوه‌ی کلمات مهم، collocationها، idiomها و جمله‌های کاربردی هر سطح در موقعیت‌هایی مثل خرید، سفر، اداره و سر کار.</p>
+  <div class="toolbar">
+    <div class="modes" role="group" aria-label="حالت">
+      <button id="m-learn" aria-pressed="true">درس‌ها</button>
+      <button id="m-sit" aria-pressed="false">موقعیت‌ها</button>
+      <button id="m-quiz" aria-pressed="false">آزمون مخلوط</button>
     </div>
-    <div style="display:flex;flex-direction:column;gap:10px;align-items:flex-start">
-      <div class="modes" role="group" aria-label="حالت">
-        <button id="m-learn" aria-pressed="true">درس‌ها</button>
-        <button id="m-sit" aria-pressed="false">موقعیت‌ها</button>
-        <button id="m-quiz" aria-pressed="false">آزمون مخلوط</button>
-      </div>
-      <div class="overall"><span id="ovText"></span><div class="bar"><i id="ovBar"></i></div></div>
-    </div>
-  </header>
+    <div class="overall"><span id="ovText"></span><div class="bar"><i id="ovBar"></i></div></div>
+  </div>
   <nav class="stairs" id="stairs" aria-label="سطح"></nav>
   <main id="main"></main>
 </div>
+<footer class="site-foot">
+  <div class="foot-in">
+    <div class="foot-grid">
+      <div><div class="foot-t">نردبان گرامر انگلیسی</div><p>گرامر، واژگان و جمله‌های روزمره در یک مسیر. پیشرفت و درس‌های تیک‌خورده‌ات فقط در مرورگر خودت ذخیره می‌شود.</p></div>
+      <div><h4>سطح‌ها</h4><div class="fl" id="fl-lv"></div></div>
+      <div><h4>موقعیت‌ها</h4><div class="fl" id="fl-sit"></div></div>
+    </div>
+    <div class="foot-bot"><span>ساخته‌شده توسط پارسا بنی‌طبا · ۱۴۰۵</span><span><a href="https://parsabanitaba.ir/">بازگشت به parsabanitaba.ir</a> · <button class="btn2" id="totop">برو بالا</button></span></div>
+  </div>
+</footer>
 
 <script>
 const LV={a1:{n:"مبتدی",c:"--a1"},a2:{n:"پایه",c:"--a2"},b1:{n:"متوسط",c:"--b1"},b2:{n:"بالاتر از متوسط",c:"--b2"},c1:{n:"پیشرفته",c:"--c1"},c2:{n:"تسلط کامل",c:"--c2"}};
@@ -1956,6 +2022,760 @@ That name rings a bell, but I can't place him.|اسمش آشناست ولی یا
 ];
 SIT.forEach(o=>Object.values(o.L).forEach(c=>{c.w=P(c.w);c.s=P(c.s)}));
 
+/* ===== six more situations ===== */
+const SIT2=[
+{id:"social",fa:"آشنایی و گپ روزمره",en:"Meeting people & small talk",L:{
+a1:{w:`hello · hi · good morning|سلام · سلام · صبح بخیر
+nice to meet you|از آشنایی خوشوقتم
+name|نام، اسم
+friend|دوست
+family|خانواده
+mother · father · brother · sister|مادر · پدر · برادر · خواهر
+married · single|متأهل · مجرد
+please · thank you · sorry|لطفاً · ممنون · ببخشید`,
+s:`Hi, I'm Parsa. What's your name?|سلام، من پارسا هستم. اسم تو چیست؟
+Nice to meet you.|از آشنایی با شما خوشحالم.
+How are you? — I'm fine, thanks. And you?|حالت چطور است؟ ـ خوبم، ممنون. تو چطوری؟
+This is my friend, Sara.|این دوستم سارا است.`},
+a2:{w:`neighbour|همسایه
+hobby|سرگرمی
+weekend|آخر هفته
+invitation|دعوت‌نامه
+Would you like to…?|دوست داری…؟|Would you like to have coffee?
+see you soon|به‌زودی می‌بینمت
+by the way|راستی، در ضمن
+also · too|همچنین · هم`,
+s:`What do you do in your free time?|در وقت آزادت چکار می‌کنی؟
+I like playing football and watching films.|فوتبال بازی کردن و فیلم دیدن را دوست دارم.
+Would you like to have coffee with me?|دوست داری با من قهوه بخوری؟
+Sorry, I can't. I'm busy on Friday.|ببخشید، نمی‌توانم. جمعه کار دارم.
+How was your weekend?|آخر هفته‌ات چطور بود؟`},
+b1:{w:`catch up|احوال‌پرسی و خبر گرفتن
+get to know|بیشتر آشنا شدن
+keep in touch|در تماس ماندن
+come over|به خانه‌ی کسی آمدن
+run into|اتفاقی کسی را دیدن
+have in common|وجه مشترک داشتن
+it's been ages|خیلی وقت است
+look forward to|مشتاق… بودن`,
+s:`It's been ages! How have you been?|خیلی وقت است ندیده‌امت! چطور بودی؟
+We should catch up soon.|باید زودتر همدیگر را ببینیم و صحبت کنیم.
+I ran into an old friend yesterday.|دیروز اتفاقی یک دوست قدیمی را دیدم.
+We have a lot in common.|ما وجه مشترک زیادی داریم.
+Let's keep in touch.|در تماس باشیم.`},
+b2:{w:`acquaintance|آشنا (نه دوست نزدیک)
+small talk|گپ سطحی
+hit it off|خوب جور شدن
+lose touch|ارتباط قطع شدن
+grow apart|از هم دور شدن
+outgoing|اجتماعی و برون‌گرا
+reserved|کم‌حرف و محتاط
+get on well|خوب کنار آمدن`,
+s:`We hit it off straight away.|از همان اول خوب جور شدیم.
+I'm not great at small talk.|در گپ‌های سطحی خوب نیستم.
+We lost touch after university.|بعد از دانشگاه ارتباطمان قطع شد.
+She's outgoing, but her brother is rather reserved.|او برون‌گراست ولی برادرش نسبتاً کم‌حرف است.`},
+c1:{w:`rapport|هم‌دلی و ارتباط خوب
+camaraderie|رفاقت
+amicable|دوستانه
+tactful|با ملاحظه
+put someone at ease|کسی را راحت کردن
+strike up a conversation|گفتگو را شروع کردن
+mutual|متقابل
+a kindred spirit|هم‌روح`,
+s:`I managed to strike up a conversation with the person next to me.|توانستم با کنار دستی‌ام گفتگو را شروع کنم.
+We built a good rapport quickly.|زود رابطه‌ی خوبی ساختیم.
+He has a knack for putting people at ease.|او استعداد خاصی در راحت کردن آدم‌ها دارد.
+The feeling is mutual.|احساس من هم همین است.`},
+c2:{w:`the life and soul of the party|جان مجلس
+a wallflower|آدم گوشه‌گیر در مهمانی
+birds of a feather flock together|کبوتر با کبوتر باز با باز
+a fair-weather friend|دوست روز خوشی
+a friend in need is a friend indeed|دوست آن است که گیرد دست دوست
+chew the fat|گپ دوستانه زدن
+click with|با کسی جور شدن
+break bread|کنار هم غذا خوردن`,
+s:`He's the life and soul of every party.|او جان هر مهمانی است.
+Beware of fair-weather friends.|مراقب دوست‌های روز خوشی باش.
+They're birds of a feather.|آن‌ها از یک جنس‌اند.
+We spent the evening chewing the fat.|شب را به گپ دوستانه گذراندیم.`}}},
+
+{id:"dir",fa:"مسیریابی و حمل‌ونقل",en:"Directions & transport",L:{
+a1:{w:`street|خیابان
+corner|گوشه
+bridge|پل
+traffic light|چراغ راهنما
+bus stop · metro station|ایستگاه اتوبوس · ایستگاه مترو
+turn left · turn right|به چپ بپیچ · به راست بپیچ
+next to · opposite · behind|کنار · روبه‌رو · پشت
+near · far|نزدیک · دور`,
+s:`Excuse me, where is the metro station?|ببخشید، ایستگاه مترو کجاست؟
+It's next to the bank.|کنار بانک است.
+Go straight on, then turn left.|مستقیم بروید، بعد به چپ بپیچید.
+Is it far?|دور است؟
+How can I get to Azadi Square?|چطور می‌توانم به میدان آزادی بروم؟`},
+a2:{w:`crossroads|چهارراه
+roundabout|میدان، دوربرگردان
+pavement|پیاده‌رو
+go past|از کنار چیزی رد شدن
+on your left · on your right|سمت چپ شما · سمت راست شما
+take the second turning|دومین پیچ را بگیر
+fare|کرایه
+a ten-minute walk|ده دقیقه پیاده‌روی
+change (trains)|عوض کردن خط`,
+s:`Go past the bank and take the second turning on the right.|از بانک رد شوید و دومین پیچ سمت راست را بگیرید.
+You can't miss it.|حتماً پیدایش می‌کنید.
+Which line do I take to get to the airport?|برای رفتن به فرودگاه کدام خط را بگیرم؟
+How much is the fare?|کرایه چقدر است؟
+You need to change at the next station.|باید ایستگاه بعدی عوض کنید.`},
+b1:{w:`junction|تقاطع
+one-way street|خیابان یک‌طرفه
+traffic jam|ترافیک سنگین
+rush hour|ساعت اوج ترافیک
+give directions|آدرس دادن
+shortcut|میان‌بر
+pick up · drop off|سوار کردن · پیاده کردن
+GPS|مسیریاب
+ring road|کمربندی`,
+s:`Sorry, I think I'm lost. Could you show me on the map?|ببخشید، فکر کنم گم شده‌ام. می‌شود روی نقشه نشانم بدهید؟
+Is there a shortcut?|میان‌بر هست؟
+We got stuck in a traffic jam for an hour.|یک ساعت در ترافیک گیر کردیم.
+Could you drop me off at the next corner?|می‌شود سر گوشه‌ی بعدی پیاده‌ام کنید؟
+The GPS says we're ten minutes away.|مسیریاب می‌گوید ده دقیقه مانده.`},
+b2:{w:`detour|مسیر انحرافی
+roadworks|تعمیرات جاده
+public transport|حمل‌ونقل عمومی
+be stuck in traffic|در ترافیک گیر کردن
+ride-hailing app|اپ درخواست خودرو
+pedestrian crossing|خط عابر پیاده
+toll|عوارض
+diversion|مسیر جایگزین`,
+s:`There are roadworks, so we'll have to take a detour.|جاده در دست تعمیر است و باید دور بزنیم.
+I usually use public transport to avoid the rush hour.|معمولاً برای اجتناب از ساعت اوج ترافیک از حمل‌ونقل عمومی استفاده می‌کنم.
+The driver took a much longer route.|راننده مسیر خیلی طولانی‌تری را رفت.
+Do I have to pay the toll?|باید عوارض بدهم؟`},
+c1:{w:`gridlock|قفل‌شدن کامل ترافیک
+congestion|ازدحام
+bypass|گذرگاه کنارگذر
+arterial road|شریان اصلی
+pedestrianised|ویژه‌ی عابر پیاده
+navigate|مسیریابی کردن
+make headway|پیشروی کردن
+alternative route|مسیر جایگزین`,
+s:`The city is in permanent gridlock at rush hour.|شهر در ساعت اوج دائم قفل است.
+We made little headway because of the congestion.|به خاطر ازدحام کم پیش رفتیم.
+The old town has been pedestrianised.|محله‌ی قدیمی را ویژه‌ی عابر کرده‌اند.
+It's quicker to take the bypass.|با کنارگذر سریع‌تر است.`},
+c2:{w:`back seat driver|مسافری که مدام به راننده دستور می‌دهد
+take a wrong turn|اشتباه پیچیدن
+at a crossroads|در دوراهی
+the fast lane|لاین سریع (زندگی پرشتاب)
+a dead end|بن‌بست
+road hog|راننده‌ی بی‌ملاحظه
+on the right track|در مسیر درست
+bumper to bumper|سپر به سپر`,
+s:`We were bumper to bumper for miles.|کیلومترها سپر به سپر بودیم.
+I think we took a wrong turn somewhere.|فکر کنم جایی اشتباه پیچیدیم.
+She's at a crossroads in her career.|او در دوراهی شغلی‌اش است.
+Stop being a back seat driver!|دست از رانندگی از صندلی عقب بردار!`}}},
+
+{id:"home",fa:"خانه، اجاره و تعمیرات",en:"Home, renting & repairs",L:{
+a1:{w:`house · flat|خانه · آپارتمان
+room|اتاق
+bedroom · bathroom · kitchen|اتاق خواب · حمام · آشپزخانه
+living room|اتاق نشیمن
+door · window|در · پنجره
+bed · table · chair|تخت · میز · صندلی
+rent|اجاره
+key|کلید`,
+s:`I live in a flat in Tehran.|در یک آپارتمان در تهران زندگی می‌کنم.
+My flat has two bedrooms.|آپارتمانم دو اتاق خواب دارد.
+Where's the bathroom?|دستشویی کجاست؟
+How much is the rent?|اجاره چقدر است؟`},
+a2:{w:`landlord|صاحبخانه
+tenant|مستأجر
+furnished · unfurnished|مبله · بدون مبلمان
+deposit|ودیعه، پیش‌پرداخت
+balcony|بالکن
+floor|طبقه
+lift|آسانسور
+move in · move out|اسباب‌کشی کردن · تخلیه کردن
+broken|خراب`,
+s:`Is the flat furnished?|آپارتمان مبله است؟
+How much is the deposit?|ودیعه چقدر است؟
+Which floor is it on?|طبقه‌ی چندم است؟
+The heating doesn't work.|شوفاژ کار نمی‌کند.
+When can I move in?|کی می‌توانم اسباب‌کشی کنم؟`},
+b1:{w:`contract|قرارداد
+utilities · bills|قبوض (آب و برق و گاز)
+plumber · electrician|لوله‌کش · برقکار
+leak|نشتی
+renovate|بازسازی کردن
+estate agent|بنگاه املاک
+sign the lease|قرارداد اجاره امضا کردن
+repair · fix|تعمیر کردن`,
+s:`There's a leak in the bathroom. Could you send a plumber?|توی حمام نشتی هست. می‌شود لوله‌کش بفرستید؟
+Are the bills included in the rent?|قبوض جزو اجاره است؟
+I'd like to arrange a viewing.|می‌خواهم برای دیدن خانه وقت بگذارم.
+When does the contract end?|قرارداد کی تمام می‌شود؟
+I'm thinking of renewing the lease.|به تمدید قرارداد فکر می‌کنم.`},
+b2:{w:`property|ملک
+on the market|برای فروش یا اجاره گذاشته‌شده
+spacious|جادار
+cosy|دنج و گرم
+well-maintained|خوب نگهداری‌شده
+down payment|پیش‌پرداخت خرید
+evict|تخلیه‌ی اجباری کردن
+neighbourhood|محله`,
+s:`The property has been on the market for months.|ملک ماه‌هاست برای فروش است.
+It's a spacious flat in a quiet neighbourhood.|آپارتمانی جادار در محله‌ای آرام است.
+I'd like to negotiate the rent.|می‌خواهم روی اجاره مذاکره کنم.
+The landlord refuses to return my deposit.|صاحبخانه از پس دادن ودیعه‌ام خودداری می‌کند.`},
+c1:{w:`tenancy agreement|قرارداد اجاره
+dilapidated|فرسوده و خراب
+refurbish|نوسازی کردن
+subletting|اجاره‌ی دست‌دوم
+amenities|امکانات رفاهی
+vacate the premises|محل را تخلیه کردن
+adequate|کافی و مناسب
+occupancy|سکونت`,
+s:`The tenancy agreement prohibits subletting.|قرارداد اجاره اجاره‌ی دست‌دوم را ممنوع می‌کند.
+The building is in a dilapidated state.|ساختمان در وضعیت فرسوده‌ای است.
+The flat offers excellent amenities.|آپارتمان امکانات عالی دارد.
+You must vacate the premises by the end of the month.|باید تا آخر ماه محل را تخلیه کنید.`},
+c2:{w:`a roof over one's head|سرپناه
+home sweet home|خانه، شیرین‌ترین جا
+a fixer-upper|خانه‌ی نیازمند تعمیر
+keep up with the Joneses|چشم‌وهم‌چشمی
+house-proud|به خانه‌اش علاقه‌مند و مقید
+make yourself at home|راحت باش
+bring the house down|حسابی تشویق گرفتن
+get on like a house on fire|خیلی خوب جور شدن`,
+s:`Make yourself at home!|راحت باش، خانه‌ی خودت است!
+It's a fixer-upper, but it has potential.|نیاز به تعمیر دارد ولی ظرفیت دارد.
+They're always trying to keep up with the Joneses.|همیشه دارند چشم‌وهم‌چشمی می‌کنند.
+We got on like a house on fire.|خیلی خوب با هم جور شدیم.`}}},
+
+{id:"tech",fa:"تکنولوژی و اینترنت",en:"Technology & the internet",L:{
+a1:{w:`computer · laptop|کامپیوتر · لپ‌تاپ
+phone|گوشی
+internet|اینترنت
+website|وب‌سایت
+app|اپلیکیشن
+password|رمز عبور
+screen|صفحه‌نمایش
+click|کلیک کردن
+Wi-Fi|وای‌فای`,
+s:`What's the Wi-Fi password?|رمز وای‌فای چیست؟
+My phone doesn't work.|گوشی‌ام کار نمی‌کند.
+I need to charge my laptop.|باید لپ‌تاپم را شارژ کنم.
+Can you help me with this app?|می‌توانید با این اپلیکیشن کمکم کنید؟`},
+a2:{w:`download · upload|دانلود · آپلود
+install|نصب کردن
+update|به‌روزرسانی
+log in · log out|ورود · خروج
+username|نام کاربری
+account|حساب کاربری
+file · folder|فایل · پوشه
+save · delete|ذخیره کردن · حذف کردن
+slow · fast|کند · سریع`,
+s:`I can't log in to my account.|نمی‌توانم وارد حسابم شوم.
+The internet is very slow today.|اینترنت امروز خیلی کند است.
+Please update the app.|لطفاً اپلیکیشن را به‌روز کن.
+Did you save the file?|فایل را ذخیره کردی؟
+I forgot my password.|رمزم را فراموش کردم.`},
+b1:{w:`settings|تنظیمات
+notification|اعلان
+turn on · turn off|روشن کردن · خاموش کردن
+restart|راه‌اندازی مجدد
+storage|فضای ذخیره‌سازی
+backup|پشتیبان
+error message|پیام خطا
+crash|کرش کردن
+connection|اتصال`,
+s:`The app keeps crashing.|اپلیکیشن مدام می‌پرد بیرون.
+Have you tried restarting it?|امتحان کردی ری‌استارتش کنی؟
+I'm getting an error message.|پیام خطا می‌گیرم.
+I've run out of storage.|فضای ذخیره‌ام پر شده.
+I lost my connection.|اتصالم قطع شد.`},
+b2:{w:`software · hardware|نرم‌افزار · سخت‌افزار
+bug|باگ
+troubleshoot|عیب‌یابی کردن
+security breach|نقض امنیتی
+two-factor authentication|احراز هویت دو مرحله‌ای
+cloud storage|ذخیره‌سازی ابری
+compatible|سازگار
+reset to factory settings|بازگردانی به تنظیمات کارخانه`,
+s:`Could you help me troubleshoot this problem?|می‌توانی کمکم کنی این مشکل را عیب‌یابی کنم؟
+The software isn't compatible with my system.|نرم‌افزار با سیستمم سازگار نیست.
+I enabled two-factor authentication for extra security.|برای امنیت بیشتر احراز هویت دو مرحله‌ای را فعال کردم.
+I reported the bug to the developers.|باگ را به توسعه‌دهنده‌ها گزارش دادم.`},
+c1:{w:`latency|تأخیر
+bandwidth|پهنای باند
+encryption|رمزنگاری
+deprecated|منسوخ‌شده
+robust|مقاوم و پایدار
+seamless integration|یکپارچگی روان
+legacy system|سیستم قدیمی
+downtime|زمان از کار افتادن
+patch|وصله‌ی نرم‌افزاری`,
+s:`The service suffered several hours of downtime.|سرویس چند ساعت از کار افتاد.
+The patch fixes a critical security flaw.|این وصله یک نقص امنیتی حیاتی را برطرف می‌کند.
+This feature will be deprecated in the next release.|این قابلیت در نسخه‌ی بعد منسوخ می‌شود.
+We need a more robust architecture.|به معماری مقاوم‌تری نیاز داریم.`},
+c2:{w:`bleeding edge|لبه‌ی پیشرفته‌ی فناوری
+a kludge|راه‌حل سرهم‌بندی
+reinvent the wheel|دوباره چرخ را اختراع کردن
+go down the rabbit hole|درگیر مسیری بی‌پایان شدن
+a single point of failure|نقطه‌ی شکست واحد
+future-proof|آینده‌نگر و بادوام
+under the hood|زیر کاپوت (پیاده‌سازی داخلی)
+vaporware|نرم‌افزار وعده‌داده‌شده‌ای که هرگز نیامد`,
+s:`Let's not reinvent the wheel.|بیا دوباره چرخ را اختراع نکنیم.
+I went down a rabbit hole reading about compilers.|درباره‌ی کامپایلرها خواندم و غرق شدم.
+What's going on under the hood?|زیر کاپوت چه خبر است؟
+That server is a single point of failure.|آن سرور نقطه‌ی شکست واحد است.`}}},
+
+{id:"interview",fa:"مصاحبه‌ی شغلی",en:"Job interviews",L:{
+a1:{w:`job|شغل
+interview|مصاحبه
+CV|رزومه
+experience|تجربه
+skill|مهارت
+good at|در چیزی خوب بودن
+team|تیم
+thank you|ممنون`,
+s:`Hello, nice to meet you.|سلام، از آشنایی با شما خوشحالم.
+My name is Parsa. I'm a developer.|اسم من پارسا است. برنامه‌نویس هستم.
+I can speak English and Persian.|می‌توانم انگلیسی و فارسی صحبت کنم.
+I'm good at working in a team.|در کار تیمی خوبم.
+Thank you for your time.|بابت وقتی که گذاشتید ممنونم.`},
+a2:{w:`apply|اقدام کردن، درخواست دادن
+position|موقعیت شغلی
+qualification|مدرک، صلاحیت
+strengths · weaknesses|نقاط قوت · ضعف
+available|در دسترس
+start date|تاریخ شروع
+reference|معرف
+work experience|سابقه‌ی کار`,
+s:`I'm applying for the developer position.|برای موقعیت شغلی برنامه‌نویس اقدام می‌کنم.
+I have two years of experience.|دو سال سابقه دارم.
+Can you tell me about yourself?|می‌توانی درباره‌ی خودت بگویی؟
+When can you start?|کی می‌توانی شروع کنی؟
+What are your strengths?|نقاط قوتت چیست؟`},
+b1:{w:`achievement|دستاورد
+responsibility|مسئولیت
+work under pressure|تحت فشار کار کردن
+meet deadlines|به موعد تحویل رسیدن
+motivated|با انگیزه
+career goal|هدف شغلی
+candidate|متقاضی
+recent graduate|فارغ‌التحصیل تازه`,
+s:`I'm a hard-working and motivated person.|آدم پرتلاش و با انگیزه‌ای هستم.
+My biggest achievement was leading a small team.|بزرگ‌ترین دستاوردم رهبری یک تیم کوچک بود.
+Why do you want to work for us?|چرا می‌خواهید برای ما کار کنید؟
+I'm used to working under pressure.|به کار کردن تحت فشار عادت دارم.
+Where do you see yourself in five years?|پنج سال دیگر خودت را کجا می‌بینی؟`},
+b2:{w:`track record|سابقه‌ی عملکرد
+relevant experience|تجربه‌ی مرتبط
+transferable skills|مهارت‌های قابل‌انتقال
+notice period|دوره‌ی اخطار
+shortlisted|در فهرست نهایی
+job offer|پیشنهاد کار
+probation period|دوره‌ی آزمایشی
+thrive|شکوفا شدن`,
+s:`I have a proven track record in delivering projects on time.|سابقه‌ی اثبات‌شده‌ای در تحویل به‌موقع پروژه‌ها دارم.
+I was shortlisted for the second round.|به مرحله‌ی دوم راه یافتم.
+What does the probation period involve?|دوره‌ی آزمایشی شامل چه چیزهایی است؟
+I'd like to discuss the salary package.|می‌خواهم درباره‌ی بسته‌ی حقوق صحبت کنم.
+I thrive in fast-paced environments.|در محیط‌های پرسرعت شکوفا می‌شوم.`},
+c1:{w:`competent|شایسته
+proficient in|مسلط به
+adaptable|انطباق‌پذیر
+a self-starter|آدم خودانگیخته
+leverage my skills|از مهارت‌هایم بهره بردن
+remuneration|دستمزد
+commensurate with experience|متناسب با تجربه
+a cultural fit|هم‌خوان با فرهنگ سازمان`,
+s:`I'm proficient in several programming languages.|به چند زبان برنامه‌نویسی مسلطم.
+I'm a self-starter who adapts quickly.|آدم خودانگیخته‌ای هستم که سریع سازگار می‌شود.
+The remuneration is commensurate with experience.|دستمزد متناسب با تجربه است.
+I believe I'd be a good cultural fit.|فکر می‌کنم با فرهنگ سازمان شما جور می‌شوم.`},
+c2:{w:`sell yourself|خودت را خوب معرفی کردن
+get a foot in the door|پا را به یک صنعت یا شرکت باز کردن
+ace the interview|مصاحبه را عالی تمام کردن
+cut the mustard|از پس کار برآمدن
+play to your strengths|از نقاط قوتت استفاده کردن
+burn bridges|پل‌های پشت سر را خراب کردن
+put your best foot forward|بهترین خودت را نشان دادن
+step up to the plate|مسئولیت را به عهده گرفتن`,
+s:`I aced the interview and got the job.|مصاحبه را عالی تمام کردم و کار را گرفتم.
+It's an entry-level job, but it gets my foot in the door.|شغل ابتدایی است ولی پایم را به صنعت باز می‌کند.
+Never burn your bridges when you leave a company.|وقتی از شرکتی می‌روی هیچ‌وقت پل‌های پشت سرت را خراب نکن.
+I wanted to put my best foot forward.|می‌خواستم بهترین خودم را نشان بدهم.`}}},
+
+{id:"hobby",fa:"سرگرمی، ورزش و آب‌وهوا",en:"Hobbies, sport & weather",L:{
+a1:{w:`football · swimming|فوتبال · شنا
+music · film|موسیقی · فیلم
+read · draw · cook|خواندن · نقاشی کردن · آشپزی کردن
+play|بازی کردن، نواختن
+free time|وقت آزاد
+sunny · rainy · windy|آفتابی · بارانی · بادی
+hot · cold|گرم · سرد
+snow|برف`,
+s:`What do you do in your free time?|در وقت آزادت چکار می‌کنی؟
+I like swimming and reading.|شنا و کتاب خواندن را دوست دارم.
+Do you play football?|فوتبال بازی می‌کنی؟
+What's the weather like today?|هوای امروز چطور است؟
+It's sunny and hot.|آفتابی و گرم است.`},
+a2:{w:`hobby|سرگرمی
+join a club|عضو باشگاه شدن
+match|مسابقه
+go for a run|برای دویدن رفتن
+go hiking|کوه‌نوردی رفتن
+forecast|پیش‌بینی
+cloudy · foggy · stormy|ابری · مه‌آلود · طوفانی
+degrees|درجه
+umbrella|چتر`,
+s:`I go for a run three times a week.|هفته‌ای سه بار می‌دوم.
+I'm learning to play the guitar.|دارم گیتار یاد می‌گیرم.
+What's the weather forecast for tomorrow?|پیش‌بینی هوای فردا چیست؟
+It's going to be cloudy with some rain.|ابری است و کمی باران می‌بارد.
+It's thirty degrees today.|امروز سی درجه است.`},
+b1:{w:`take up|شروع کردن (سرگرمی)
+keep fit|تناسب اندام را حفظ کردن
+work out|ورزش کردن
+get into|علاقه‌مند شدن به
+enthusiast|علاقه‌مند
+tournament|مسابقات
+drizzle|نم‌نم باران
+heatwave|موج گرما
+humid|شرجی`,
+s:`I've recently taken up photography.|تازگی عکاسی را شروع کرده‌ام.
+I work out at the gym twice a week.|هفته‌ای دو بار در باشگاه ورزش می‌کنم.
+I'm really into board games.|خیلی به بازی‌های رومیزی علاقه دارم.
+There's a heatwave this week.|این هفته موج گرما داریم.
+It's too humid today.|امروز هوا زیادی شرجی است.`},
+b2:{w:`pastime|سرگرمی
+passionate about|عاشق
+competitive|رقابتی
+stamina|استقامت
+downpour|بارش شدید
+clear up|صاف شدن (هوا)
+freezing|یخ‌بندان
+sports facilities|امکانات ورزشی`,
+s:`I'm passionate about rock climbing.|عاشق صخره‌نوردی‌ام.
+It poured with rain all afternoon.|تمام بعدازظهر باران شدید می‌بارید.
+The weather is supposed to clear up this evening.|قرار است هوا امشب صاف شود.
+Building stamina takes time.|ساختن استقامت زمان می‌برد.`},
+c1:{w:`avid reader|کتاب‌خوان پرشور
+a keen amateur|آماتور علاقه‌مند
+pursue a passion|دنبال علاقه‌ات رفتن
+torrential rain|باران سیل‌آسا
+inclement weather|هوای نامساعد
+overcast|ابری و گرفته
+balmy|ملایم و دلپذیر
+sweltering|طاقت‌فرسا (گرما)`,
+s:`I'm an avid reader of science fiction.|خواننده‌ی پرشور داستان‌های علمی‌تخیلی هستم.
+The match was postponed due to inclement weather.|مسابقه به خاطر هوای نامساعد به تعویق افتاد.
+It was a balmy evening.|عصر دلپذیر و ملایمی بود.
+It's sweltering in July.|در تیر و مرداد (ژوئیه) گرما طاقت‌فرساست.`},
+c2:{w:`take a rain check|فرصت دیگری خواستن
+come rain or shine|در هر شرایطی
+steal someone's thunder|ابتکار کسی را از او گرفتن
+it's raining cats and dogs|سیل‌آسا می‌بارد
+save for a rainy day|برای روز مبادا پس‌انداز کردن
+a breath of fresh air|نسیم تازه، چیز تازه و دلپذیر
+right as rain|کاملاً سالم
+the calm before the storm|آرامش قبل از طوفان`,
+s:`I'll take a rain check, if you don't mind.|اگر اشکالی ندارد یک وقت دیگر.
+We'll be there, come rain or shine.|در هر شرایطی آنجا خواهیم بود.
+It's raining cats and dogs.|دارد سیل‌آسا می‌بارد.
+Save some money for a rainy day.|کمی پول برای روز مبادا کنار بگذار.`}}}
+];
+SIT2.forEach(o=>Object.values(o.L).forEach(c=>{c.w=P(c.w);c.s=P(c.s)}));
+const SORDER=["num","city","social","shop","food","travel","dir","health","school","interview","office","work","phone","tech","home","hobby"];
+SIT.push(...SIT2); SIT.sort((a,b)=>SORDER.indexOf(a.id)-SORDER.indexOf(b.id));
+
+/* ===== phrasebank: practical phrases by function; m = lowest level that sees the group ===== */
+const PH={
+num:[
+{m:"a1",t:"پرسیدن و تأیید عدد",p:`How many…? / How much…?|چند تا…؟ / چقدر…؟
+Could you say that number again?|می‌شود آن عدد را دوباره بگویید؟
+Is that fifteen or fifty?|پانزده است یا پنجاه؟
+Can you write it down, please?|می‌شود بنویسید لطفاً؟`},
+{m:"a2",t:"ساعت و قرار",p:`What time shall we meet?|ساعت چند همدیگر را ببینیم؟
+Let's meet at half past five.|ساعت پنج و نیم همدیگر را ببینیم.
+I'll be there in ten minutes.|ده دقیقه‌ی دیگر آنجا هستم.
+The shop closes at nine p.m.|مغازه ساعت نه شب بسته می‌شود.`},
+{m:"b1",t:"قیمت و پرداخت",p:`That comes to three hundred thousand in total.|روی هم سیصد هزار تومان می‌شود.
+Could you round it up?|می‌شود رقم را گرد کنید؟
+Keep the change.|بقیه‌اش برای خودتان.
+It's two hundred thousand tomans a month.|ماهی دویست هزار تومان است.`}],
+city:[
+{m:"a1",t:"معرفی خودت",p:`I'm from Iran.|اهل ایرانم.
+I was born in Shiraz.|در شیراز به دنیا آمدم.
+I live in Tehran, in district twenty-two.|در تهران، منطقه‌ی ۲۲ زندگی می‌کنم.
+My hometown is Rasht.|زادگاهم رشت است.`},
+{m:"a2",t:"پرسیدن درباره‌ی یک شهر",p:`What's your city like?|شهرتان چطور است؟
+What is it famous for?|به چه چیزی مشهور است؟
+Is it worth visiting?|ارزش دیدن دارد؟
+How do I get there from here?|از اینجا چطور آنجا بروم؟`},
+{m:"b1",t:"توصیف یک شهر",p:`It's a lively city with lots to do.|شهری پرجنب‌وجوش با کلی کار برای انجام دادن است.
+It's famous for its bazaar and gardens.|به بازار و باغ‌هایش مشهور است.
+It gets very crowded in summer.|تابستان‌ها خیلی شلوغ می‌شود.
+The weather is mild all year round.|هوا در تمام سال معتدل است.`}],
+social:[
+{m:"a1",t:"سلام و خداحافظی",p:`Good morning! / Good evening!|صبح بخیر! / عصر بخیر!
+How are you doing? — Not bad, thanks.|حالت چطور است؟ ـ بد نیست، ممنون.
+Long time no see!|چه عجب از این طرف‌ها!
+Have a nice day!|روز خوبی داشته باشی!`},
+{m:"a2",t:"دعوت کردن و جواب دادن",p:`Would you like to come to dinner on Friday?|دوست داری جمعه برای شام بیایی؟
+I'd love to!|خیلی هم دوست دارم!
+Thanks for the invitation, but I can't.|ممنون از دعوت ولی نمی‌توانم.
+What time should I come?|ساعت چند بیایم؟
+Can I bring something?|چیزی با خودم بیاورم؟`},
+{m:"b1",t:"عذرخواهی و تشکر",p:`I'm so sorry about that.|بابت آن خیلی متأسفم.
+It's my fault.|تقصیر من است.
+Thank you so much for your help.|از کمکت خیلی ممنونم.
+I really appreciate it.|واقعاً قدردانم.
+Don't mention it.|قابلی ندارد.`},
+{m:"b2",t:"موافقت و مخالفت مؤدبانه",p:`I see what you mean, but…|منظورت را می‌فهمم، ولی…
+I couldn't agree more.|بیشتر از این نمی‌شد موافق بود.
+That's a fair point.|حرف منصفانه‌ای است.
+I'm afraid I disagree.|متأسفانه موافق نیستم.`}],
+shop:[
+{m:"a1",t:"پرسیدن و پیدا کردن",p:`Excuse me, do you sell phone chargers?|ببخشید، شارژر گوشی دارید؟
+Where can I find the milk?|شیر را کجا پیدا کنم؟
+Do you have any bigger ones?|بزرگ‌ترش را دارید؟
+Is this on sale?|این حراج است؟`},
+{m:"a2",t:"سفارش و خرید کردن",p:`I'll take it.|همین را می‌خرم.
+I'll take two of these.|از این‌ها دو تا می‌خرم.
+Could I have a bag, please?|می‌شود یک کیسه بدهید؟
+I'd like to order this online.|می‌خواهم این را آنلاین سفارش بدهم.
+Can I pay cash on delivery?|می‌توانم موقع تحویل نقد پرداخت کنم؟`},
+{m:"b1",t:"پیگیری سفارش",p:`When will my order arrive?|سفارشم کی می‌رسد؟
+I'd like to track my order.|می‌خواهم سفارشم را پیگیری کنم.
+The item arrived damaged.|کالا آسیب‌دیده رسید.
+I'd like to cancel my order.|می‌خواهم سفارشم را لغو کنم.
+Could you send me an invoice?|می‌توانید فاکتور برایم بفرستید؟`},
+{m:"b2",t:"شکایت",p:`I'd like to speak to the manager.|می‌خواهم با مدیر صحبت کنم.
+I was charged twice.|دو بار از من پول کم شده.
+This isn't what was advertised.|این چیزی نیست که تبلیغ شده بود.
+I expect a full refund.|انتظار دارم کل مبلغ برگردد.`}],
+food:[
+{m:"a1",t:"سفارش دادن",p:`I'd like the chicken, please.|مرغ می‌خواستم، لطفاً.
+Can I have a coffee, please?|یک قهوه می‌شود؟
+Could I have the menu, please?|می‌شود منو را بیاورید؟
+I'll have the soup.|من سوپ می‌خورم.
+Can we order, please?|می‌توانیم سفارش بدهیم؟`},
+{m:"a2",t:"ترجیحات و سؤال درباره‌ی غذا",p:`No onions, please.|بدون پیاز، لطفاً.
+Could I have it less spicy?|می‌شود کمتر تند باشد؟
+I'm vegetarian. What can I eat?|گیاه‌خوارم. چه چیزی می‌توانم بخورم؟
+What's in this dish?|داخل این غذا چیست؟
+Could I have some more bread?|کمی نان بیشتر می‌شود؟`},
+{m:"b1",t:"مشکل و درخواست",p:`Excuse me, we've been waiting for a long time.|ببخشید، خیلی وقت است منتظریم.
+This is cold. Could you heat it up?|این سرد است. می‌شود گرمش کنید؟
+We didn't order this.|ما این را سفارش نداده بودیم.
+Could we have another table?|می‌شود میز دیگری بدهید؟
+Could you bring the bill, please?|می‌شود صورت‌حساب را بیاورید؟`},
+{m:"b2",t:"تعریف و حساب کردن",p:`Compliments to the chef!|دست‌پخت سرآشپز درجه‌یک!
+Everything was delicious.|همه‌چیز عالی بود.
+Is a tip expected here?|اینجا انعام معمول است؟
+Let me get this one.|این یکی با من.`}],
+travel:[
+{m:"a1",t:"خرید بلیت",p:`One ticket to Mashhad, please.|یک بلیت به مشهد، لطفاً.
+A return ticket, please.|یک بلیت رفت‌وبرگشت، لطفاً.
+How much is the ticket to Shiraz?|بلیت شیراز چقدر است؟
+Which platform does it leave from?|از کدام سکو حرکت می‌کند؟
+Is this seat taken?|این صندلی صاحب دارد؟`},
+{m:"a2",t:"در هتل",p:`I have a reservation under the name Banitaba.|با نام بنی‌طبا رزرو دارم.
+Could I have a room with a view?|می‌شود اتاقی با منظره بدهید؟
+What time is breakfast?|صبحانه ساعت چند است؟
+Could I have a late check-out?|می‌شود دیرتر تحویل بدهم؟
+Is there Wi-Fi in the room?|توی اتاق وای‌فای هست؟`},
+{m:"b1",t:"در فرودگاه",p:`Where do I check in?|کجا باید ثبت‌نام (چک‌این) کنم؟
+I'd like a window seat.|صندلی کنار پنجره می‌خواهم.
+Is this the gate for the flight to Istanbul?|این گیت پرواز استانبول است؟
+My flight was cancelled. What are my options?|پروازم لغو شد. چه گزینه‌هایی دارم؟
+I'd like to rebook my flight.|می‌خواهم پروازم را دوباره رزرو کنم.`},
+{m:"b2",t:"ویزا و گمرک",p:`I'm here on holiday.|برای تعطیلات آمده‌ام.
+I'll be staying for two weeks.|دو هفته می‌مانم.
+I have nothing to declare.|چیزی برای اظهار ندارم.
+Where do I collect my baggage?|چمدانم را از کجا تحویل بگیرم؟`}],
+dir:[
+{m:"a1",t:"پرسیدن مسیر",p:`Excuse me, how do I get to the bazaar?|ببخشید، چطور به بازار بروم؟
+Is there a bank near here?|این اطراف بانک هست؟
+Which way is the station?|ایستگاه از کدام طرف است؟
+Can you show me on the map?|می‌توانید روی نقشه نشانم دهید؟
+How long does it take?|چقدر طول می‌کشد؟`},
+{m:"a2",t:"در تاکسی",p:`To this address, please.|به این آدرس، لطفاً.
+How much will it cost?|چقدر می‌شود؟
+Please stop here.|لطفاً همین‌جا نگه دارید.
+Could you wait here for a few minutes?|می‌توانید چند دقیقه اینجا منتظر بمانید؟`},
+{m:"b1",t:"حمل‌ونقل عمومی",p:`Does this bus go to the airport?|این اتوبوس به فرودگاه می‌رود؟
+Where should I get off?|کجا باید پیاده شوم؟
+How many stops is it?|چند ایستگاه مانده؟
+Is there a direct train?|قطار مستقیم هست؟
+What time is the last metro?|آخرین مترو ساعت چند است؟`}],
+health:[
+{m:"a1",t:"گفتن مشکل",p:`I feel sick.|حالت تهوع دارم / حالم بد است.
+It hurts here.|اینجا درد می‌کند.
+I have a fever.|تب دارم.
+I've been coughing a lot.|خیلی سرفه می‌کنم.
+I need some medicine.|دارو لازم دارم.`},
+{m:"a2",t:"در مطب و داروخانه",p:`How long have you had these symptoms?|چه مدت است این علائم را دارید؟
+Do you have anything for a cold?|برای سرماخوردگی چیزی دارید؟
+How many times a day should I take it?|روزی چند بار بخورم؟
+Take one tablet after meals.|بعد از غذا یک قرص بخورید.
+Is it safe to take with my other medicine?|با داروهای دیگرم هم می‌شود خورد؟`},
+{m:"b1",t:"اورژانس",p:`Call an ambulance!|آمبولانس خبر کنید!
+It's an emergency.|وضعیت اضطراری است.
+He's unconscious.|بی‌هوش است.
+I think I've broken my arm.|فکر کنم دستم شکسته.
+Is there a hospital nearby?|بیمارستان نزدیک هست؟`},
+{m:"b2",t:"پرسیدن از پزشک",p:`What do you advise?|چه توصیه‌ای دارید؟
+Do I need surgery?|به عمل نیاز دارم؟
+How long will the recovery take?|دوره‌ی بهبودی چقدر طول می‌کشد؟
+Is it covered by my insurance?|بیمه‌ام پوشش می‌دهد؟`}],
+school:[
+{m:"a1",t:"در کلاس",p:`May I come in?|می‌توانم بیایم داخل؟
+May I ask a question?|می‌توانم سؤال بپرسم؟
+How do you say this in English?|این را به انگلیسی چه می‌گویند؟
+How do you spell it?|املایش چیست؟
+I don't understand. Could you repeat?|متوجه نشدم. می‌شود تکرار کنید؟`},
+{m:"a2",t:"صحبت با استاد",p:`Could I talk to you after class?|می‌توانم بعد از کلاس با شما صحبت کنم؟
+Sorry I'm late.|ببخشید دیر کردم.
+When is the next exam?|امتحان بعدی کی است؟
+Could you check my work, please?|می‌شود کارم را نگاه کنید؟
+What should I read for next week?|برای هفته‌ی بعد چه چیزی بخوانم؟`},
+{m:"b1",t:"تکلیف و مهلت",p:`I'd like to ask for an extension.|می‌خواهم درخواست تمدید مهلت کنم.
+I couldn't finish because I was ill.|چون مریض بودم نتوانستم تمام کنم.
+Could you give me some feedback?|می‌توانید بازخورد بدهید؟
+Where can I find the reading list?|فهرست منابع را از کجا بگیرم؟`},
+{m:"b2",t:"ایمیل به استاد",p:`Dear Professor Ahmadi, I'm writing to ask about…|استاد احمدی عزیز، می‌نویسم تا درباره‌ی … بپرسم.
+I would appreciate your guidance.|از راهنمایی شما سپاسگزار می‌شوم.
+Thank you for your time and consideration.|بابت وقت و توجه شما سپاسگزارم.
+Kind regards,|با احترام،`}],
+interview:[
+{m:"a2",t:"معرفی خودت",p:`Let me introduce myself.|اجازه بدهید خودم را معرفی کنم.
+I graduated from West Tehran University.|از دانشگاه تهران غرب فارغ‌التحصیل شدم.
+I've worked as a developer for two years.|دو سال به عنوان برنامه‌نویس کار کرده‌ام.
+I'm looking for a new challenge.|دنبال چالش تازه‌ای هستم.`},
+{m:"b1",t:"سؤال‌های رایج مصاحبه",p:`Tell me about yourself.|درباره‌ی خودت بگو.
+What are your strengths and weaknesses?|نقاط قوت و ضعفت چیست؟
+Why should we hire you?|چرا باید تو را استخدام کنیم؟
+Do you have any questions for us?|شما سؤالی از ما دارید؟`},
+{m:"b2",t:"پرسیدن از شرکت",p:`What would my daily tasks be?|وظایف روزانه‌ام چه خواهد بود؟
+Is there room for growth?|امکان رشد هست؟
+What's the team like?|تیم چطوری است؟
+What are the next steps?|مراحل بعدی چیست؟`}],
+office:[
+{m:"a1",t:"کمک خواستن",p:`Can you help me fill in this form?|می‌توانید در پر کردن این فرم کمکم کنید؟
+Where do I sign?|کجا را امضا کنم؟
+Which window do I go to?|به کدام باجه بروم؟
+What do I need to bring?|چه چیزی باید بیاورم؟
+Is this the right queue?|این صف درست است؟`},
+{m:"a2",t:"پرسیدن روند کار",p:`How long will it take?|چقدر طول می‌کشد؟
+When will it be ready?|کی آماده می‌شود؟
+Do I need an appointment?|وقت قبلی لازم است؟
+Can I pay by card?|می‌توانم با کارت پرداخت کنم؟
+Could you give me a receipt?|رسید می‌دهید؟`},
+{m:"b1",t:"پیگیری",p:`I'm calling to check the status of my application.|زنگ می‌زنم تا وضعیت درخواستم را بپرسم.
+I submitted the documents last week.|مدارک را هفته‌ی پیش تحویل دادم.
+Is there anything else you need from me?|چیز دیگری از من لازم دارید؟
+Who should I speak to?|با چه کسی صحبت کنم؟`},
+{m:"b2",t:"اعتراض",p:`I'd like to file a complaint.|می‌خواهم شکایت ثبت کنم.
+There seems to be a mistake with my account.|به نظر می‌رسد در حسابم اشتباهی شده.
+I'd like this corrected as soon as possible.|می‌خواهم هرچه زودتر اصلاح شود.
+Could you put that in writing?|می‌شود آن را کتبی بدهید؟`}],
+work:[
+{m:"a1",t:"در دفتر",p:`Good morning, everyone.|صبح همه بخیر.
+Can I borrow your pen?|می‌توانم خودکارت را قرض بگیرم؟
+Where's the meeting room?|اتاق جلسه کجاست؟
+I'm on a break.|در استراحتم.
+See you tomorrow.|فردا می‌بینمت.`},
+{m:"a2",t:"درخواست و قبول کردن",p:`Could you help me with this?|می‌توانی در این کار کمکم کنی؟
+I'll do it right away.|همین الان انجامش می‌دهم.
+I'll send it by the end of the day.|تا آخر وقت می‌فرستم.
+Sorry, I didn't catch that.|ببخشید، متوجه نشدم.
+Can you repeat that, please?|می‌شود تکرار کنی؟`},
+{m:"b1",t:"در جلسه",p:`Let's get started.|شروع کنیم.
+Shall we move on to the next point?|برویم سراغ نکته‌ی بعدی؟
+Does anyone have any questions?|کسی سؤالی دارد؟
+Could you share your screen?|می‌توانید صفحه‌تان را به اشتراک بگذارید؟
+I'll send the notes after the meeting.|یادداشت‌ها را بعد از جلسه می‌فرستم.`},
+{m:"b2",t:"نظر دادن و جمع‌بندی",p:`I'd like to suggest a different approach.|می‌خواهم رویکرد متفاوتی پیشنهاد کنم.
+I see it differently.|من جور دیگری می‌بینم.
+Let's take this offline.|این را بعداً جدا صحبت کنیم.
+Can we pick this up tomorrow?|می‌توانیم فردا ادامه بدهیم؟
+Let's agree on the next steps.|روی قدم‌های بعدی توافق کنیم.`}],
+phone:[
+{m:"a1",t:"تلفن",p:`Hello? Who's calling, please?|الو؟ شما؟
+Speaking.|خودم هستم (پای تلفن).
+Can you hear me?|صدایم را می‌شنوی؟
+Can you call me back?|می‌توانی بهم زنگ بزنی؟
+I'll text you.|پیامک می‌دهم.`},
+{m:"a2",t:"گذاشتن پیام",p:`Could you tell him I called?|می‌شود بگویید من زنگ زدم؟
+Please ask her to call me back.|لطفاً بگویید با من تماس بگیرد.
+My number is…|شماره‌ام … است.
+Could you spell that, please?|می‌شود هجی کنید؟`},
+{m:"b1",t:"ایمیل کاری",p:`Dear Mr. Rezaei,|آقای رضایی عزیز،
+Thank you for your email.|بابت ایمیلتان ممنونم.
+I'm attaching the file.|فایل را پیوست می‌کنم.
+Best regards,|با بهترین آرزوها / با احترام،
+Looking forward to your reply.|منتظر پاسخ شما هستم.`},
+{m:"b2",t:"پیگیری رسمی",p:`I'm writing regarding…|درباره‌ی … می‌نویسم.
+Please let me know if you need further information.|اگر اطلاعات بیشتری لازم دارید خبر بدهید.
+I apologise for the delay in replying.|بابت دیر پاسخ دادن عذرخواهی می‌کنم.
+Please find my CV attached.|رزومه‌ام پیوست است.`}],
+tech:[
+{m:"a2",t:"درخواست پشتیبانی",p:`I'm having a problem with my account.|با حسابم مشکل دارم.
+It doesn't load.|لود نمی‌شود.
+It says "wrong password".|پیام «رمز اشتباه» می‌دهد.
+Can you reset my password?|می‌توانید رمزم را بازنشانی کنید؟
+How do I update it?|چطور به‌روزش کنم؟`},
+{m:"b1",t:"توضیح مشکل",p:`It stopped working after the update.|بعد از به‌روزرسانی از کار افتاد.
+I get an error when I click Save.|وقتی روی ذخیره می‌زنم خطا می‌دهد.
+I've already tried restarting it.|قبلاً ری‌استارتش کرده‌ام.
+Is it a known issue?|مشکل شناخته‌شده‌ای است؟`},
+{m:"b2",t:"گزارش باگ",p:`I'd like to report a bug.|می‌خواهم یک باگ گزارش کنم.
+It only happens on mobile.|فقط روی موبایل رخ می‌دهد.
+Here are the steps to reproduce it.|این هم مراحل بازتولیدش.
+Could you look into it?|می‌توانید بررسی کنید؟`}],
+home:[
+{m:"a2",t:"دیدن خانه",p:`Can I see the flat?|می‌توانم آپارتمان را ببینم؟
+How many rooms are there?|چند اتاق دارد؟
+Is the building quiet?|ساختمان ساکت است؟
+Are pets allowed?|حیوان خانگی مجاز است؟
+How far is it from the metro?|چقدر تا مترو فاصله دارد؟`},
+{m:"b1",t:"صحبت با صاحبخانه",p:`The heater is broken.|شوفاژ خراب است.
+When can someone come to fix it?|کی می‌توانند بیایند درستش کنند؟
+Can I get a copy of the contract?|می‌توانم یک نسخه از قرارداد داشته باشم؟
+Can I extend the lease?|می‌توانم اجاره را تمدید کنم؟`},
+{m:"b2",t:"مذاکره",p:`Is the rent negotiable?|اجاره قابل مذاکره است؟
+Would you consider lowering the deposit?|امکان دارد ودیعه را کم کنید؟
+What does the rent include?|اجاره شامل چه چیزهایی است؟
+What's the notice period?|دوره‌ی اخطار چقدر است؟`}],
+hobby:[
+{m:"a1",t:"گفتن علایق",p:`I like swimming.|شنا را دوست دارم.
+I love music.|عاشق موسیقی‌ام.
+I don't like cold weather.|هوای سرد را دوست ندارم.
+I'm good at drawing.|در نقاشی خوبم.
+My favourite sport is football.|ورزش مورد علاقه‌ام فوتبال است.`},
+{m:"a2",t:"پیشنهاد دادن",p:`Do you want to play football on Friday?|جمعه فوتبال بازی کنیم؟
+Let's go for a walk.|بیا بریم قدم بزنیم.
+Shall we watch a film tonight?|امشب فیلم ببینیم؟
+Sounds great!|عالیه!
+Maybe another time.|شاید یک وقت دیگر.`},
+{m:"b1",t:"حرف زدن درباره‌ی هوا",p:`What a lovely day!|چه روز قشنگی!
+It looks like it's going to rain.|به نظر می‌رسد باران بیاید.
+It's freezing today!|امروز هوا یخ می‌زند!
+Take a jacket with you.|یک ژاکت با خودت ببر.
+The weather is getting better.|هوا دارد بهتر می‌شود.`}]
+};
+Object.values(PH).forEach(a=>a.forEach(g=>{g.p=P(g.p)}));
+
 /* ===== state ===== */
 const store={get(k,d){try{const v=localStorage.getItem(k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 let learned=new Set(store.get("gl-learned",[]));
@@ -2088,20 +2908,22 @@ function renderResult(){
 }
 
 /* ===== wiring ===== */
+function phCount(id,lv){const LI=Object.keys(LV);return (PH[id]||[]).filter(g=>LI.indexOf(g.m)<=LI.indexOf(lv)).reduce((a,g)=>a+g.p.length,0)}
 function renderSit(){
   setLvColor(S.lv);
   const i=Math.max(0,SIT.findIndex(x=>x.id===S.sit)),cur=SIT[i]; S.sit=cur.id; store.set("gl-sit",S.sit);
-  const c=cur.L[S.lv], lvn=LV[S.lv].n;
-  $("#main").innerHTML=`<div class="grid"><aside class="list" aria-label="موقعیت‌ها"><h2>موقعیت‌ها · ${S.lv.toUpperCase()}</h2><ol>${SIT.map(x=>`<li><button data-s="${x.id}" aria-current="${x.id===cur.id}"><span class="dot cnt">${faDigits(x.L[S.lv].w.length+x.L[S.lv].s.length)}</span><span>${esc(x.fa)}</span></button></li>`).join("")}</ol></aside>
+  const c=cur.L[S.lv], lvn=LV[S.lv].n, LI=Object.keys(LV), pg=(PH[cur.id]||[]).filter(g=>LI.indexOf(g.m)<=LI.indexOf(S.lv)), pn=pg.reduce((a,g)=>a+g.p.length,0);
+  $("#main").innerHTML=`<div class="grid"><aside class="list" aria-label="موقعیت‌ها"><h2>موقعیت‌ها · ${S.lv.toUpperCase()}</h2><ol>${SIT.map(x=>`<li><button data-s="${x.id}" aria-current="${x.id===cur.id}"><span class="dot cnt">${faDigits(x.L[S.lv].w.length+x.L[S.lv].s.length+phCount(x.id,S.lv))}</span><span>${esc(x.fa)}</span></button></li>`).join("")}</ol></aside>
   <article class="lesson" id="lesson">
    <div class="eyebrow"><span class="lvtag">${S.lv.toUpperCase()}</span><span>موقعیت ${faDigits(i+1)} از ${faDigits(SIT.length)} · ${lvn}</span></div>
    <h2>${esc(cur.fa)}</h2><div class="entitle">${esc(cur.en)}</div>
-   <p>کلمه‌ها و جمله‌های مهم این موقعیت در سطح ${S.lv.toUpperCase()}. بالا روی پله‌ها سطح را عوض کن تا همین موقعیت را در سطح بالاتر یا پایین‌تر ببینی.</p>
+   <p>کلمه‌ها و جمله‌های مهم این موقعیت در سطح ${S.lv.toUpperCase()}. بالا روی پله‌ها سطح را عوض کن تا همین موقعیت را در سطح بالاتر یا پایین‌تر ببینی. جمله‌های پرکاربرد پایین صفحه با بالا رفتن سطح بیشتر می‌شوند.</p>
    <div class="vbar"><button class="btn" id="hide" aria-pressed="${hideMean}">${hideMean?"نمایش همه‌ی معنی‌ها":"پنهان کردن معنی‌ها (خودآزمایی)"}</button><span style="color:var(--muted);font-size:.85rem">${hideMean?"اول حدس بزن، بعد روی معنی بزن تا ظاهر شود.":""}</span></div>
    <h3>کلمه‌ها و عبارت‌ها (${faDigits(c.w.length)})</h3>
    <div class="vgrid ${hideMean?"hidemean":""}">${c.w.map(v=>`<div class="vcard"><div class="vh"><span class="vw">${esc(v[0])}</span>${canSpeak?`<button class="say" data-say="${esc(v[0].replace(/ · /g,", "))}" aria-label="پخش تلفظ">${ICON}</button>`:""}</div><button class="vm">${rich(v[1])}</button>${v[2]?`<div class="vx">${esc(v[2])}</div>`:""}</div>`).join("")}</div>
    <h3>جمله‌های مهم (${faDigits(c.s.length)})</h3>
    <ul class="exs ${hideMean?"hidemean":""}">${c.s.map(e=>`<li class="ex">${canSpeak?`<button class="say" data-say="${esc(e[0])}" aria-label="پخش تلفظ">${ICON}</button>`:""}<div class="s"><div class="e">${esc(e[0])}</div><div class="f">${esc(e[1])}</div></div></li>`).join("")}</ul>
+   ${pg.length?`<h3>جمله‌های پرکاربرد بر اساس موقعیت (${faDigits(pn)})</h3>${pg.map(g=>`<div class="pgroup"><div class="ptitle"><span class="lvtag" style="background:var(${LV[g.m].c})">${g.m.toUpperCase()}</span>${esc(g.t)}</div><ul class="exs ${hideMean?"hidemean":""}">${g.p.map(e=>`<li class="ex">${canSpeak?`<button class="say" data-say="${esc(e[0].replace(/ \/ /g,". "))}" aria-label="پخش تلفظ">${ICON}</button>`:""}<div class="s"><div class="e">${esc(e[0])}</div><div class="f">${esc(e[1])}</div></div></li>`).join("")}</ul></div>`).join("")}`:""}
    <div class="foot"><span></span><div class="nav"><button class="btn" id="sprev" ${i===0?"disabled":""}>→ قبلی</button><button class="btn" id="snext" ${i===SIT.length-1?"disabled":""}>بعدی ←</button></div></div>
   </article></div>`;
 }
@@ -2113,6 +2935,12 @@ document.addEventListener("click",e=>{
   const fx=e.target.closest(".hidemean .ex .f"); if(fx){fx.classList.toggle("show");return}
   const b=e.target.closest("button,input"); if(!b)return;
   if(b.matches(".step")){if(S.mode!=="sit"){S.mode="learn";S.view="g"}S.lv=b.dataset.lv;S.id=lvTopics(S.lv)[0].id;render();return}
+  if(b.id==="theme"){toggleTheme();return}
+  if(b.id==="tdNext"){tdK++;renderToday();return}
+  if(b.id==="tdSay"){speak($("#tdEn").textContent);return}
+  if(b.id==="totop"){window.scrollTo({top:0,behavior:"smooth"});return}
+  if(b.dataset.flv){if(S.mode!=="sit"){S.mode="learn";S.view="g"}S.lv=b.dataset.flv;S.id=lvTopics(S.lv)[0].id;render();$("#stairs").scrollIntoView({behavior:"smooth",block:"start"});return}
+  if(b.dataset.fsit){S.mode="sit";S.sit=b.dataset.fsit;render();$("#stairs").scrollIntoView({behavior:"smooth",block:"start"});return}
   if(b.id==="m-sit"){S.mode="sit";render();return}
   if(b.matches(".list button[data-s]")){S.sit=b.dataset.s;render();scrollLesson();return}
   if(b.id==="sprev"||b.id==="snext"){const k=SIT.findIndex(x=>x.id===S.sit)+(b.id==="snext"?1:-1);if(SIT[k]){S.sit=SIT[k].id;render();scrollLesson()}return}
@@ -2133,6 +2961,25 @@ document.addEventListener("click",e=>{
   if(b.id==="qnext"){Q.n++;Q.n<Q.items.length?renderQ():renderResult();return}
   if(b.dataset.goto){goKey(b.dataset.goto);return}
 });
+/* ===== header, footer, theme ===== */
+const ALLP=[];
+SIT.forEach(o=>Object.keys(o.L).forEach(lv=>o.L[lv].s.forEach(x=>ALLP.push([x[0],x[1],lv,o.fa]))));
+Object.keys(PH).forEach(id=>{const o=SIT.find(x=>x.id===id);PH[id].forEach(g=>g.p.forEach(x=>ALLP.push([x[0],x[1],g.m,o.fa])))});
+let tdK=Math.floor(Date.now()/864e5);
+function renderToday(){const p=ALLP[(tdK*37)%ALLP.length];if(!p)return;$("#tdEn").textContent=p[0];$("#tdFa").textContent=p[1];const t=$("#tdLv");t.textContent=p[2].toUpperCase();t.style.background=`var(${LV[p[2]].c})`;$("#tdSit").textContent=p[3];$("#tdSay").innerHTML=canSpeak?ICON:"";$("#tdSay").hidden=!canSpeak}
+function fillStats(){
+  const big=n=>faDigits(String(Math.floor(n/10)*10))+"+";
+  const nw=Object.values(V).reduce((a,o)=>a+o.w.length+o.c.length+o.i.length,0)+SIT.reduce((a,o)=>a+Object.values(o.L).reduce((b,c)=>b+c.w.length,0),0);
+  const np=SIT.reduce((a,o)=>a+Object.values(o.L).reduce((b,c)=>b+c.s.length,0),0)+Object.values(PH).reduce((a,g)=>a+g.reduce((b,x)=>b+x.p.length,0),0);
+  $("#st-g").textContent=faDigits(T.length);$("#st-s").textContent=faDigits(SIT.length);$("#st-w").textContent=big(nw);$("#st-p").textContent=big(np);
+}
+function fillFooter(){
+  $("#fl-lv").innerHTML=Object.keys(LV).map(k=>`<button class="lvb" style="--c:var(${LV[k].c})" data-flv="${k}">${k.toUpperCase()}</button>`).join("");
+  $("#fl-sit").innerHTML=SIT.map(o=>`<button data-fsit="${o.id}">${esc(o.fa)}</button>`).join("");
+}
+try{const st=localStorage.getItem("gl-theme");if(st==="dark"||st==="light")document.documentElement.setAttribute("data-theme",st)}catch(e){}
+function toggleTheme(){const d=document.documentElement,cur=d.getAttribute("data-theme")||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light"),n=cur==="dark"?"light":"dark";d.setAttribute("data-theme",n);try{localStorage.setItem("gl-theme",n)}catch(e){}}
+fillStats();fillFooter();renderToday();
 render();
 </script>
 </body>
