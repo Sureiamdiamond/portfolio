@@ -874,18 +874,16 @@ let AC=null,soundOn=true;try{soundOn=localStorage.getItem('fdm-sound')!=='off'}c
 function syncSnd(){const b=$('sndBtn');b.setAttribute('aria-pressed',soundOn);$('sndLbl').textContent=soundOn?'صدا':'بی‌صدا';b.style.opacity=soundOn?1:.6}
 function tone(f0,f1,dur,type,vol,delay){if(!AC)return;const t=AC.currentTime+(delay||0),o=AC.createOscillator(),g=AC.createGain();o.type=type||'triangle';o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(Math.max(30,f1),t+dur);
   g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.004);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);o.connect(g).connect(AC.destination);o.start(t);o.stop(t+dur+.02)}
-function playSound(kind){if(!soundOn)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){return}
-  if(kind==='on'){tone(700,1000,.07,'triangle',.07);tone(1000,1400,.08,'triangle',.06,.05)}
-  else if(kind==='off'){tone(1000,650,.07,'triangle',.07);tone(700,450,.08,'triangle',.06,.05)}
-  else if(kind==='mode'){tone(320,200,.12,'sine',.12);tone(640,420,.09,'triangle',.05,.02)}
-  else if(kind==='order'){tone(660,990,.1,'triangle',.08);tone(990,1320,.14,'triangle',.07,.08)}
-  else if(kind==='win'){[523,659,784,1047].forEach((f,i)=>tone(f,f*1.01,.18,'triangle',.07,i*.09))}
-  else tone(1300,760,.045,'square',.035)}
+let NB=null;
+function clickSnd(v,soft){const t=AC.currentTime;if(!NB){const n=(AC.sampleRate*.03)|0;NB=AC.createBuffer(1,n,AC.sampleRate);const d=NB.getChannelData(0);for(let i=0;i<n;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/n,5)}
+  const s=AC.createBufferSource();s.buffer=NB;const f=AC.createBiquadFilter();f.type='bandpass';f.frequency.value=soft?2400:3400;f.Q.value=.8;const g=AC.createGain();g.gain.value=v;s.connect(f).connect(g).connect(AC.destination);s.start(t);
+  tone(soft?230:280,soft?120:140,.03,'sine',v*.35)}
+function playSound(){if(!soundOn)return;try{if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();if(AC.state==='suspended')AC.resume()}catch(e){return}
+  clickSnd(.5,false);setTimeout(()=>{if(soundOn)clickSnd(.2,true)},75)}
 document.addEventListener('click',e=>{const b=e.target.closest('button,a.order');if(!b||b.id==='sndBtn')return;
-  playSound(b.classList.contains('sw')?(b.getAttribute('aria-checked')==='true'?'off':'on'):b.classList.contains('swbtn')?'mode':b.classList.contains('order')?'order':'click')},true);
-$('sndBtn').onclick=()=>{soundOn=!soundOn;try{localStorage.setItem('fdm-sound',soundOn?'on':'off')}catch(e){}syncSnd();if(soundOn)playSound('on')};
+  playSound()},true);
+$('sndBtn').onclick=()=>{soundOn=!soundOn;try{localStorage.setItem('fdm-sound',soundOn?'on':'off')}catch(e){}syncSnd();if(soundOn)playSound()};
 syncSnd();
-const _cel=celebrate;celebrate=function(){playSound('win');return _cel.apply(this,arguments)};
 </script>
 
 </body></html>
