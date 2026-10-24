@@ -186,6 +186,7 @@ b{font-weight:800}
 .pr{border:1px solid var(--goldl);border-radius:12px;padding:10px 14px;background:var(--surface);margin:8px 0}
 .gp-note{margin-top:16px;padding:10px 14px;border-radius:10px;background:var(--soft);border-right:3px solid var(--gold)}
 .iconbtn svg{width:20px;height:20px}
+.picks select,.dpanel select{font:inherit;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:2px 8px;max-width:100%}
 /* footer */
 .site-foot{margin-top:20px;background:var(--lap2);color:var(--hero-ink);border-top:3px solid var(--goldl);position:relative;
  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23D9B25E' stroke-opacity='.16' stroke-width='1.2'%3E%3Cpath d='M36 8l7 15 15-7-7 15 15 7-15 7 7 15-15-7-7 15-7-15-15 7 7-15-15-7 15-7-7-15 15 7z'/%3E%3C/svg%3E")}
@@ -232,7 +233,7 @@ b{font-weight:800}
  <button data-mode="prov" aria-pressed="false">ضرب‌المثل‌ها</button>
  <button data-mode="poet" aria-pressed="false">شعر و آرایه‌ها</button>
  <button data-mode="anal" aria-pressed="false">تحلیل جمله و بیت</button>
- <button data-mode="quiz" aria-pressed="false">آزمون</button>
+ <button data-mode="quiz" aria-pressed="false">تمرین و آزمون</button>
 </nav></div></div>
 <main class="in"><div id="main"></div></main>
 <footer class="site-foot">
@@ -240,7 +241,7 @@ b{font-weight:800}
  <div class="in">
   <div class="foot-in">
    <div><h4>پارسی‌نامه</h4><p>یادگیری دستور زبان فارسی، ضرب‌المثل و شعر، با توضیح ساده و مثال و آزمون. بیت‌های نمونه برای آموزش در همین صفحه نوشته شده‌اند.</p></div>
-   <div><h4>بخش‌ها</h4><ul><li><button class="fl" data-fmode="gram">دستور زبان</button></li><li><button class="fl" data-fmode="prov">ضرب‌المثل‌ها</button></li><li><button class="fl" data-fmode="poet">شعر و آرایه‌ها</button></li><li><button class="fl" data-fmode="anal">تحلیل جمله و بیت</button></li><li><button class="fl" data-fmode="quiz">آزمون</button></li></ul></div>
+   <div><h4>بخش‌ها</h4><ul><li><button class="fl" data-fmode="gram">دستور زبان</button></li><li><button class="fl" data-fmode="prov">ضرب‌المثل‌ها</button></li><li><button class="fl" data-fmode="poet">شعر و آرایه‌ها</button></li><li><button class="fl" data-fmode="anal">تحلیل جمله و بیت</button></li><li><button class="fl" data-fmode="quiz">تمرین و آزمون</button></li></ul></div>
    <div><h4>سایت</h4><ul><li><a href="https://parsabanitaba.ir/">صفحه‌ی اصلی</a></li><li><a href="https://parsabanitaba.ir/english/">نردبان گرامر انگلیسی</a></li><li><button class="up" id="totop">↑ بالای صفحه</button></li></ul></div>
   </div>
   <div class="copy"><span>ساخته‌شده برای آموزش زبان فارسی</span><span>© پارسا بنی‌طبا</span></div>
@@ -456,12 +457,53 @@ const AN=[
 {id:"v7",t:"بیت",fa:"برگ از غم رفتن بهار زرد شد",m:[[["برگ","اسم","نهاد","",""],["از غم رفتن بهار","گروه متمم","متمم","علت: غم رفتن بهار."],["زرد","صفت","مسند","","g1"],["شد","فعل اسنادی","فعل","ماضی ساده.","g1"]]],gr:{},pr:"برگ از اندوه رفتن بهار زرد شد.",ar:["حسن تعلیل: علت زرد شدن برگ را غم شاعرانه می‌داند","تشخیص: برگ غمگین می‌شود"]}
 ];
 
+const GX={
+esm:[["«ایران» چه نوع اسمی است؟",["عام","خاص","معنی","جمع"],1,"نام یک کشور مشخص است."],["«آزادی» چه اسمی است؟",["ذات","خاص","معنی","مرکب"],2,"مفهومی انتزاعی است."],["«کتاب‌ها» چه اسمی است؟",["مفرد","جمع","خاص","مرکب"],1,"با «ها» جمع بسته شده."],["«دانش‌گاه» کدام است؟",["ساده","مشتق","مرکب","جمع"],1,"دانش + ـگاه؛ پسوند دارد."],["کدام اسم مرکب است؟",["دریا","گل‌دان","درخت","باران"],1,"گل + دان: دو جزء معنادار."]],
+zamir:[["«مال من» «من» چیست؟",["ضمیر شخصی","ضمیر اشاره","ضمیر مبهم","ضمیر پرسشی"],0,"ضمیر شخصی جدا."],["«کدام را برداشتی؟» «کدام» چیست؟",["ضمیر پرسشی","صفت","ضمیر شخصی","قید"],0,"به جای اسم نشسته و پرسش می‌کند."],["«همه آمدند» «همه» چیست؟",["ضمیر مبهم","اسم","قید","فعل"],0,"مبهم است."],["«خودت را بشناس» «خود» چیست؟",["ضمیر مشترک","اسم","صفت","قید"],0,"برای همه‌ی شخص‌ها."],["کدام ضمیر پیوسته است؟",["من","او","ـمان","شما"],2,"به واژه می‌چسبد."]],
+sefat:[["«چه هوایی!» «چه» چیست؟",["صفت تعجبی","صفت پرسشی","ضمیر","قید"],0,"حالت شگفتی را می‌رساند."],["«کدام کتاب؟» «کدام» چیست؟",["صفت پرسشی","ضمیر","قید","اسم"],0,"اسم بعد از آن آمده."],["«دومین روز» چه صفتی دارد؟",["شمارشی ترتیبی","شمارشی اصلی","بیانی","اشاره"],0,"ترتیب را می‌گوید."],["«هر دانش‌آموز» «هر» چیست؟",["صفت مبهم","ضمیر","قید","نشانه"],0,"مبهم است."],["«نوشته» در «نامه‌ی نوشته» چه صفتی است؟",["مفعولی","فاعلی","نسبی","اشاره"],0,"صفت مفعولی."]],
+fel:[["بن ماضی «گفتن» کدام است؟",["گفت","گو","می‌گو","گفتن"],0,"«گفت»."],["«بنویس» چیست؟",["امر","نهی","مضارع","ماضی"],0,"فرمان است."],["«نرو» چیست؟",["نهی","امر","اخباری","آینده"],0,"با «نـ» ساخته شده."],["«خواهیم رفت» چه زمانی است؟",["آینده","ماضی","امر","مضارع"],0,"خواه + شناسه + بن ماضی."],["شناسه‌ی «ایم / یم» برای کدام شخص است؟",["اول جمع","دوم مفرد","سوم جمع","اول مفرد"],0,"ما."]],
+jam:[["«درختان» با چه علامتی جمع شده؟",["ان","ها","ات","ین"],0,"ـان."],["«نامه‌ها» با چه جمعی ساخته شده؟",["ها","ان","ات","مکسر"],0,"ـها."],["جمع «علم» عربی کدام است؟",["علوم","علمات","علمان","علم‌ها"],0,"جمع مکسر عربی."],["کدام درست است؟",["پنج مدادها","پنج مداد","پنج مدادان","پنج مداداً"],1,"بعد از عدد مفرد می‌آید."],["«ـات» در «ادبیات» چیست؟",["نشانه‌ی جمع","نشانه‌ی نفی","پیشوند","شناسه"],0,"نشانه‌ی جمع عربی."]],
+harf:[["«در» در «در خانه» چه حرفی است؟",["اضافه","ربط","ندا","نفی"],0,"متمم می‌خواهد."],["«ولی» چه حرفی است؟",["ربط همپایه","اضافه","ندا","تشبیه"],0,"دو جمله را هم‌ردیف می‌کند."],["«اگر بیایی» «اگر» چیست؟",["ربط وابسته","اضافه","همپایه","ندا"],0,"شرط."],["«چون» در «چون ماه» چیست؟",["حرف اضافه (ادات تشبیه)","فعل","اسم","قید"],0,"مانند را می‌رساند."],["«ای» در «ای دوست» چیست؟",["حرف ندا","حرف ربط","حرف اضافه","ضمیر"],0,"صدا زدن."]],
+jomle:[["نهاد در «کودک خندید» کدام است؟",["کودک","خندید","هر دو","هیچ"],0,"کننده‌ی کار."],["فعل در «او رفت» کدام است؟",["او","رفت","هیچ","هر دو"],1,"رفت."],["«را» نشانه‌ی چیست؟",["مفعول","نهاد","فعل","قید"],0,"مفعول معین."],["«به مدرسه» چه نقشی دارد؟",["متمم","نهاد","مسند","فعل"],0,"حرف اضافه + اسم."],["«امروز» در «امروز آمد» چه نقشی دارد؟",["قید","مفعول","مسند","نهاد"],0,"زمان."]],
+emla:[["کدام درست است؟",["قبر","غبر","قابر","گبر"],0,"قبر."],["کدام درست است؟",["سرزش","سرزنش","صرزنش","زرزنش"],1,"سرزنش با «س» و «ز»."],["کدام درست است؟",["زیارت","ضیارت","ذیارت","ظیارت"],0,"زیارت با «ز»."],["کدام درست است؟",["ثروت","سروت","صروت","ضروت"],0,"ثروت با «ث»."]],
+moratebe:[["مرتبه‌ی «بلندتر» چیست؟",["مطلق","تفضیلی","عالی","هیچ"],1,"ـتر."],["مرتبه‌ی «بزرگ‌ترین» چیست؟",["مطلق","تفضیلی","عالی","هیچ"],2,"ـترین."],["«خوب» چه مرتبه‌ای دارد؟",["مطلق","تفضیلی","عالی","هیچ"],0,"بدون مقایسه."],["صفت عالی «زیبا» کدام است؟",["زیباتر","زیباترین","زیبا‌تر‌ترین","زیبایی"],1,"ـترین."],["کدام درست است؟",["بدتر از او","بدتر‌تر از او","بدترین‌تر از او","از او بدتر‌تر"],0,"بدتر خود تفضیلی است."]],
+zaman:[["«رفته بودم» چه زمانی است؟",["ماضی بعید","نقلی","ساده","استمراری"],0,"صفت مفعولی + بودم."],["«می‌رفتم» چه زمانی است؟",["ماضی استمراری","ساده","نقلی","التزامی"],0,"می + ماضی."],["«بروم» چه زمانی است؟",["مضارع التزامی","اخباری","ماضی","آینده"],0,"ب + بن مضارع."],["«رفته‌ام» چه زمانی است؟",["ماضی نقلی","ساده","استمراری","بعید"],0,"صفت مفعولی + ام."],["«رفته باشم» چه زمانی است؟",["ماضی التزامی","نقلی","بعید","ساده"],0,"صفت مفعولی + باشم."]],
+lazem:[["کدام فعل متعدی است؟",["دیدن","رفتن","خوابیدن","نشستن"],0,"مفعول می‌گیرد."],["«در شکسته شد» چیست؟",["مجهول","معلوم","امر","لازم"],0,"صفت مفعولی + شد."],["از کدام فعل مجهول نمی‌شود ساخت؟",["رفتن","خوردن","دیدن","نوشتن"],0,"لازم است."],["«او نامه را نوشت» چیست؟",["معلوم","مجهول","امر","نهی"],0,"فاعل معلوم."],["«خورده شد» چیست؟",["مجهول","معلوم","امر","نهی"],0,"صفت مفعولی + شد."]],
+mord:[["«برداشتن» چیست؟",["پیشوندی","مرکب","ساده","مجهول"],0,"بر + داشتن."],["«گوش دادن» چیست؟",["مرکب","ساده","پیشوندی","لازم"],0,"اسم + فعل کمکی."],["«خوردن» چیست؟",["ساده","مرکب","پیشوندی","مجهول"],0,"یک جزء."],["«دوست داشتن» چیست؟",["مرکب","ساده","پیشوندی","مجهول"],0,"صفت/اسم + داشتن."],["«باز آمدن» چیست؟",["پیشوندی","ساده","مرکب","مجهول"],0,"باز + آمدن."]],
+tarkib:[["«دفتر علی» چیست؟",["اضافی","وصفی","عطفی","فعلی"],0,"اسم + اسم."],["«دختر زیبا» چیست؟",["وصفی","اضافی","عطفی","فعلی"],0,"اسم + صفت."],["هسته‌ی «هوای سرد» کدام است؟",["هوا","سرد","هر دو","هیچ"],0,"اسم هسته است."],["«خانه‌ی بزرگ پدر» چیست؟",["اضافی و وصفی تو در تو","فقط وصفی","فقط اضافی","هیچ"],0,"خانه‌ی بزرگ + پدر."],["کسره‌ی بعد از «ا» چه می‌شود؟",["ـیِ","ـو","هیچ","ـا"],0,"دانایِ روزگار."]],
+ra:[["«کتاب را خواند» «را» نشانه‌ی چیست؟",["مفعول","فاعل","مسند","متمم"],0,"مفعول معین."],["«کتاب خرید» مفعول چه نوع است؟",["نامعین","معین","نیست","مسند"],0,"بدون را."],["«او را گفتم» «را» یعنی؟",["به (کهن)","برای","از","با"],0,"معنی کهن."],["«دلم را شکستی» چیست؟",["فک اضافه","مجهول","شرط","ندا"],0,"دل من را شکستی."],["«او را دیدم» نقش «او را» چیست؟",["مفعول","نهاد","مسند","قید"],0,"مفعول."]],
+esnadi:[["مسند «علی پزشک است» کدام است؟",["پزشک","علی","است","هیچ"],0,"«پزشک» مسند."],["«او رفت» اسنادی است؟",["خیر","بله","گاهی","همیشه"],0,"«رفت» اسنادی نیست."],["«هوا سرد شد» مسند کدام است؟",["سرد","هوا","شد","هیچ"],0,"«سرد»."],["کدام فعل اسنادی است؟",["گشتن (در معنی شدن)","خندیدن","خوردن","رفتن"],0,"گشت = شد."],["«او دانا گردید» مسند کدام است؟",["دانا","او","گردید","هیچ"],0,"ویژگی نهاد."]],
+qeyd:[["«همیشه» چه قیدی است؟",["زمان","مکان","حالت","مقدار"],0,"زمان."],["«آنجا» چه قیدی است؟",["مکان","زمان","حالت","مقدار"],0,"مکان."],["«آرام» در «آرام رفت» چیست؟",["قید حالت","صفت","مفعول","مسند"],0,"چگونگی."],["«بسیار» در «بسیار خوب» چیست؟",["قید مقدار","صفت","اسم","فعل"],0,"شدت می‌دهد."],["«هرگز» چیست؟",["قید نفی","قید زمان","قید مکان","صفت"],0,"نفی."]],
+vajsaz:[["«بی‌کار» چه واژه‌ای است؟",["مشتق","ساده","مرکب","جمع"],0,"بی + کار."],["«گلستان» چه پسوندی دارد؟",["ـستان","گل","ـان","هیچ"],0,"مکان."],["«نویسنده» چه ساختی دارد؟",["مشتق","ساده","مرکب","جمع"],0,"نویس + ـنده."],["پیشوند «هم» در «همکار» چه می‌کند؟",["هم‌راه","نفی","مکان","زمان"],0,"با هم."],["«دانشکده» پسوند؟",["ـکده","دانش","ـده","ش"],0,"ـکده."]],
+neshane:[["کدام درست است؟",["می‌خوانم","میخوانم","می خوانم","میخوانم"],0,"نیم‌فاصله."],["گیومه‌ی ورودی کدام است؟",["«","»","“","‹"],0,"«."],["نشانه‌ی پرسش کدام است؟",["؟","!","،","؛"],0,"؟"],["جدا کردن واژه‌های هم‌نقش با؟",["ویرگول","نقطه","علامت پرسش","گیومه"],0,"،"],["بعد از ویرگول چه می‌آید؟",["یک فاصله","هیچ","دو فاصله","نیم‌فاصله"],0,"یک فاصله."]],
+morakkab:[["«او آمد و من رفتم» چیست؟",["جمله‌ی همپایه","وابسته","ساده","امری"],0,"دو جمله مستقل با «و»."],["«چون خسته بود خوابید» پایه کدام است؟",["خوابید","چون خسته بود","هر دو","هیچ"],0,"«خوابید» پایه."],["«اگر باران بیاید نمی‌روم» وابسته؟",["اگر باران بیاید","نمی‌روم","هیچ","هر دو"],0,"شرط."],["«که» بیشتر در کدام جمله‌هاست؟",["وابسته","ساده","همپایه","امری"],0,"وابسته‌ساز."],["جمله‌ی مرکب چند فعل دارد؟",["دست‌کم دو","یک","هیچ","سه فقط"],0,"دست‌کم دو."]],
+tabei:[["«حافظ، شاعر شیراز» «شاعر شیراز» چیست؟",["بدل","صفت","معطوف","مفعول"],0,"توضیح اسم."],["«علی و رضا» رضا چیست؟",["معطوف","بدل","صفت","فعل"],0,"عطف."],["«کتاب خوب» «خوب» چیست؟",["صفت","بدل","معطوف","مضاف‌الیه"],0,"تبعی."],["«دفتر علی» «علی» چیست؟",["مضاف‌الیه","صفت","بدل","معطوف"],0,"تبعی."],["بدل را می‌شود؟",["حذف کرد","جابه‌جا","فعل کرد","همان صفت"],0,"حذف‌پذیر است."]],
+vajh:[["«کاش بیاید» وجه؟",["التزامی","امری","اخباری","نهی"],0,"آرزو."],["«بیا» وجه؟",["امری","التزامی","اخباری","نهی"],0,"فرمان."],["«او آمد» وجه؟",["اخباری","التزامی","امری","نهی"],0,"واقعیت."],["نشانه‌ی التزامی کدام است؟",["شاید","اما","و","چون"],0,"احتمال."],["«نرو» وجه؟",["نهی","امری","اخباری","التزامی"],0,"نهی."]],
+hazf:[["حذف به قرینه یعنی؟",["حذف با تکیه بر جمله‌ی دیگر","حذف بی‌دلیل","اشتباه","تکرار"],0,"قرینه = نشانه."],["«او رفت و من» چه حذف شده؟",["فعل","فاعل","مفعول","قید"],0,"«رفتم»."],["ایجاز یعنی؟",["کوتاه گفتن","طولانی گفتن","تکرار","شرح"],0,"کم‌گویی."],["حذف می‌تواند؟",["ابهام نیاورد","همیشه درست","غلط","نادر"],0,"باید ابهام نسازد."],["«آمدم، دیدم، گفتم» فاعل؟",["محذوف مشترک","ندارد","فرق دارد","غلط"],0,"«من» محذوف."]],
+fak:[["فک اضافه چیست؟",["جدا کردن مضاف‌الیه و آوردن با «را»","جمع","نفی","شرط"],0,"دل مرا شکست."],["«دلش را شکست» «ش» چیست؟",["مضاف‌الیه","نهاد","مفعول","قید"],0,"دل او."],["«را» در «او را دیدم»؟",["نشانه‌ی مفعول","مضاف‌الیه","فعل","شرط"],0,"مفعول."],["«عقل او را پریشان کرد» مفعول؟",["عقل","او","هیچ","پریشان"],0,"عقل (او را مضاف‌الیه)."],["فک اضافه بیشتر در؟",["شعر و نثر ادبی","کودکان","علمی فقط","خبر"],0,"ادبی."]],
+nada:[["منادا در «ای علی بیا» کدام است؟",["علی","بیا","ای","هیچ"],0,"او را صدا می‌زنند."],["«آه» چیست؟",["شبه‌جمله","منادا","فعل","صفت"],0,"عاطفی."],["شبه‌جمله از ارکان است؟",["خیر","بله","گاهی","همیشه"],0,"از ارکان نیست."],["«ای وای» چیست؟",["شبه‌جمله","منادا","فعل","اسم"],0,"عاطفی."],["«خدایا» چیست؟",["منادا","فعل","شبه‌جمله","قید"],0,"ندا."]],
+vaj:[["هجای «دا» چیست؟",["بلند","کوتاه","کشیده","هیچ"],0,"صامت + مصوت بلند."],["هجای «کَ» چیست؟",["کوتاه","بلند","کشیده","هیچ"],0,"صامت + مصوت کوتاه."],["«کتاب» چند هجا دارد؟",["۲","۱","۳","۴"],0,"کَ‌تاب."],["«دوست» چند هجا دارد؟",["۱","۲","۳","۴"],0,"یک هجای کشیده."],["مصوت بلند کدام است؟",["آ","اَ","اِ","اُ"],0,"آ."]],
+sakht:[["«رایانه» ساخته‌ی کیست؟",["فرهنگستان","ترکی","عربی","انگلیسی"],0,"معادل‌سازی."],["«خوش‌باوری» چیست؟",["مشتق‌مرکب","ساده","مرکب","جمع"],0,"خوش + باور + ی."],["«دانشگاه» چیست؟",["مشتق","مرکب","ساده","جمع"],0,"دانش + گاه."],["«سرخ‌پوست» چیست؟",["مرکب","مشتق","ساده","جمع"],0,"سرخ + پوست."],["مخفف «مبارک باد» چیست؟",["مبارکباد","مبارکبادان","مبارکی","هیچ"],0,"ساخت فشرده."]]
+};
+const SP=[["صبر","سبر","ثبر"],["ذهن","زهن","ضهن"],["سرزنش","صرزنش","سرزنس"],["حتماً","هتماً","حتمن"],["مسئله","مسله","مسلاه"],["اشتباه","اشتباح","اشتبا"],["صبح","سبح","ثبح"],["زیارت","ضیارت","ذیارت"],["خواهر","خاهر","خواهار"],["ثروت","سروت","صروت"],["ضرورت","زرورت","ظرورت"],["حضور","حزور","هضور"],["اطلاع","اتلاع","اطلا"],["قبر","غبر","گبر"],["غم","قم","گم"]];
+const AN2=[
+{id:"s9",t:"جمله",fa:"استاد درس تازه را به دانشجویان توضیح داد",m:[[["استاد","اسم","نهاد","کننده‌ی کار."],["درس","اسم","مفعول","مفعول معین با «را».","g1"],["تازه","صفت","صفت","وابسته‌ی «درس».","g1"],["را","نشانه‌ی مفعول","حرف","","g1"],["به","حرف اضافه","حرف","","g2"],["دانشجویان","اسم (جمع)","متمم","دانشجو + ان.","g2"],["توضیح داد","فعل مرکب","فعل","توضیح دادن؛ ماضی ساده."]]],gr:{g1:"مفعول (درس تازه را)",g2:"متمم (به دانشجویان)"},pr:"جمله با مفعول و متمم.",ar:[]},
+{id:"s10",t:"جمله",fa:"کودکان شاد در باغ بازی می‌کردند",m:[[["کودکان","اسم (جمع)","نهاد","کودک + ان.","g1"],["شاد","صفت","صفت","وابسته‌ی نهاد.","g1"],["در","حرف اضافه","حرف","","g2"],["باغ","اسم","متمم","مکان کار.","g2"],["بازی می‌کردند","فعل مرکب (ماضی استمراری)","فعل","بازی کردن؛ می‌کردند = کار تکراری."]]],gr:{g1:"نهاد (کودکان شاد)",g2:"متمم (در باغ)"},pr:"ماضی استمراری یعنی کار تکرارشونده یا ادامه‌دار.",ar:[]},
+{id:"s11",t:"جمله",fa:"چون باران آمد مسافران ماندند",m:[[["چون","حرف ربط وابسته","حرف","علت می‌سازد.","g1"],["باران","اسم","نهاد","","g1"],["آمد","فعل","فعل","","g1"],["مسافران","اسم (جمع)","نهاد","مسافر + ان.","g2"],["ماندند","فعل","فعل","","g2"]]],gr:{g1:"جمله‌ی وابسته‌ی علت",g2:"جمله‌ی پایه"},pr:"چون باران آمد، مسافران ماندند.",ar:[]},
+{id:"s12",t:"جمله",fa:"آن شاگرد باهوش جایزه‌ی بزرگ را برد",m:[[["آن","صفت اشاره","صفت","وابسته‌ی «شاگرد».","g1"],["شاگرد","اسم","نهاد","","g1"],["باهوش","صفت","صفت","","g1"],["جایزه‌ی","اسم","مفعول","مضاف.","g2"],["بزرگ","صفت","صفت","وابسته‌ی «جایزه».","g2"],["را","نشانه‌ی مفعول","حرف","","g2"],["برد","فعل","فعل","ماضی ساده."]]],gr:{g1:"نهاد (آن شاگرد باهوش)",g2:"مفعول (جایزه‌ی بزرگ را)"},pr:"جمله با دو گروه اسمی.",ar:[]},
+{id:"s13",t:"جمله",fa:"ای مادر عزیز دعا کن",m:[[["ای","حرف ندا","حرف","","g1"],["مادر","اسم","منادا","","g1"],["عزیز","صفت","صفت","وابسته‌ی منادا.","g1"],["دعا کن","فعل مرکب (امر)","فعل","دعا کردن.","g2"]]],gr:{g1:"منادا (ای مادر عزیز)"},pr:"ندا و فعل امر.",ar:[]},
+{id:"v8",t:"بیت",fa:"سرو سبز و سرکش، سر به سوی آسمان سود",m:[[["سرو","اسم","نهاد","","g1"],["سبز","صفت","صفت","","g1"],["و","حرف ربط","حرف","دو صفت را عطف می‌کند."],["سرکش","صفت","صفت","","g1"],["سر","اسم","مفعول","",""],["به سوی آسمان","گروه متمم","متمم","به سوی + آسمان."],["سود","فعل","فعل","سودن: ساییدن؛ «سر به آسمان سودن» یعنی بسیار بلند شدن."]]],gr:{g1:"نهاد (سرو سبز و سرکش)"},pr:"سرو سبز و سرکش سرش را به سوی آسمان رساند.",ar:["واج‌آرایی: تکرار «س»","تشخیص (سرکش بودن سرو)"]},
+{id:"v10",t:"بیت",fa:"دل ز دنیا برکندم و رفتم",m:[[["دل","اسم","مفعول","بدون «را»؛ در شعر رایج است.","g1"],["ز","حرف اضافه","حرف","مخفف «از».","g2"],["دنیا","اسم","متمم","","g2"],["برکندم","فعل پیشوندی","فعل","بر + کندن؛ ماضی ساده.","g1"],["و","حرف ربط","حرف",""],["رفتم","فعل","فعل","","g3"]]],gr:{g2:"متمم (ز دنیا)"},pr:"دل را از دنیا کندم و رفتم.",ar:["کنایه: «دل از دنیا کندن» یعنی دلبستگی نداشتن","حذف «را» و مخفف‌کردن «از» به «ز»"]}
+];
+AN.push(...AN2);
+
 const ARN={};AR.forEach(a=>ARN[a.id]=a.fa);
 const PVALL=[];PV.forEach(c=>c.p.forEach(l=>{const [t,m,u]=l.split("|");PVALL.push({t,m,u,cat:c.id,cf:c.fa})}));
 const NT=AN.length;
-const NQ=G.reduce((a,t)=>a+t.q.length,0)+PVALL.length+PQ.length+4;
+
 let learned=new Set(store.get("pn-learned",[]));
-const S={an:{i:0,prac:false,col:false,sel:null,tgt:null,sc:0,n:0,res:{}},mode:store.get("pn-mode","gram"),lv:store.get("pn-lv",1),id:store.get("pn-id","esm"),pt:"ar",pid:"tashbih",cat:"all",q:"",open:false};
+const UV=store.get("pn-uv",{text:"",lab:{}});
+const S={uv:{sel:null,tok:null},an:{i:0,prac:false,col:false,sel:null,tgt:null,sc:0,n:0,res:{}},mode:store.get("pn-mode","gram"),lv:store.get("pn-lv",1),id:store.get("pn-id","esm"),pt:"ar",pid:"tashbih",cat:"all",q:"",open:false};
 let Q=null;
 function setLv(n){document.documentElement.style.setProperty("--lv",`var(${LVN[n].c})`)}
 function setCol(v){document.documentElement.style.setProperty("--lv",v)}
@@ -483,7 +525,7 @@ function renderGram(){
   <h2>${esc(t.fa)}</h2><p class="intro">${rich(t.i)}</p>
   <h3>قاعده‌ها</h3><ul class="rules">${t.r.map(r=>`<li>${rich(r)}</li>`).join("")}</ul>
   <h3>مثال‌ها</h3><div class="exs">${t.x.map(e=>{const [a,b]=e.split("|");return `<div class="ex"><div class="s">${esc(a)}</div><div class="n">${esc(b||"")}</div></div>`}).join("")}</div>
-  <h3>تمرین</h3>${t.q.map((q,k)=>qHTML(q,"g"+k)).join("")}<div class="pscore" id="pscore">پاسخ بده تا امتیازت را ببینی.</div>
+  <h3>تمرین</h3>${t.q.map((q,k)=>qHTML(q,"g"+k)).join("")}<div class="pscore" id="pscore">پاسخ بده تا امتیازت را ببینی.</div><div style="margin-top:10px"><button class="btn" data-more="g:${t.id}">تمرین بیشتر از این درس (${fd(t.q.length+(GX[t.id]||[]).length)} پرسش)</button></div>
   <div class="foot"><button class="btn" id="prev" ${i===0&&S.lv===1?"disabled":""}>→ درس قبل</button><button class="btn${learned.has(t.id)?"":" primary"}" id="mark">${learned.has(t.id)?"✓ یاد گرفتم (برای برداشتن بزن)":"این درس را یاد گرفتم"}</button><button class="btn" id="next" ${G.indexOf(t)===G.length-1?"disabled":""}>درس بعد ←</button></div></article></div>`;
 }
 /* ---------- proverbs ---------- */
@@ -511,7 +553,7 @@ function renderPoet(){
   <div class="grid"><aside class="list"><h3>${ar?"آرایه‌ها":"درس‌ها"}</h3><ol>${items.map((y,k)=>`<li><button data-pid="${y.id}" aria-current="${y.id===x.id}"><span class="dot">${fd(k+1)}</span><span>${esc(y.fa)}</span></button></li>`).join("")}</ol></aside>
   <article class="card"><div class="eyebrow"><span class="tag">${ar?x.k:"دستور شعر"}</span></div><h2>${esc(x.fa)}</h2><p class="intro">${rich(x.i)}</p>
   <h3>${ar?"ویژگی‌ها":"نکته‌ها"}</h3><ul class="rules">${x.r.map(r=>`<li>${rich(r)}</li>`).join("")}</ul>
-  ${exs?`<h3>بیت نمونه</h3>${exs}`:""}${phs}${ar&&GP[x.id]?`<div class="gp-note"><b>در آثار بزرگان:</b> ${esc(GP[x.id])}</div>`:""}${prac}</article></div>`;
+  ${ar?`<div style="margin:6px 0"><button class="btn" data-more="a:${x.id}">تمرین بیشتر از این آرایه</button></div>`:""}${exs?`<h3>بیت نمونه</h3>${exs}`:""}${phs}${ar&&GP[x.id]?`<div class="gp-note"><b>در آثار بزرگان:</b> ${esc(GP[x.id])}</div>`:""}${prac}</article></div>`;
 }
 function pqQ(q){const names=Object.values(ARN),c=ARN[q[1]],o=shuf(names.filter(n=>n!==c)).slice(0,3);const opts=shuf([c,...o]);return [q[0],opts,opts.indexOf(c),q[2],"v"]}
 function rqPool(){return [
@@ -520,26 +562,54 @@ function rqPool(){return [
  ["هر که با تو همنشین شد، دل‌نواز است / هر که با تو همسخن شد، سرفراز است","قافیه‌ی این بیت کدام است؟","دل‌نواز / سرفراز",["است","همنشین / همسخن","تو / تو"],"کلمه‌های هم‌آهنگ پیش از ردیف «است»."],
  ["شب‌ها به یاد روی تو بیدار می‌مانم / روزها به شوق کوی تو بیمار می‌مانم","قافیه‌ی این بیت کدام است؟","بیدار / بیمار",["می‌مانم","روی / کوی","تو / تو"],"پیش از ردیف «می‌مانم»؛ حرف روی «ر»."]]}
 function rqList(){return shuf(rqPool()).map(r=>{const opts=shuf([r[2],...r[3]]);return [r[1]+"\n"+r[0],opts,opts.indexOf(r[2]),r[4],"v"]})}
-/* ---------- quiz ---------- */
+/* ---------- quiz & practice ---------- */
+const QT=[["g","دستور زبان"],["e","املا"],["p","معنی ضرب‌المثل"],["c","تکمیل ضرب‌المثل"],["a","تشخیص آرایه در عبارت و بیت"],["d","تعریف آرایه"],["r","قافیه و ردیف"],["t","نقش واژه‌ها در جمله و بیت"]];
+function stripB(t){return t.replace(/\*\*/g,"")}
+function buildItems(types,o){
+  o=o||{};const out=[];const add=(q,from,go)=>out.push({q,from,go});
+  if(types.includes("g"))G.forEach(t=>{if(o.lesson&&o.lesson!==t.id)return;[...t.q,...(GX[t.id]||[])].forEach(q=>add(q,t.fa,"g:"+t.id))});
+  if(types.includes("e"))SP.forEach(r=>{const opts=shuf(r);add(["کدام املا درست است؟",opts,opts.indexOf(r[0]),"املای درست: «"+r[0]+"»."],"املا","g:emla")});
+  if(types.includes("p"))PVALL.forEach(x=>{const o2=shuf(PVALL.filter(y=>y.t!==x.t)).slice(0,3).map(y=>y.m);const opts=shuf([x.m,...o2]);add(["معنی ضرب‌المثل «"+x.t+"» کدام است؟",opts,opts.indexOf(x.m),x.u,"v",1],x.cf,"p:"+x.cat)});
+  if(types.includes("c"))PVALL.forEach(x=>{const w=x.t.split(" ");const cand=w.map((y,k)=>k).filter(k=>w[k].replace(/[،«»]/g,"").length>=3&&k>=Math.floor(w.length/3));if(!cand.length)return;const k=cand[Math.floor(Math.random()*cand.length)],ans=w[k].replace(/[،]/g,"");const pool=[...new Set(PVALL.flatMap(y=>y.t.split(" ")).map(y=>y.replace(/[،]/g,"")).filter(y=>y.length>=3&&y!==ans&&Math.abs(y.length-ans.length)<=2))];const opts=shuf([ans,...shuf(pool).slice(0,3)]);const t2=w.map((y,m)=>m===k?"_____":y).join(" ");add(["جای خالی را پر کن: «"+t2+"»",opts,opts.indexOf(ans),"ضرب‌المثل کامل: «"+x.t+"». "+x.m,"v"],x.cf,"p:"+x.cat)});
+  if(types.includes("a")){PQ.forEach(q=>{if(o.ar&&q[1]!==o.ar)return;add(pqQ(q),ARN[q[1]],"a:"+q[1])});AR.forEach(a=>{if(o.ar&&a.id!==o.ar)return;(a.ph||[]).forEach(l=>{const [t,n]=l.split("|");const names=Object.values(ARN),c=a.fa,d=shuf(names.filter(x=>x!==c)).slice(0,3),opts=shuf([c,...d]);add(["کدام آرایه است؟ «"+t+"»",opts,opts.indexOf(c),n||c,"v"],a.fa,"a:"+a.id)})})}
+  if(types.includes("d"))AR.forEach(a=>{if(o.ar&&a.id!==o.ar)return;let def=stripB(a.i);a.fa.replace(/[()]/g," ").split(/\s+/).filter(w=>w.length>=3&&w!=="حسن").forEach(w=>{def=def.split(w).join("…")});const names=Object.values(ARN),c=a.fa,d=shuf(names.filter(x=>x!==c)).slice(0,3),opts=shuf([c,...d]);add(["«"+def+"» کدام آرایه است؟",opts,opts.indexOf(c),"آرایه: "+c+".","v"],a.fa,"a:"+a.id)});
+  if(types.includes("r"))rqList().forEach(q=>add(q,"قافیه و ردیف","r:qafiye"));
+  if(types.includes("t"))AN.forEach(it=>{const fl=it.m.flat().filter(t=>RO.includes(t[2]));const txt=it.m.map(l=>l.map(t=>t[0]).join(" ")).join(" / ");fl.forEach(t=>{const o3=shuf(RO.filter(r=>r!==t[2])).slice(0,3);const opts=shuf([t[2],...o3]);add(["در «"+txt+"» نقش «"+t[0]+"» چیست؟",opts,opts.indexOf(t[2]),t[3]||t[1],"v"],"تحلیل: "+it.fa,"t:"+it.id)})});
+  return out}
+let NQALL=0;
 function renderQuizSetup(){
-  setCol("var(--lap)");const ty=store.get("pn-qty",["g","p","a"]);
-  $("#main").innerHTML=`<div class="quizbox"><h2 class="sec" style="margin:0">آزمون مخلوط</h2><p class="lead">۱۰ پرسش تصادفی از بخش‌هایی که انتخاب می‌کنی. در پایان اشتباه‌هایت را با توضیح می‌بینی.</p>
-  <div class="picks">${[["g","دستور زبان"],["p","معنی ضرب‌المثل"],["a","آرایه، قافیه و ردیف"],["t","نقش واژه‌ها در جمله و بیت"]].map(([v,n])=>`<label><input type="checkbox" class="ty" value="${v}" ${ty.includes(v)?"checked":""}> ${n}</label>`).join("")}</div>
-  <button class="btn primary" id="qstart">شروع آزمون</button></div>`;
+  setCol("var(--lap)");const ty=store.get("pn-qty2",["g","e","p","a"]),cnt=store.get("pn-qn",10);
+  $("#main").innerHTML=`<div class="quizbox"><h2 class="sec" style="margin:0">تمرین و آزمون</h2><p class="lead">پرسش‌ها از درسنامه جدا هستند و هر بار تصادفی انتخاب می‌شوند. بخش‌ها و تعداد را خودت تعیین کن. پس از پایان، اشتباه‌ها را با توضیح و لینک به درس می‌بینی.</p>
+  <div class="picks">${QT.map(([v,n])=>`<label><input type="checkbox" class="ty" value="${v}" ${ty.includes(v)?"checked":""}> ${n}</label>`).join("")}</div>
+  <div class="picks"><label>درس دستور: <select id="qless" aria-label="درس دستور"><option value="">همه‌ی درس‌ها</option>${G.map(t=>`<option value="${t.id}">${esc(t.fa)}</option>`).join("")}</select></label><label>تعداد پرسش: <select id="qcnt" aria-label="تعداد پرسش">${[10,20,30,50].map(n=>`<option value="${n}" ${n===cnt?"selected":""}>${fd(n)}</option>`).join("")}</select></label></div>
+  <p class="pscore">بانک پرسش‌ها: ${fd(NQALL)} پرسش.</p>
+  <button class="btn primary" id="qstart">شروع</button></div>`;
 }
-function startQuiz(){
-  const ty=[...document.querySelectorAll(".ty:checked")].map(i=>i.value);if(!ty.length)return;store.set("pn-qty",ty);
-  const g=[],p=[],a=[],tt=[];
-  if(ty.includes("g"))G.forEach(t=>t.q.forEach(q=>g.push({q,from:t.fa,go:"g:"+t.id})));
-  if(ty.includes("p"))PVALL.forEach(x=>{const o=shuf(PVALL.filter(y=>y.t!==x.t)).slice(0,3).map(y=>y.m);const opts=shuf([x.m,...o]);p.push({q:["معنی ضرب‌المثل «"+x.t+"» کدام است؟",opts,opts.indexOf(x.m),x.u,"v",1],from:x.cf,go:"p:"+x.cat})});
-  if(ty.includes("a")){PQ.forEach(q=>a.push({q:pqQ(q),from:ARN[q[1]],go:"a:"+q[1]}));rqList().forEach(q=>a.push({q,from:"قافیه و ردیف",go:"r:qafiye"}))}
-  if(ty.includes("t"))AN.forEach(it=>{const fl=it.m.flat().filter(t=>RO.includes(t[2]));const txt=it.m.map(l=>l.map(t=>t[0]).join(" ")).join(" / ");fl.forEach(t=>{const o=shuf(RO.filter(r=>r!==t[2])).slice(0,3);const opts=shuf([t[2],...o]);tt.push({q:["در «"+txt+"» نقش «"+t[0]+"» چیست؟",opts,opts.indexOf(t[2]),t[3]||t[1],"v"],from:"تحلیل: "+it.fa,go:"t:"+it.id})})});
-  const groups=[g,p,a,tt].filter(x=>x.length),per=Math.ceil(10/groups.length);
-  const items=shuf(groups.flatMap(x=>shuf(x).slice(0,per))).slice(0,10);Q={items,n:0,ok:0,miss:[]};renderQ();
+function startQuiz(pre){
+  let items;
+  if(pre){items=shuf(buildItems(pre.types,pre)).slice(0,pre.n||10)}
+  else{const ty=[...document.querySelectorAll(".ty:checked")].map(i=>i.value);if(!ty.length)return;store.set("pn-qty2",ty);const n=+$("#qcnt").value||10;store.set("pn-qn",n);const les=$("#qless").value;
+    const per=Math.ceil(n/ty.length);const groups=ty.map(t=>shuf(buildItems([t],{lesson:t==="g"?les:""}))).filter(x=>x.length);items=shuf(groups.flatMap(x=>x.slice(0,per))).slice(0,n)}
+  if(!items.length)return;Q={items,n:0,ok:0,miss:[],pre:pre||null};renderQ();
 }
 function renderQ(){const it=Q.items[Q.n];$("#main").innerHTML=`<div class="quizbox"><div class="qprog"><span>پرسش ${fd(Q.n+1)} از ${fd(Q.items.length)}</span><span>${esc(it.from)}</span></div>${qHTML(it.q,"quiz",it.q[5])}<div class="foot" style="border:0;margin-top:14px;padding:0"><span class="pscore">درست: ${fd(Q.ok)}</span><button class="btn primary" id="qnext" hidden>${Q.n===Q.items.length-1?"دیدن نتیجه":"پرسش بعد ←"}</button></div></div>`}
 function renderResult(){const pc=Math.round(Q.ok/Q.items.length*100);const msg=pc>=90?"آفرین! این بخش‌ها را خوب می‌دانی.":pc>=60?"خوب است. اشتباه‌ها را مرور کن.":"اشکالی ندارد. دوباره درس‌ها را بخوان و دوباره امتحان کن.";
   $("#main").innerHTML=`<div class="quizbox"><div class="score">${fd(Q.ok)}/${fd(Q.items.length)}</div><p style="font-weight:800">${msg}</p>${Q.miss.length?`<h3>اشتباه‌ها</h3><ul class="miss">${Q.miss.map(m=>`<li><div>${rich(m.q[0].split("\n")[0])}</div><div><b>پاسخ درست:</b> ${esc(m.q[1][m.q[2]])}</div><div class="pscore">${rich(m.q[3])}</div><button class="link" data-goto="${m.go}">برو به درس: ${esc(m.from)}</button></li>`).join("")}</ul>`:""}<div class="foot"><button class="btn primary" id="qagain">آزمون دوباره</button><button class="btn" id="qsetup">تغییر بخش‌ها</button></div></div>`}
+/* ---------- user verse ---------- */
+const POS=["اسم","ضمیر","صفت","فعل","قید","حرف اضافه","حرف ربط","حرف ندا","نشانه‌ی مفعول","شبه‌جمله","عدد"];
+function uvTokens(){return UV.text.split(/\n+/).map(l=>l.trim()).filter(Boolean).map(l=>l.split(/\s+/).filter(Boolean))}
+function uvHTML(){
+  const L=S.uv.tok||[];let k=0;
+  const lines=L.map(l=>`<div class="ansline">${l.map(w=>{const i=k++,lb=UV.lab[i]||{},rc=lb.role?RC[lb.role]:null;return `<button class="tk${S.uv.sel===i?" sel":""}" style="--rc:${rc!=null?`var(--r${rc})`:"var(--line)"}" data-uvt="${i}">${esc(w)}</button>`}).join("")}</div>`).join("");
+  const flat=L.flat(),sel=S.uv.sel;
+  const sum=flat.map((w,i)=>[w,UV.lab[i]]).filter(x=>x[1]&&(x[1].pos||x[1].role));
+  return `<article class="card" style="margin-top:20px" id="uvbox"><h2 style="font-size:1.4rem">بیت یا جمله‌ی دلخواه تو</h2><p class="lead">متن را از هر جا (مثلاً از گنجور) بچسبان، هر مصراع در یک خط. بعد روی هر واژه بزن و نوع و نقشش را خودت تعیین کن؛ خلاصه‌ی تحلیل پایین می‌آید. متن فقط در مرورگر تو می‌ماند.</p>
+  <label for="uvtxt" class="pscore">متن:</label><textarea id="uvtxt" rows="3" style="width:100%;font:inherit;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 12px" placeholder="هر مصراع را در یک خط بنویس…">${esc(UV.text)}</textarea>
+  <div class="antools"><button class="btn primary" id="uvgo">تقسیم به واژه‌ها</button><button class="btn" id="uvclr">پاک کردن</button></div>
+  ${L.length?`<div class="vbox">${lines}</div>`:""}
+  ${sel!=null?`<div class="dpanel"><h4>${esc(flat[sel])}</h4><dl><dt>نوع واژه</dt><dd><select id="uvpos" aria-label="نوع واژه"><option value="">انتخاب کن</option>${POS.map(p=>`<option ${((UV.lab[sel]||{}).pos===p)?"selected":""}>${p}</option>`).join("")}</select></dd><dt>نقش</dt><dd><select id="uvrole" aria-label="نقش"><option value="">انتخاب کن</option>${[...RO,"حرف"].map(p=>`<option ${((UV.lab[sel]||{}).role===p)?"selected":""}>${p}</option>`).join("")}</select></dd></dl></div>`:""}
+  ${sum.length?`<h3>خلاصه‌ی تحلیل تو</h3><ul class="rules">${sum.map(([w,l])=>`<li><b>${esc(w)}</b>: ${esc(l.pos||"؟")} · ${esc(l.role||"؟")}</li>`).join("")}</ul>`:""}</article>`;
+}
 /* ---------- analysis ---------- */
 const RO=["نهاد","فعل","مفعول","متمم","مسند","قید","صفت","مضاف‌الیه","منادا"];
 const RC={"نهاد":1,"فعل":2,"مفعول":3,"متمم":4,"مسند":5,"قید":6,"صفت":7,"مضاف‌الیه":8,"منادا":9,"حرف":0};
@@ -568,7 +638,7 @@ function renderAnal(){
   <div class="antools"><button class="btn" id="ancol" aria-pressed="${A.col}">${A.col?"پنهان کردن رنگ نقش‌ها":"نمایش رنگ نقش‌ها"}</button><button class="btn${A.prac?" primary":""}" id="anprac">${A.prac?"خروج از تمرین":"تمرین نقش‌ها"}</button></div>
   ${A.col&&!A.prac?`<div class="legend">${keys.map(k=>`<span style="--rc:var(--r${RC[k]})">${k}</span>`).join("")}</div>`:""}
   <div class="${it.t==="بیت"?"vbox":""} ${A.col&&!A.prac?"show-col":""}">${lines}</div>${panel}
-  ${A.prac?"":`<div class="pr"><b>برگردان به نثر:</b> ${esc(it.pr)}</div>${it.ar.length?`<h3>آرایه‌ها و نکته‌ها</h3><ul class="rules">${it.ar.map(r=>`<li>${esc(r)}</li>`).join("")}</ul>`:""}`}</article></div>`;
+  ${A.prac?"":`<div class="pr"><b>برگردان به نثر:</b> ${esc(it.pr)}</div>${it.ar.length?`<h3>آرایه‌ها و نکته‌ها</h3><ul class="rules">${it.ar.map(r=>`<li>${esc(r)}</li>`).join("")}</ul>`:""}`}</article></div>${uvHTML()}`;
 }
 /* ---------- nav ---------- */
 function render(){
@@ -581,7 +651,7 @@ function goto(k){const [t,id]=k.split(":");if(t==="t"){S.mode="anal";S.an.i=Math
 /* ---------- header / footer ---------- */
 const DAY=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);let ti=DAY%PVALL.length;
 function today(){const p=PVALL[ti];$("#tdT").textContent=p.t;$("#tdM").textContent=p.m}
-function fillStats(){$("#st-g").textContent=fd(G.length);$("#st-p").textContent=fd(PVALL.length);$("#st-a").textContent=fd(AR.length);$("#st-q").textContent=fd(NQ);$("#st-t").textContent=fd(NT)}
+function fillStats(){$("#st-g").textContent=fd(G.length);$("#st-p").textContent=fd(PVALL.length);$("#st-a").textContent=fd(AR.length);$("#st-q").textContent=fd(NQALL);$("#st-t").textContent=fd(NT)}
 const SUN='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
 const MOON='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 14.5A8.5 8.5 0 1 1 9.5 4a7 7 0 0 0 10.5 10.5z"/></svg>';
 function curTheme(){return document.documentElement.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light")}
@@ -596,6 +666,9 @@ document.addEventListener("click",e=>{
   if(b.id==="theme"){toggleTheme();return}
   if(b.dataset.ai!==undefined){S.an.i=+b.dataset.ai;S.an.sel=null;S.an.res={};S.an.tgt=null;if(S.an.prac)newTarget();render();return}
   if(b.dataset.tk!==undefined){tokClick(+b.dataset.tk);return}
+  if(b.id==="uvgo"){UV.text=$("#uvtxt").value;UV.lab={};S.uv.sel=null;S.uv.tok=uvTokens();store.set("pn-uv",UV);renderAnal();$("#uvbox").scrollIntoView({block:"start"});return}
+  if(b.id==="uvclr"){UV.text="";UV.lab={};S.uv={sel:null,tok:null};store.set("pn-uv",UV);renderAnal();return}
+  if(b.dataset.uvt!==undefined){S.uv.sel=+b.dataset.uvt;renderAnal();return}
   if(b.id==="ancol"){S.an.col=!S.an.col;render();return}
   if(b.id==="anprac"){S.an.prac=!S.an.prac;S.an.sel=null;S.an.res={};S.an.sc=0;S.an.n=0;if(S.an.prac)newTarget();render();return}
   if(b.id==="annext"){newTarget();S.an.res={};render();return}
@@ -613,15 +686,18 @@ document.addEventListener("click",e=>{
     if(Q&&S.mode==="quiz"&&b.closest('[data-key="quiz"]')){const it=Q.items[Q.n];if(ok)Q.ok++;else Q.miss.push(it);$("#qnext").hidden=false;$("#qnext").focus()}return}
   if(b.id==="mark"){learned.has(S.id)?learned.delete(S.id):learned.add(S.id);store.set("pn-learned",[...learned]);render();return}
   if(b.id==="prev"||b.id==="next"){const i=G.findIndex(x=>x.id===S.id)+(b.id==="next"?1:-1);if(G[i]){S.lv=G[i].lv;S.id=G[i].id;render();toTop("#lesson")}return}
-  if(b.id==="qstart"||b.id==="qagain"){startQuiz();return}
+  if(b.dataset.more){const [t,id]=b.dataset.more.split(":");S.mode="quiz";if(t==="g")startQuiz({types:["g"],lesson:id,n:20});else startQuiz({types:["a","d"],ar:id,n:20});toTop(".bar");return}
+  if(b.id==="qstart"){startQuiz();return}
+  if(b.id==="qagain"){if(Q&&Q.pre)startQuiz(Q.pre);else startQuiz();return}
   if(b.id==="qsetup"){renderQuizSetup();return}
   if(b.id==="qnext"){Q.n++;Q.n<Q.items.length?renderQ():renderResult();return}
   if(b.dataset.goto){goto(b.dataset.goto);return}
 });
+document.addEventListener("change",e=>{if(e.target.id==="uvpos"||e.target.id==="uvrole"){const i=S.uv.sel;UV.lab[i]=UV.lab[i]||{};UV.lab[i][e.target.id==="uvpos"?"pos":"role"]=e.target.value;store.set("pn-uv",UV);renderAnal()}});
 document.addEventListener("input",e=>{if(e.target.id==="psearch"){S.q=e.target.value;const pos=e.target.selectionStart;renderProv();const i=$("#psearch");i.focus();try{i.setSelectionRange(pos,pos)}catch(x){}}});
 const th=store.get("pn-theme",null);if(th)document.documentElement.dataset.theme=th;
 const h=location.hash.replace("#","");if(["gram","prov","poet","anal","quiz"].includes(h))S.mode=h;
-fillStats();today();themeIcon();render();
+S.uv.tok=UV.text?uvTokens():null;NQALL=buildItems(QT.map(x=>x[0])).length;fillStats();today();themeIcon();render();
 window.__pn={G,PVALL,AR,PG,PQ,AN};
 })();
 
