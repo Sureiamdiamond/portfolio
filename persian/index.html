@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="پارسی‌نامه: آموزش تعاملی دستور زبان فارسی، ضرب‌المثل‌ها و آرایه‌های ادبی شعر، با مثال و آزمون."><meta property="og:title" content="پارسی‌نامه"><meta property="og:type" content="website"><link rel="icon" href="../assets/img/favicon.svg"><meta name="theme-color" content="#0B2652"><title>پارسی‌نامه | دستور زبان، ضرب‌المثل و شعر فارسی</title>
+
+
+<style>@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}@font-face{font-family:'Vazirmatn';font-style:normal;font-weight:900;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}[hidden]{display:none!important}body{margin:0}
+/* Layout: lapis header with khatam lattice and a pointed-arch emblem; tile-framed cards below; gold hairlines, turquoise for level accents. */
+:root{
+  --bg:#EDF3F2; --surface:#FBFDFC; --ink:#0F1F3D; --muted:#4F5E78; --line:#C9D6D5; --soft:#E2ECEA;
+  --lap:#12376F; --lap2:#0B2652; --fir:#13897F; --gold:#A87A22; --goldl:#D9B25E; --anar:#A3283C;
+  --l1:#13897F; --l2:#2B5CB0; --l3:#A3283C; --lv:var(--fir);
+  --ok:#157A4E; --ok-bg:#E1F3EA; --bad:#B02A3D; --bad-bg:#FBE6E9; --hero-ink:#F6F0DC;
+  --fa:"Vazirmatn",Tahoma,"Segoe UI",sans-serif; --shadow:0 1px 0 rgba(15,31,61,.04),0 8px 24px -14px rgba(15,31,61,.25);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#08142B; --surface:#0F1F3E; --ink:#E9EFF7; --muted:#9DAFCB; --line:#233A63; --soft:#13264A;
+  --lap:#0C2252; --lap2:#071838; --fir:#45C9BE; --gold:#E0B85F; --goldl:#E0B85F; --anar:#EE7389;
+  --l1:#45C9BE; --l2:#7BA6F0; --l3:#EE7389; --lv:var(--fir);
+  --ok:#5FD39A; --ok-bg:#12372B; --bad:#FF8696; --bad-bg:#431A24; --hero-ink:#F6F0DC; --shadow:0 8px 24px -14px rgba(0,0,0,.6); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#08142B; --surface:#0F1F3E; --ink:#E9EFF7; --muted:#9DAFCB; --line:#233A63; --soft:#13264A;
+  --lap:#0C2252; --lap2:#071838; --fir:#45C9BE; --gold:#E0B85F; --goldl:#E0B85F; --anar:#EE7389;
+  --l1:#45C9BE; --l2:#7BA6F0; --l3:#EE7389; --lv:var(--fir);
+  --ok:#5FD39A; --ok-bg:#12372B; --bad:#FF8696; --bad-bg:#431A24; --hero-ink:#F6F0DC; --shadow:0 8px 24px -14px rgba(0,0,0,.6); color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--fa);font-size:1.02rem;line-height:1.9;-webkit-font-smoothing:antialiased}
+button{font-family:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--goldl);outline-offset:2px}
+.in{width:100%;max-width:1120px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+/* hero */
+.hero{position:relative;color:var(--hero-ink);background:var(--lap2);isolation:isolate;overflow:hidden;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23D9B25E' stroke-opacity='.22' stroke-width='1.2'%3E%3Cpath d='M36 8l7 15 15-7-7 15 15 7-15 7 7 15-15-7-7 15-7-15-15 7 7-15-15-7 15-7-7-15 15 7z'/%3E%3Cpath d='M0 0l6 6M72 0l-6 6M0 72l6-6M72 72l-6-6' /%3E%3Ccircle cx='36' cy='36' r='5'/%3E%3C/svg%3E");
+ border-bottom:3px solid var(--goldl)}
+.hero::after{content:"";position:absolute;inset:0;background:radial-gradient(60% 90% at 50% 0,rgba(19,137,127,.35),transparent 70%);z-index:-1}
+.hero-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:14px}
+.brand{display:flex;align-items:center;gap:10px;color:inherit;text-decoration:none;font-weight:700;font-size:.95rem}
+.brand svg{width:28px;height:34px}
+.iconbtn{border:1px solid rgba(217,178,94,.55);background:rgba(7,24,56,.5);color:var(--hero-ink);width:40px;height:40px;border-radius:50%;cursor:pointer;display:grid;place-items:center;font-size:1.1rem}
+.iconbtn:hover{background:rgba(217,178,94,.2)}
+.hero-main{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:28px;padding-block:16px 40px;align-items:center}
+.hero h1{margin:0 0 8px;font-weight:900;font-size:clamp(2.4rem,7vw,4.1rem);line-height:1.2;letter-spacing:0}
+.hero h1 em{font-style:normal;color:var(--goldl)}
+.hero .sub{margin:0 0 18px;max-width:34em;color:#DCE5F2;font-size:1.05rem}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips span{border:1px solid rgba(217,178,94,.5);border-radius:999px;padding:3px 14px;font-size:.9rem;background:rgba(7,24,56,.45)}
+.chips b{color:var(--goldl);font-weight:800}
+.arch{position:relative;justify-self:center;width:min(100%,360px)}
+.arch::before{content:"";position:absolute;inset:-10px;border:2px solid var(--goldl);border-radius:50% 50% 14px 14px/38% 38% 14px 14px;opacity:.7}
+.today{position:relative;background:rgba(7,24,56,.72);border:2px solid var(--goldl);border-radius:50% 50% 14px 14px/34% 34% 14px 14px;padding:56px 22px 20px;text-align:center;backdrop-filter:blur(2px)}
+.today .lab{display:inline-block;color:var(--goldl);font-weight:800;font-size:.85rem;letter-spacing:.02em}
+.today .pvt{font-size:1.45rem;font-weight:800;line-height:1.7;margin:4px 0 8px;text-wrap:balance}
+.today .pvm{font-size:.95rem;color:#DCE5F2;margin:0 0 12px;min-height:3.4em}
+.today .go{border:1px solid var(--goldl);background:transparent;color:var(--goldl);padding:4px 16px;border-radius:999px;cursor:pointer;font-weight:700}
+.today .go:hover{background:var(--goldl);color:#0B2652}
+.toranj{position:absolute;top:-18px;left:50%;transform:translateX(-50%);width:54px;height:66px}
+/* ornament */
+.zar{height:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='14' viewBox='0 0 28 14'%3E%3Cpath d='M14 1l6 6-6 6-6-6z' fill='none' stroke='%23B8892E' stroke-width='1.4'/%3E%3Ccircle cx='0' cy='7' r='1.6' fill='%23B8892E'/%3E%3Ccircle cx='28' cy='7' r='1.6' fill='%23B8892E'/%3E%3C/svg%3E") repeat-x center;opacity:.85}
+/* tabs */
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:6px;padding-block:10px;overflow-x:auto;scrollbar-width:thin}
+.tabs button{flex:0 0 auto;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 18px;font-weight:700;cursor:pointer;font-size:.98rem;white-space:nowrap}
+.tabs button[aria-pressed="true"]{background:var(--lap);color:#fff;border-color:var(--goldl);box-shadow:0 0 0 2px var(--lap) inset}
+:root[data-theme="dark"] .tabs button[aria-pressed="true"]{background:var(--lap);}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+main{padding-block:22px 40px}
+h2.sec{font-size:1.5rem;margin:0 0 4px;font-weight:900}
+.lead{color:var(--muted);margin:0 0 14px;max-width:46em}
+/* levels */
+.levels{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:16px}
+.lvb{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 14px;cursor:pointer;text-align:right;position:relative;overflow:hidden}
+.lvb b{display:block;font-size:1.05rem}.lvb small{color:var(--muted)}
+.lvb::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--p,0%);background:var(--c);opacity:.14}
+.lvb[aria-pressed="true"]{border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset}
+.grid{display:grid;grid-template-columns:260px minmax(0,1fr);gap:20px;align-items:start}
+.list{position:sticky;top:64px;max-height:calc(100vh - 80px);overflow:auto;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px}
+.list h3{margin:2px 8px 8px;font-size:.9rem;color:var(--muted)}
+.list ol{list-style:none;margin:0;padding:0;display:grid;gap:3px}
+.list button{width:100%;display:flex;align-items:center;gap:8px;border:0;background:transparent;border-radius:9px;padding:6px 10px;cursor:pointer;text-align:right;font-size:.98rem}
+.list button:hover{background:var(--soft)}
+.list button[aria-current="true"]{background:var(--soft);font-weight:800;box-shadow:inset -3px 0 0 var(--lv)}
+.dot{flex:0 0 22px;height:22px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-size:.72rem;color:var(--muted)}
+.dot.on{background:var(--ok);border-color:var(--ok);color:#fff}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,3.2vw,34px);box-shadow:var(--shadow);position:relative}
+.card::after{content:"";position:absolute;inset:6px;border:1px solid var(--goldl);border-radius:11px;opacity:.45;pointer-events:none}
+.eyebrow{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:.9rem}
+.tag{background:var(--lv);color:#fff;border-radius:7px;padding:0 10px;font-weight:800;font-size:.85rem}
+.card h2{margin:6px 0 10px;font-size:clamp(1.5rem,3.6vw,2.1rem);font-weight:900;line-height:1.5}
+.card h3{font-size:1.1rem;margin:22px 0 8px;display:flex;align-items:center;gap:8px}
+.card h3::before{content:"";width:12px;height:12px;background:var(--lv);transform:rotate(45deg);flex:0 0 12px}
+.intro{font-size:1.1rem}
+.rules{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+.rules li{padding:9px 14px;border-radius:10px;background:var(--soft);border-right:3px solid var(--lv)}
+b{font-weight:800}
+.exs{display:grid;gap:8px}
+.ex{border:1px dashed var(--line);border-radius:10px;padding:8px 14px}
+.ex .s{font-weight:800;font-size:1.08rem}
+.ex .n{color:var(--muted);font-size:.93rem}
+.foot{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-top:24px;padding-top:16px;border-top:1px solid var(--line)}
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 16px;cursor:pointer;font-weight:700}
+.btn:hover{border-color:var(--lv)}
+.btn.primary{background:var(--lv);border-color:var(--lv);color:#fff}
+:root:not([data-theme="dark"]) .btn.primary{color:#fff}
+.btn:disabled{opacity:.4;cursor:default}
+/* quiz */
+.q{margin:12px 0;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}
+.qt{font-weight:800;margin-bottom:8px}
+.qt.v{font-weight:600;line-height:2}
+.opts{display:flex;flex-wrap:wrap;gap:8px}
+.opts button{border:1.5px solid var(--line);background:var(--surface);border-radius:9px;padding:5px 14px;cursor:pointer;font-size:1rem}
+.opts button:hover:not(:disabled){border-color:var(--lv)}
+.opts button.ok{border-color:var(--ok);background:var(--ok-bg);color:var(--ok);font-weight:800}
+.opts button.bad{border-color:var(--bad);background:var(--bad-bg);color:var(--bad);text-decoration:line-through}
+.opts button:disabled{cursor:default}
+.opts.col{flex-direction:column;align-items:stretch}
+.opts.col button{text-align:right;line-height:1.8}
+.why{margin-top:10px;font-size:.94rem;padding:8px 12px;border-radius:8px}
+.why.ok{background:var(--ok-bg);color:var(--ok)}.why.bad{background:var(--bad-bg);color:var(--bad)}
+.pscore{color:var(--muted);font-size:.95rem}
+.link{border:0;background:none;color:var(--lv);text-decoration:underline;cursor:pointer;padding:0;font-weight:700}
+/* verses */
+.bayt{display:grid;grid-template-columns:minmax(0,1fr) 28px minmax(0,1fr);align-items:center;gap:6px;margin:10px 0;padding:14px 16px;border:1px solid var(--goldl);border-radius:10px;background:linear-gradient(var(--soft),var(--soft));position:relative;font-size:1.12rem;font-weight:500;line-height:2}
+.bayt::before{content:"";position:absolute;inset:3px;border:1px solid var(--line);border-radius:7px;pointer-events:none}
+.bayt .m{text-align:center;position:relative}
+.bayt .g{text-align:center;color:var(--gold);font-size:.9rem}
+.bayt.one{grid-template-columns:1fr}
+.bn{margin:-4px 4px 12px;font-size:.93rem;color:var(--muted)}
+.bn b{color:var(--lv)}
+.phs{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.ph{border:1px dashed var(--line);border-radius:10px;padding:8px 12px}
+.ph b{display:block}.ph span{color:var(--muted);font-size:.92rem}
+.ptabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.ptabs button{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 16px;cursor:pointer;font-weight:700}
+.ptabs button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#fff}
+:root[data-theme="dark"] .ptabs button[aria-pressed="true"]{color:#0B2652}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ptabs button[aria-pressed="true"]{color:#0B2652}}
+/* proverbs */
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.tools input{flex:1 1 220px;min-width:0;font:inherit;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);padding:6px 14px;border-radius:10px}
+.cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.cats button{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 14px;cursor:pointer;font-size:.93rem}
+.cats button[aria-pressed="true"]{background:var(--fir);border-color:var(--fir);color:#fff}
+:root[data-theme="dark"] .cats button[aria-pressed="true"]{color:#08142B}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .cats button[aria-pressed="true"]{color:#08142B}}
+.pvs{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:12px}
+.pv{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px 18px;position:relative;box-shadow:var(--shadow);min-width:0}
+.pv::before{content:"";position:absolute;inset:5px;border:1px solid var(--goldl);border-radius:10px;opacity:.4;pointer-events:none}
+.pv .t{font-weight:900;font-size:1.12rem;line-height:1.8;text-wrap:balance}
+.pv .c{font-size:.8rem;color:var(--muted)}
+.pv .mm{margin-top:8px}
+.pv .mm p{margin:0 0 6px}
+.pv .us{color:var(--muted);font-size:.93rem}
+.pv button.show{margin-top:6px}
+/* quiz box */
+.quizbox{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:clamp(18px,3.5vw,34px);max-width:780px;margin:0 auto;box-shadow:var(--shadow);position:relative}
+.quizbox::after{content:"";position:absolute;inset:6px;border:1px solid var(--goldl);border-radius:11px;opacity:.45;pointer-events:none}
+.picks{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.picks label{border:1.5px solid var(--line);border-radius:10px;padding:4px 14px;cursor:pointer;display:flex;gap:8px;align-items:center}
+.qprog{display:flex;justify-content:space-between;color:var(--muted);font-size:.92rem;margin-bottom:6px}
+.score{font-size:3rem;font-weight:900;color:var(--lv)}
+.miss{list-style:none;padding:0;display:grid;gap:8px}
+.miss li{border:1px solid var(--line);border-radius:10px;padding:10px 14px}
+/* footer */
+.site-foot{margin-top:20px;background:var(--lap2);color:var(--hero-ink);border-top:3px solid var(--goldl);position:relative;
+ background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72' fill='none' stroke='%23D9B25E' stroke-opacity='.16' stroke-width='1.2'%3E%3Cpath d='M36 8l7 15 15-7-7 15 15 7-15 7 7 15-15-7-7 15-7-15-15 7 7-15-15-7 15-7-7-15 15 7z'/%3E%3C/svg%3E")}
+.foot-in{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:24px;padding-block:30px 20px}
+.site-foot h4{margin:0 0 8px;color:var(--goldl);font-size:1rem}
+.site-foot p,.site-foot li{margin:0;color:#DCE5F2;font-size:.95rem}
+.site-foot ul{list-style:none;margin:0;padding:0;display:grid;gap:2px}
+.site-foot a,.site-foot .fl{color:var(--hero-ink);text-decoration:none;border:0;background:none;cursor:pointer;padding:0;font-size:.95rem}
+.site-foot a:hover,.site-foot .fl:hover{color:var(--goldl)}
+.copy{border-top:1px solid rgba(217,178,94,.3);padding-block:12px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:.88rem;color:#B9C8DF}
+.up{border:1px solid var(--goldl);background:transparent;color:var(--goldl);border-radius:999px;padding:2px 14px;cursor:pointer}
+@media (max-width:860px){
+ .hero-main{grid-template-columns:1fr}.arch{width:min(100%,380px)}
+ .grid{grid-template-columns:1fr}.list{position:static;max-height:none}
+ .list ol{display:flex;overflow-x:auto;gap:6px;padding-bottom:4px}.list li{flex:0 0 auto}.list button{white-space:nowrap;border:1px solid var(--line)}
+ .foot-in{grid-template-columns:1fr}
+ .bayt{grid-template-columns:1fr;gap:0}.bayt .g{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head><body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="toranj" viewBox="0 0 54 66"><path d="M27 2c10 14 20 26 20 40 0 12-9 20-20 22C16 62 7 54 7 42 7 28 17 16 27 2z" fill="#0B2652" stroke="#D9B25E" stroke-width="2"/><path d="M27 14c6 9 11 17 11 27 0 8-5 14-11 16-6-2-11-8-11-16 0-10 5-18 11-27z" fill="none" stroke="#D9B25E" stroke-width="1.2"/><circle cx="27" cy="42" r="4" fill="#13897F" stroke="#D9B25E" stroke-width="1"/></symbol>
+<symbol id="star" viewBox="0 0 40 40"><path d="M20 2l5 11 11-5-5 11 11 5-11 5 5 11-11-5-5 11-5-11-11 5 5-11L2 20l11-5-5-11 11 5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+</defs></svg>
+<header class="hero">
+ <div class="in">
+  <div class="hero-top">
+   <a class="brand" href="https://parsabanitaba.ir/" aria-label="سایت پارسا بنی‌طبا"><svg aria-hidden="true"><use href="#toranj"/></svg><span>پارسا بنی‌طبا</span></a>
+   <button class="iconbtn" id="theme" aria-label="تغییر تم روشن و تاریک" title="تغییر تم" style="font-size:.8rem;font-weight:700">تم</button>
+  </div>
+  <div class="hero-main">
+   <div>
+    <h1>پارسی<em>‌نامه</em></h1>
+    <p class="sub">دستور زبان فارسی، ضرب‌المثل‌ها و آرایه‌های ادبی را گام‌به‌گام بیاموز: از نام و فعل تا تشبیه و قافیه، با مثال و آزمون پس از هر درس.</p>
+    <div class="chips"><span><b id="st-g">۰</b> درس دستور</span><span><b id="st-p">۰</b> ضرب‌المثل</span><span><b id="st-a">۰</b> آرایه‌ی ادبی</span><span><b id="st-q">۰</b> پرسش</span></div>
+   </div>
+   <div class="arch"><div class="today"><svg class="toranj" aria-hidden="true"><use href="#toranj"/></svg><span class="lab">ضرب‌المثل امروز</span><div class="pvt" id="tdT"></div><p class="pvm" id="tdM"></p><button class="go" id="tdN">یکی دیگر</button></div></div>
+  </div>
+ </div>
+</header>
+<div class="zar" aria-hidden="true"></div>
+<div class="bar"><div class="in"><nav class="tabs" aria-label="بخش‌ها">
+ <button data-mode="gram" aria-pressed="true">دستور زبان</button>
+ <button data-mode="prov" aria-pressed="false">ضرب‌المثل‌ها</button>
+ <button data-mode="poet" aria-pressed="false">شعر و آرایه‌ها</button>
+ <button data-mode="quiz" aria-pressed="false">آزمون</button>
+</nav></div></div>
+<main class="in"><div id="main"></div></main>
+<footer class="site-foot">
+ <div class="zar" aria-hidden="true" style="margin-top:-2px"></div>
+ <div class="in">
+  <div class="foot-in">
+   <div><h4>پارسی‌نامه</h4><p>یادگیری دستور زبان فارسی، ضرب‌المثل و شعر، با توضیح ساده و مثال و آزمون. بیت‌های نمونه برای آموزش در همین صفحه نوشته شده‌اند.</p></div>
+   <div><h4>بخش‌ها</h4><ul><li><button class="fl" data-fmode="gram">دستور زبان</button></li><li><button class="fl" data-fmode="prov">ضرب‌المثل‌ها</button></li><li><button class="fl" data-fmode="poet">شعر و آرایه‌ها</button></li><li><button class="fl" data-fmode="quiz">آزمون</button></li></ul></div>
+   <div><h4>سایت</h4><ul><li><a href="https://parsabanitaba.ir/">صفحه‌ی اصلی</a></li><li><a href="https://parsabanitaba.ir/english/">نردبان گرامر انگلیسی</a></li><li><button class="up" id="totop">↑ بالای صفحه</button></li></ul></div>
+  </div>
+  <div class="copy"><span>ساخته‌شده برای آموزش زبان فارسی</span><span>© پارسا بنی‌طبا</span></div>
+ </div>
+</footer>
+<noscript><p style="padding:24px">برای استفاده از این صفحه جاوااسکریپت را فعال کنید.</p></noscript><script>
+(function(){
+"use strict";
+const $=(s,r)=>(r||document).querySelector(s);
+const store={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const rich=s=>esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+const fd=n=>String(n).replace(/\d/g,d=>"۰۱۲۳۴۵۶۷۸۹"[d]);
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const LVN={1:{n:"پایه",c:"--l1"},2:{n:"میانه",c:"--l2"},3:{n:"پیشرفته",c:"--l3"}};
+const G=[
+{lv:1,id:"esm",fa:"اسم و انواع آن",i:"**اسم** واژه‌ای است که نام کس، چیز، جا یا مفهومی را می‌رساند: «دانش‌آموز»، «کوه»، «شیراز»، «مهربانی». اسم را از چند نظر دسته‌بندی می‌کنند.",r:["**عام و خاص:** اسم خاص فقط یک فرد یا جای مشخص را می‌رساند (حافظ، تهران، دماوند)؛ اسم عام برای همه‌ی هم‌گروه‌ها به کار می‌رود (شاعر، شهر، کوه).","**مفرد و جمع:** «کتاب» مفرد است و «کتاب‌ها» جمع.","**ساده، مرکب و مشتق:** ساده یک جزء دارد (دست)؛ مرکب دو واژه‌ی معنادار دارد (دست‌نوشته)؛ مشتق پیشوند یا پسوند می‌گیرد (دانشگاه، بی‌کاری).","**ذات و معنی:** اسم ذات چیزی است که می‌بینیم یا می‌لمسیم (درخت)؛ اسم معنی مفهومی انتزاعی است (آزادی)."],x:["علی به مدرسه رفت.|«علی» اسم خاص، «مدرسه» اسم عام و ذات.","دوستی بهترین سرمایه است.|«دوستی» اسم معنی و مشتق (دوست + ی).","کتاب‌خانه‌ی شهر بزرگ است.|«کتاب‌خانه» مرکب (کتاب + خانه)."],q:[["کدام واژه اسم خاص است؟",["شهر","اصفهان","رود","مرد"],1,"«اصفهان» نام یک شهر مشخص است."],["«مهربانی» چه نوع اسمی است؟",["اسم ذات","اسم خاص","اسم معنی","اسم جمع"],2,"مفهومی انتزاعی است و دیده یا لمس نمی‌شود."],["«گل‌دان» چه ساختی دارد؟",["ساده","مشتق","مرکب","جمع"],2,"گل + دان؛ دو جزء معنادار."]]},
+{lv:1,id:"zamir",fa:"ضمیر",i:"**ضمیر** واژه‌ای است که به جای اسم می‌نشیند تا تکرار نشود: «مریم آمد. او نشست.»",r:["**شخصی جدا:** من، تو، او، ما، شما، ایشان، آنان.","**شخصی پیوسته:** «‌م، ‌ت، ‌ش، ‌مان، ‌تان، ‌شان» که به واژه می‌چسبند: کتابم، کتابت، کتابش.","**اشاره:** این، آن، همین، همان، اینجا، آنجا.","**پرسشی:** که، کی، چه، چی، کدام، چند.","**مشترک:** خود، خویش، خویشتن (برای همه‌ی شخص‌ها).","**مبهم:** همه، هیچ‌کس، برخی، دیگری."],x:["من او را دیدم.|«من» ضمیر جدا؛ «او» ضمیر جدا (مفعول).","کتابم را برداشتم.|«‌م» ضمیر پیوسته (مضاف‌الیه).","او خود این کار را کرد.|«خود» ضمیر مشترک."],q:[["در «دفترش را باز کرد» ضمیر کدام است؟",["دفتر","ش","را","باز"],1,"«‌ش» ضمیر پیوسته است."],["«این» در «این را بردار» چیست؟",["ضمیر اشاره","ضمیر شخصی","صفت","قید"],0,"به جای اسم نشسته است."],["«خود» چه ضمیری است؟",["پرسشی","مشترک","اشاره","مبهم"],1,"در همه‌ی شخص‌ها به کار می‌رود."]]},
+{lv:1,id:"sefat",fa:"صفت و انواع آن",i:"**صفت** واژه‌ای است که اسم را توصیف یا محدود می‌کند. در فارسی صفت معمولاً **بعد** از اسم می‌آید و میان آن‌ها کسره است: «گل زیبا».",r:["**بیانی:** ویژگی را می‌گوید (هوای سرد).","**شمارشی:** عدد است (سه کتاب، سومین روز). اصلی و ترتیبی دارد.","**اشاره:** این، آن (این کتاب).","**پرسشی:** کدام، چه، چند (کدام راه؟).","**تعجبی:** چه (چه هوایی!).","**مبهم:** هر، همه، چند، برخی (هر روز).","**صفت فاعلی، مفعولی، نسبی، لیاقت:** خندان، نوشته، ایرانی، دیدنی."],x:["دانش‌آموز کوشا موفق می‌شود.|«کوشا» صفت بیانی.","این کتاب را بردار.|«این» صفت اشاره.","چه شبی بود!|«چه» صفت تعجبی."],q:[["در «سه روز» «سه» چیست؟",["صفت شمارشی","صفت بیانی","قید","ضمیر"],0,"عدد است و اسم را می‌شمارد."],["صفت در «آب سرد» کدام است؟",["آب","سرد","هیچ‌کدام","هر دو"],1,"«سرد» ویژگی «آب» را می‌گوید."],["«ایرانی» در «غذای ایرانی» چه نوع صفتی است؟",["فاعلی","نسبی","شمارشی","اشاره"],1,"با پسوند «ـی» منسوب می‌کند."]]},
+{lv:1,id:"fel",fa:"فعل و زمان‌های ساده",i:"**فعل** کاری را یا حالتی را همراه با زمان می‌رساند. هر فعل **بن ماضی** و **بن مضارع** دارد: «رفت» (بن ماضی: رفت) و «رو» (بن مضارع).",r:["**ماضی ساده:** بن ماضی + شناسه: رفتم، رفتی، رفت.","**مضارع اخباری:** می + بن مضارع + شناسه: می‌روم.","**آینده:** خواه + شناسه + بن ماضی: خواهم رفت.","**امر:** (ب) + بن مضارع: برو، بنویس. **نهی:** نـ + بن مضارع: نرو.","**شناسه‌ها:** ـم، ـی، ـ(ـد)، ـیم، ـید، ـند."],x:["او دیروز آمد.|ماضی ساده.","من هر روز کتاب می‌خوانم.|مضارع اخباری.","فردا خواهم رفت.|آینده.","در را نبند.|نهی."],q:[["«می‌نویسیم» چه زمانی است؟",["ماضی ساده","مضارع اخباری","آینده","امر"],1,"می + بن مضارع (نویس) + یم."],["بن مضارع «رفتن» کدام است؟",["رف","رو","رفت","می‌رو"],1,"«رو» (می‌روم)."],["«خواهند آمد» چه زمانی است؟",["مضارع","ماضی نقلی","آینده","امر"],2,"خواه + شناسه + بن ماضی."]]},
+{lv:1,id:"jam",fa:"جمع بستن واژه‌ها",i:"در فارسی چند راه برای جمع بستن هست؛ پرکاربردترین «ها» است.",r:["**ـها:** برای همه‌ی اسم‌ها و امروز بیش از همه: کتاب‌ها، درخت‌ها.","**ـان:** بیشتر برای جاندار و کاربرد ادبی: دانشجویان، درختان.","**ـات:** معمولاً در واژه‌های عربی‌تبار: ادبیات، تجربیات، کلمات.","**ـین / ـون:** معلمین، مسلمون (عربی و گفتاری).","**جمع مکسر عربی:** کتب (کتاب)، علوم (علم)، اساتید (استاد). امروز بهتر است برای واژه‌ی فارسی از «ها» استفاده شود.","نکته: بعد از عدد، اسم مفرد می‌آید: «سه کتاب»، نه «سه کتاب‌ها»."],x:["پرندگان در آسمان‌اند.|ـان در پرنده‌گان (گ برای پیوند).","میوه‌جات فروشی باز است.|ـات.","پنج دانش‌آموز آمدند.|بعد از عدد مفرد."],q:[["شکل درست کدام است؟",["چهار کتاب‌ها","چهار کتاب","چهار کتابان","چهارتا کتب"],1,"بعد از عدد مفرد می‌آید."],["جمع «ادیب» با ـان کدام است؟",["ادیبان","ادیب‌ها‌ان","ادیبات","ادیب‌ین"],0,"ادیبان درست و رایج است."],["«ـات» بیشتر با چه واژه‌هایی می‌آید؟",["فارسی اصیل","عربی‌تبار","ترکی","فرانسوی"],1,"مثل ادبیات و مکاتبات."]]},
+{lv:1,id:"harf",fa:"حروف اضافه و ربط",i:"**حرف** واژه‌ای است که بین واژه‌ها یا جمله‌ها پیوند می‌دهد و خودش معنی مستقل ندارد.",r:["**حرف اضافه:** از، به، در، با، بر، برای، تا، بی، مانند: «به خانه رفتم».","**حرف ربط همپایه:** و، یا، اما، ولی، لیکن.","**حرف ربط وابسته:** که، اگر، چون، زیرا، تا، هرچند.","**حرف ندا:** ای، یا، ا: «ای دوست!».","**حرف تأکید و ربط ویژه:** همین، نیز، هم."],x:["من و تو به بازار رفتیم.|«و» ربط همپایه؛ «به» حرف اضافه.","اگر بیایی، می‌روم.|«اگر» ربط وابسته (شرط).","ای خدا!|«ای» حرف ندا."],q:[["«که» در «گفت که می‌آید» چه حرفی است؟",["اضافه","ربط وابسته","ندا","همپایه"],1,"جمله‌ی «می‌آید» را به جمله‌ی پایه وصل می‌کند."],["حرف اضافه کدام است؟",["و","اما","با","اگر"],2,"«با» متمم می‌گیرد."],["«ای» کجا به کار می‌رود؟",["شرط","ندا","مقایسه","مکان"],1,"برای خطاب کردن."]]},
+{lv:1,id:"jomle",fa:"ارکان جمله",i:"جمله از **نهاد** و **گزاره** ساخته می‌شود. نهاد کننده‌ی کار است و گزاره بقیه‌ی جمله. فعل در پایان جمله می‌آید.",r:["**نهاد:** کننده‌ی کار یا موضوع جمله (چه کسی؟).","**فعل:** هسته‌ی گزاره.","**مفعول:** آنچه کار بر آن واقع می‌شود (معمولاً با «را»).","**متمم:** اسمی با حرف اضافه (به مدرسه).","**قید:** زمان و مکان و چگونگی (امروز، آهسته).","**مسند:** در جمله‌ی اسنادی، ویژگی نهاد (هوا سرد است)."],x:["مریم نامه را نوشت.|نهاد: مریم؛ مفعول: نامه؛ فعل: نوشت.","کودک به باغ رفت.|متمم: به باغ.","او آهسته آمد.|قید: آهسته."],q:[["نهاد در «پسر کتاب را خرید» کدام است؟",["کتاب","پسر","را","خرید"],1,"کننده‌ی کار «پسر» است."],["«را» در «کتاب را خرید» نشانه‌ی چیست؟",["متمم","مفعول","مسند","نهاد"],1,"«را» نشانه‌ی مفعول است."],["«به باغ» چه نقشی دارد؟",["مفعول","قید","متمم","مسند"],2,"اسم همراه حرف اضافه."]]},
+{lv:1,id:"emla",fa:"املای واژه‌های هم‌آوا",i:"در فارسی چند حرف یک صدا دارند و املای درست را باید از معنی و ریشه دانست.",r:["**ز، ذ، ض، ظ** (همه «ز»): زمان، ذهن، ضمیر، ظهر.","**س، ث، ص** (همه «س»): سبز، ثروت، صبر.","**ت، ط** (همه «ت»): تاب، طاقت.","**ق، غ:** قصه (ق)، غصه (غ)؛ قایم و غایب.","**ه، ح** و **ع، ا** در واژه‌های عربی: حیات، هیجان، عمر، امر.","هم‌آواها: **خوار** (ذلیل)، **خار** (تیغ)، **خواست** و **خاست**، **حضور** و **حظور**(نادرست)."],x:["صبر تلخ است ولی میوه‌ی شیرین دارد.|ص در صبر.","ذهنش خسته است.|ذ در ذهن.","غصه نخور، قصه بگو.|غ / ق."],q:[["شکل درست کدام است؟",["زهن","ذهن","ضهن","ظهن"],1,"ذهن با «ذ» است."],["«سبر / صبر / ثبر» کدام درست است؟",["سبر","صبر","ثبر","هیچ‌کدام"],1,"«صبر» با «ص»."],["«غایب» با «قایب» چه فرقی دارد؟",["هیچ","غایب درست است","قایب درست است","هر دو"],1,"غایب یعنی حاضر نبودن."]]}];
+
+G.push(
+{lv:2,id:"moratebe",fa:"مراتب صفت",i:"صفت سه مرتبه دارد: **مطلق**، **تفضیلی** و **عالی**.",r:["**مطلق:** بدون مقایسه: بزرگ.","**تفضیلی:** صفت + «تر»: بزرگ‌تر. با «از» مقایسه می‌کند: او از من بزرگ‌تر است.","**عالی:** صفت + «ترین» یا «تر از همه»: بزرگ‌ترین. در شعر کهن «ـین» هم هست: مهین، کهین.","صفت‌های تفضیلی عربی مثل «برتر، بهتر، بیشتر» خود تفضیلی‌اند؛ «بهتر» را «بهتر‌تر» نمی‌نویسند."],x:["البرز بلندتر از ساوالان نیست.|تفضیلی با «از».","او کوشاترین دانش‌آموز کلاس است.|عالی.","این راه بهتر است.|بهتر = خوب + تر."],q:[["مرتبه‌ی «زیباترین» چیست؟",["مطلق","تفضیلی","عالی","هیچ"],2,"ـترین = عالی."],["کدام درست است؟",["بهتر‌تر","بهتر","بدتر‌ترین‌تر","خوب‌تر‌تر"],1,"«بهتر» خود تفضیلی است."],["«از» در جمله‌ی «علی از رضا بلندتر است» چه می‌کند؟",["مقایسه","مکان","زمان","علت"],0,"مقایسه را کامل می‌کند."]]},
+{lv:2,id:"zaman",fa:"زمان‌های ماضی و مضارع",i:"هر زمان با ساختی مشخص ساخته می‌شود. ماضی چند گونه دارد.",r:["**ماضی ساده:** رفتم.","**ماضی استمراری:** می + ماضی: می‌رفتم (کار مکرر یا ادامه‌دار).","**ماضی نقلی:** صفت مفعولی + هستم: رفته‌ام (نتیجه‌اش تا حالا ادامه دارد).","**ماضی بعید:** رفته بودم (پیش از ماضی دیگر).","**ماضی التزامی:** رفته باشم (احتمال، آرزو).","**مضارع اخباری:** می‌روم. **مضارع التزامی:** بروم (با «باید، شاید، تا»).","**آینده:** خواهم رفت."],x:["پارسال می‌رفتیم کوه.|استمراری.","تا رسیدی، رفته بودم.|ماضی بعید.","شاید فردا بیایم.|مضارع التزامی."],q:[["«کتاب را خوانده‌ام» چه زمانی است؟",["ماضی ساده","ماضی نقلی","ماضی بعید","التزامی"],1,"خوانده + ام."],["«باید بروی» چه زمانی است؟",["اخباری","التزامی","آینده","امر"],1,"بعد از «باید» التزامی می‌آید."],["«می‌خواندند» کدام است؟",["ماضی استمراری","نقلی","بعید","آینده"],0,"می + ماضی."]]},
+{lv:2,id:"lazem",fa:"فعل لازم و متعدی، معلوم و مجهول",i:"فعل **لازم** مفعول نمی‌خواهد؛ **متعدی** مفعول می‌خواهد. فعل **معلوم** کننده‌ی کار را نشان می‌دهد؛ **مجهول** کننده‌ی کار را پنهان می‌کند.",r:["لازم: رفتن، آمدن، خندیدن (او خندید).","متعدی به یک مفعول: خوردن (نان را خورد). متعدی به دو مفعول یا مفعول و متمم: دادن (کتاب را به او داد).","**مجهول:** صفت مفعولی + شدن: «کتاب نوشته شد».","از لازم مجهول ساخته نمی‌شود: «رفته شد» غلط است.","مجهول در گفتار رسمی و علمی پرکاربرد است."],x:["پنجره شکسته شد.|مجهول (فاعل نامعلوم).","علی پنجره را شکست.|معلوم.","او خوابید.|لازم."],q:[["«نامه نوشته شد» چه فعلی است؟",["معلوم","مجهول","لازم","امر"],1,"صفت مفعولی + شد."],["کدام فعل لازم است؟",["خوردن","دیدن","دویدن","بردن"],2,"«دوید» مفعول نمی‌خواهد."],["کدام جمله غلط است؟",["در باز شد","به خانه رفته شد","نان خورده شد","نامه نوشته شد"],1,"فعل لازم مجهول نمی‌شود."]]},
+{lv:2,id:"mord",fa:"فعل ساده، پیشوندی و مرکب",i:"از نظر ساخت فعل‌ها **ساده** (رفتن)، **پیشوندی** (برگشتن، درآمدن) یا **مرکب** (کمک کردن) اند.",r:["**ساده:** فقط بن و شناسه: می‌نویسم.","**پیشوندی:** پیشوند (بر، در، باز، فرو) + فعل: برداشتن، بازگشتن.","**مرکب:** اسم/صفت + فعل کمکی: تماشا کردن، پاک شدن، دوست داشتن.","فعل مرکب را یک معنی کلی می‌دهد و می‌شود با فعل ساده جایگزین کرد: **کمک کردن = یاری دادن**.","از «کردن، شدن، داشتن، دادن، زدن، گرفتن» بسیار فعل مرکب ساخته می‌شود."],x:["او در را باز کرد.|«باز کردن» مرکب.","کتاب را برداشت.|پیشوندی (بر + داشت).","نامه‌ها را آورد.|ساده."],q:[["«برگشتن» چه نوع فعلی است؟",["ساده","پیشوندی","مرکب","مجهول"],1,"بر + گشتن."],["«گوش دادن» چه نوع فعلی است؟",["ساده","پیشوندی","مرکب","لازم‌تر"],2,"اسم + فعل کمکی."],["کدام فعل ساده است؟",["پیدا کردن","خوردن","در آوردن","تماشا کردن"],1,"یک جزء دارد."]]},
+{lv:2,id:"tarkib",fa:"ترکیب وصفی و اضافی",i:"وقتی دو واژه با **کسره‌ی اضافه** به هم وصل شوند، یا ترکیب وصفی است یا ترکیب اضافی.",r:["**وصفی:** اسم + صفت: «گل زیبا»، «روز سرد». هسته: اسم؛ وابسته: صفت.","**اضافی:** اسم + اسم (مضاف و مضاف‌الیه): «کتاب علی»، «دیوار باغ».","ترکیب‌ها می‌توانند تو در تو باشند: «دیوار بلند باغ قدیمی».","کسره بعد از واژه‌ی مختوم به مصوت «ا، و» به «ی» تبدیل می‌شود: «دانایِ روزگار»، «روی ماه».","در خط، کسره نوشته نمی‌شود؛ در شعر همیشه تلفظ می‌شود."],x:["درخت بلند|وصفی.","درخت باغ|اضافی.","پنجره‌ی اتاق کودک|اضافی (تو در تو): پنجره‌ی (اتاقِ کودک)."],q:[["«دفتر حسابداری» چه ترکیبی است؟",["وصفی","اضافی","عطفی","هیچ"],1,"دو اسم به هم وصل شده‌اند."],["«شب تاریک» چه ترکیبی است؟",["وصفی","اضافی","مجهول","شمارشی"],0,"صفت بعد از اسم."],["هسته‌ی «کتاب خوب» کدام است؟",["کتاب","خوب","هر دو","هیچ"],0,"اسم هسته و صفت وابسته است."]]},
+{lv:2,id:"ra",fa:"نقش «را» و مفعول",i:"«را» نشانه‌ی **مفعول** است ولی در همه‌ی جمله‌ها نمی‌آید. مفعول معین با «را» و مفعول نامعین بیشتر بدون «را» می‌آید.",r:["مفعول معین: «کتاب را خواندم» (کتاب مشخص).","نامعین: «کتاب خریدم» (یک کتاب).","«را» به معنی «برای» یا «به»: «او را گفتم» (به او گفتم)؛ در شعر کهن بسیار است.","«را» می‌تواند بین ضمیر و مضاف‌الیه فاصله بیندازد (فک اضافه): «دلش را شکستی» = دل او را شکستی."],x:["دوستم را دیدم.|مفعول معین.","نان خوردم.|مفعول نامعین.","او را گفتم که بیاید.|«را» به معنی «به» (کهن)."],q:[["«کتاب را خرید» مفعول چیست؟",["کتاب","را","خرید","هیچ"],0,"مفعول با «را» همراه است."],["«دل او را شکست» به شکل فک اضافه کدام است؟",["دلش را شکست","دل شکست او","او دل را شکست","دلی شکست"],0,"«ش» به او برمی‌گردد."],["کدام مفعول نامعین است؟",["کتاب را برداشت","نان خرید","آن را دید","علی را شناخت"],1,"بدون «را»."]]},
+{lv:2,id:"esnadi",fa:"جمله‌ی اسنادی و مسند",i:"جمله‌ی **اسنادی** چیزی را به نهاد نسبت می‌دهد. هسته‌ی آن مسند است و فعل از نوع **اسنادی** (است، شد، گشت، گردید، بود، ماند).",r:["ساختار: نهاد + مسند + فعل اسنادی.","«هوا سرد است» نهاد: هوا؛ مسند: سرد.","بعضی فعل‌ها در جمله‌ای اسنادی و در جمله‌ای دیگر غیراسنادی‌اند: «علی معلم شد» (اسنادی) و «علی به مدرسه شد» (غیراسنادی، کهن).","مسند می‌تواند اسم، صفت یا ضمیر باشد."],x:["مریم پزشک است.|مسند: پزشک.","او خسته شد.|مسند: خسته.","هوا گرم می‌ماند.|مسند: گرم."],q:[["مسند در «شب تاریک شد» کدام است؟",["شب","تاریک","شد","هیچ"],1,"ویژگی را به نهاد نسبت می‌دهد."],["کدام فعل اسنادی است؟",["خوردن","شدن","رفتن","نوشتن"],1,"«شدن» اسنادی است."],["«او کتاب را خواند» اسنادی است؟",["بله","خیر","گاهی","هیچ"],1,"فعل «خواند» اسنادی نیست."]]},
+{lv:2,id:"qeyd",fa:"قید و انواع آن",i:"**قید** واژه‌ای است که معنی فعل، صفت یا قید دیگری را روشن می‌کند: چگونه؟ کی؟ کجا؟ چقدر؟",r:["**زمان:** امروز، دیروز، هنوز، همیشه.","**مکان:** اینجا، آنجا، بالا، پایین.","**حالت:** آهسته، شادمانه، سریع.","**مقدار:** خیلی، بسیار، کمی، اندکی.","**تأکید:** حتماً، قطعاً. **نفی:** هرگز، اصلاً. **پرسش:** چرا، چگونه.","قید می‌تواند اسم یا صفت باشد که نقش قیدی گرفته است: «صبح آمد».","قید‌ها معمولاً جابه‌جا می‌شوند ولی فعل آخر می‌ماند."],x:["او آهسته رفت.|قید حالت.","من هنوز نیامده‌ام.|قید زمان.","خیلی خوب است.|قید مقدار."],q:[["«فردا» چه قیدی است؟",["مکان","زمان","حالت","مقدار"],1,"زمان انجام کار."],["«خیلی بزرگ» «خیلی» چیست؟",["قید مقدار","صفت","فعل","حرف ربط"],0,"صفت را شدت می‌دهد."],["«هرگز نرفت» «هرگز» چیست؟",["قید نفی","صفت","ضمیر","اسم"],0,"قید نفی."]]},
+{lv:2,id:"vajsaz",fa:"واژه‌سازی: پیشوند و پسوند",i:"فارسی با افزودن **پیشوند** و **پسوند** هزاران واژه می‌سازد. این روش «اشتقاق» نام دارد.",r:["**پیشوند:** بی‌ (بی‌کار)، نا‌ (ناامید)، هم‌ (همکار)، با‌ (باهوش)، فرا‌ (فراگیر)، ور‌ (ورآمدن)، در‌.","**پسوند:** ـگاه (دانشگاه)، ـستان (گلستان)، ـی (آزادی)، ـکده (دانشکده)، ـدان (نمکدان)، ـنده (نویسنده)، ـش (دانش)، ـار (رفتار).","**ترکیب:** دو واژه کنار هم: خوش‌حال، دانش‌آموز، خانه‌زاد.","واژه‌های مشتق‌ـ‌مرکب هر دو را دارند: «خوش‌رفتاری»."],x:["نویسنده|نویس + ـنده.","بی‌دانش|بی‌ + دانش.","دانشگاه|دانش + ـگاه."],q:[["«ناامید» چه ساختی دارد؟",["ساده","مشتق","مرکب","جمع"],1,"نا + امید."],["پسوند مکان در «گلستان» کدام است؟",["ـستان","گل","ـان","هیچ"],0,"ـستان نشان‌دهنده‌ی جا."],["«خوش‌حال» چه نوع واژه‌ای است؟",["ساده","مرکب","مشتق","جمع"],1,"دو واژه‌ی مستقل."]]},
+{lv:2,id:"neshane",fa:"همزه، نیم‌فاصله و نشانه‌گذاری",i:"نوشتن درست یعنی رعایت **همزه**، **نیم‌فاصله** و **نشانه‌های سجاوندی**.",r:["**نیم‌فاصله** (ZWNJ): بین «می» و فعل (می‌روم)، پیش از «ها» (کتاب‌ها)، «ام، ای» (رفته‌ام)، در ترکیب‌ها (دانش‌آموز).","**همزه:** «مسئله/مسأله» هر دو درست؛ «جرئت/جرأت». «ئ» پس از حرف‌های چسبان.","نشانه‌ها: **ویرگول** ( ، ) برای جدا کردن، **نقطه‌ویرگول** ( ؛ )، **دو نقطه**، **گیومه** « »، **پرسش** ؟، **تعجب** !، **سه‌نقطه** …","نقطه‌ی پایان جمله: «.»","در فارسی گیومه‌ی ورودی «، خروجی ».","فاصله پیش از نشانه‌ها گذاشته نمی‌شود؛ بعد از آن‌ها یک فاصله می‌آید."],x:["می‌روم نه «میروم».|نیم‌فاصله.","او گفت: «می‌آیم.»|گیومه و دو نقطه.","چرا نیامدی؟|نشانه‌ی پرسش."],q:[["کدام درست است؟",["میروم","می‌روم","می روم","میروم"],1,"با نیم‌فاصله."],["پیش از «:» چه می‌آید؟",["فاصله","هیچ","نقطه","ویرگول"],1,"نشانه به واژه می‌چسبد."],["جدا کردن اجزای هم‌پایه با چه نشانه‌ای است؟",["ویرگول","گیومه","دو نقطه","علامت تعجب"],0,"«،» برای جدا کردن."]]}
+);
+G.push(
+{lv:3,id:"morakkab",fa:"جمله‌ی ساده و مرکب",i:"جمله‌ی **ساده** یک فعل دارد. جمله‌ی **مرکب** دست‌کم دو فعل دارد؛ یا **همپایه** است (با و، یا، اما) یا **پایه و وابسته**.",r:["همپایه: «او آمد و من رفتم» (دو جمله‌ی مستقل).","ناهمپایه: «گفتم که می‌آیم» (پایه: گفتم؛ وابسته: که می‌آیم).","**انواع وابسته:** مفعولی (که...)، شرطی (اگر)، علت (زیرا)، زمان (وقتی)، مقایسه (چنان‌که)، تعلیل، تقابل (هرچند).","جمله‌ی وابسته به تنهایی معنی کامل نمی‌دهد.","شمردن فعل‌ها راه آسان تشخیص مرکب‌بودن است."],x:["اگر بخوانی، یاد می‌گیری.|پایه: یاد می‌گیری؛ وابسته‌ی شرطی.","من رفتم ولی او ماند.|همپایه.","می‌دانم که او آمده است.|وابسته‌ی مفعولی."],q:[["«چون هوا سرد بود، نرفتیم» چه نوع جمله‌ای است؟",["ساده","همپایه","پایه و وابسته","امری"],2,"«چون هوا سرد بود» وابسته‌ی علت است."],["چند فعل در «گفت آمده است و می‌رود» هست؟",["یک","دو","سه","چهار"],2,"گفت، آمده است، می‌رود."],["«و» بین دو جمله چه می‌کند؟",["وابستگی","همپایگی","شرط","مقایسه"],1,"دو جمله‌ی مستقل را هم‌ردیف می‌کند."]]},
+{lv:3,id:"tabei",fa:"نقش‌های تبعی",i:"نقش‌های **تبعی** وابسته‌ی اسم‌اند و از آن پیروی می‌کنند: صفت، مضاف‌الیه، بدل، معطوف و تکرار.",r:["**صفت:** «کتاب خوب».","**مضاف‌الیه:** «کتاب علی».","**بدل:** توضیح دهنده‌ی اسم: «سعدی، شاعر شیراز، درگذشت». بدل را می‌شود حذف کرد.","**معطوف:** با «و، یا» به اسم دیگری وصل می‌شود: «علی و رضا».","**تکرار (تأکید):** «خودش» یا «همه‌ی آن‌ها خودشان».","هر یک از این‌ها جای اسم نمی‌نشیند و بی‌اسم معنا نمی‌دهد."],x:["رستم، پهلوان ایران، آمد.|بدل: پهلوان ایران.","میز و صندلی را برد.|معطوف.","او خودش آمد.|تکرار (تأکید)."],q:[["«استاد، دانشمند بزرگ، حاضر شد» بدل کدام است؟",["استاد","دانشمند بزرگ","حاضر","شد"],1,"توضیح درباره‌ی استاد است."],["«علی و رضا» رضا چه نقشی دارد؟",["معطوف","بدل","صفت","تکرار"],0,"با «و» عطف شده است."],["مضاف‌الیه در «کتاب علی» کدام است؟",["کتاب","علی","هر دو","هیچ"],1,"«علی» به «کتاب» اضافه شده است."]]},
+{lv:3,id:"vajh",fa:"وجه فعل: اخباری، التزامی، امری",i:"**وجه** نگرش گوینده را به کار نشان می‌دهد: واقعیت، آرزو، فرمان.",r:["**اخباری:** خبر قطعی: او رفت.","**التزامی:** احتمال، آرزو، شرط: «کاش بیاید»، «شاید بنویسد»، «بنویسم».","**امری:** فرمان یا خواهش: «بیا». نهی: «نیا».","نشانه‌های التزامی: باید، شاید، کاش، تا، که، اگر.","ماضی التزامی: «ای کاش آمده باشد»."],x:["کاش بیایی.|التزامی.","اگر آمده باشد، می‌بینیمش.|ماضی التزامی.","بنشین.|امری."],q:[["«شاید برود» چه وجهی است؟",["اخباری","التزامی","امری","نهی"],1,"شاید + مضارع التزامی."],["«نخورید» چه وجهی است؟",["نهی","اخباری","شرط","التزامی"],0,"نه + بن مضارع."],["«او رفت» چه وجهی است؟",["اخباری","امری","التزامی","نهی"],0,"واقعیت."]]},
+{lv:3,id:"hazf",fa:"حذف و ایجاز",i:"فارسی گاهی بخشی از جمله را به **قرینه** حذف می‌کند، یعنی خواننده خودش آن را از جمله‌های دیگر می‌فهمد. بسیار در نثر و شعر دیده می‌شود.",r:["**حذف فعل:** «من رفتم و او (رفت)».","**حذف فاعل:** «آمدم و (من) دیدم».","**حذف مسند یا متمم** که در جمله‌ی قبل بوده است.","**فعل مضارع به جای ماضی:** در روایت تاریخی (حال تاریخی).","حذف باید ابهام نسازد."],x:["من نان خوردم و او شیر.|«خورد» حذف شده.","آمد و رفت.|فاعل مشترک حذف.","بیا تا برویم.|«بیا» و «برویم» جمله‌هایی با فاعل یکسان (شما/ما)."],q:[["در «علی کتاب خرید و رضا قلم» چه حذف شده؟",["فعل","فاعل","مفعول","قید"],0,"«خرید» حذف شده."],["حذف به قرینه یعنی چه؟",["حذف بی‌دلیل","حذف با تکیه بر جمله‌ی دیگر","نادرستی","نوشتن بیشتر"],1,"قرینه یعنی نشانه."],["ایجاز یعنی…؟",["کوتاه گفتن بی‌کاستن معنی","زیاد گفتن","شعر","فصاحت"],0,"گفتن معنی در کمترین کلمه."]]},
+{lv:3,id:"fak",fa:"فک اضافه و نقش‌های ویژه‌ی «را»",i:"**فک اضافه** یعنی جدا کردن مضاف‌الیه از مضاف و آوردن آن با «را». در شعر و نثر ادبی بسیار پیش می‌آید.",r:["«دل مرا شکستی» = فک اضافه‌ی «دل من را شکستی».","«را» در قدیم برای مفعول، مالکیت و «برای» به کار می‌رفت.","وقتی ضمیر پیوسته مضاف‌الیه است: «کتابم را» همان «کتاب من را» است.","در فک اضافه ضمیر پیوسته (م، ت، ش) مضاف‌الیه است و مضاف مفعول یا نقش دیگری دارد."],x:["دلم را شکستی.|دل (مفعول) و «م» مضاف‌الیه.","من او را دیدم.|فک اضافه ندارد.","عقل او را پریشان کرد.|«را» با مضاف‌الیه."],q:[["«چشمش را بست» ضمیر «ش» چه نقشی دارد؟",["نهاد","مضاف‌الیه","مفعول","قید"],1,"چشم او."],["فک اضافه برای چه به کار می‌رود؟",["زیبایی و تأکید","اشتباه","مجهول","شرط"],0,"در نثر و شعر ادبی."],["«را» بعد از «او» چه می‌کند؟",["مفعول بودن","متمم","مضاف‌الیه","حرف ربط"],0,"«او را» مفعول است."]]},
+{lv:3,id:"nada",fa:"منادا و شبه‌جمله",i:"**منادا** کسی یا چیزی است که صدایش می‌زنیم. **شبه‌جمله** واژه‌ای است که جمله‌ی کامل را می‌رساند ولی ارکان جمله ندارد.",r:["منادا با «ای»، «یا»، «ا» یا بدون حرف: «ای دوست»، «خدایا».","معمولاً در آغاز جمله می‌آید و با ویرگول جدا می‌شود.","**شبه‌جمله:** بله، نه، آفرین، افسوس، آه، ای وای، به‌به.","شبه‌جمله می‌تواند جایگزین جمله باشد: «آیا آمد؟ — نه.»","منادا و شبه‌جمله از ارکان جمله نیستند و حذفشان به ساختار آسیب نمی‌زند."],x:["ای دوست، بیا!|منادا.","آه، چه روزی!|«آه» شبه‌جمله.","خدایا، کمک کن.|منادا."],q:[["منادا در «حسن، بیا» کدام است؟",["حسن","بیا","هر دو","هیچ"],0,"او را صدا می‌زنیم."],["«آفرین» چه نقشی دارد؟",["شبه‌جمله","نهاد","قید","مفعول"],0,"جمله‌ی کوتاه عاطفی."],["کدام حرف ندا است؟",["و","ای","که","اگر"],1,"«ای» برای صدا زدن."]]},
+{lv:3,id:"vaj",fa:"واج، هجا و تکیه",i:"**واج** کوچک‌ترین واحد صدا است. فارسی ۶ مصوت و ۲۳ صامت دارد. **هجا** (سیلاب) واحد تلفظ است و در شعر برای وزن مهم است.",r:["**مصوت‌های کوتاه:** ـَ (a)، ـِ (e)، ـُ (o). **بلند:** ا (â)، ای (i)، او (u).","هر هجا با یک صامت شروع می‌شود و یک مصوت دارد.","**هجای کوتاه (U):** صامت + مصوت کوتاه: «کَ» در کتاب.","**هجای بلند (–):** صامت + مصوت بلند (دا، نا، تو) یا صامت + مصوت کوتاه + صامت (دَر، بَر، مِن).","**هجای کشیده:** صامت + مصوت بلند + صامت (تاب، کار، نان) یا صامت + مصوت کوتاه + دو صامت (دوست، گفت).","واژه‌ی «کتاب» = کَ (کوتاه) + تاب (کشیده).","واژه‌ی «دانا» = دا + نا → هر دو بلند."],x:["کتاب = کَ + تاب|کوتاه + کشیده.","دانا = دا|نا|بلند + بلند.","دوست|یک هجای کشیده (دو + ست)."],q:[["«کتاب» چند هجا دارد؟",["۱","۲","۳","۴"],1,"کَ‌تاب."],["هجای اول «دانا» چه نوع است؟",["کوتاه","بلند","کشیده","نیست"],1,"دا = صامت + مصوت بلند."],["کدام مصوت بلند است؟",["اِ","اُ","آ","اَ"],2,"«آ» (ا) مصوت بلند است."]]},
+{lv:3,id:"sakht",fa:"ساخت واژه: ترکیب و اشتقاق پیچیده",i:"واژه‌ها را می‌توان با چند راه ساخت: **ترکیب، اشتقاق، ترکیب‌واشتقاق** و **مخفف‌سازی**.",r:["**ترکیب:** سرخ‌پوست، دلپذیر، شب‌نشینی.","**اشتقاق:** نویسنده، دانشمند، آزادگی.","**ترکیب و اشتقاق:** خوش‌باوری، بی‌دانشی، راه‌نمایی.","**مخفف و نحت:** مبارک‌باد → مبارکباد؛ هم‌کار → همکار؛ بی‌آن‌که؛ **مرکب فشرده** مثل «ایران‌شناس».","واژه‌ی مرکب با نیم‌فاصله و گاهی بدون فاصله نوشته می‌شود: «دانش‌آموز»، «همسایه».","فرهنگستان زبان برای واژه‌های بیگانه معادل‌سازی می‌کند (رایانه، پیام‌رسان)."],x:["جهان‌گردی = جهان + گرد + ـی.|ترکیب و اشتقاق.","دانشگاه = دانش + ـگاه.|مشتق.","رایانه|برابر پارسی «کامپیوتر»."],q:[["«خوش‌باوری» کدام است؟",["ساده","مرکب","مشتق","مشتق‌مرکب"],3,"خوش + باور + ـی."],["«رایانه» ساخته‌ی چیست؟",["فرهنگستان زبان","ترکی","عربی","فرانسوی"],0,"معادل‌سازی برای computer."],["«دانشگاه» چه ساختی دارد؟",["مرکب","مشتق","ساده","مخفف"],1,"دانش + ـگاه."]]}
+);
+
+const PV=[
+{id:"danesh",fa:"دانش و کار نیکو",p:[
+"دانستن توانستن است|هر که بداند و آگاه باشد، می‌تواند.|برای تشویق به یادگیری: «زبان یاد بگیر، دانستن توانستن است.»",
+"از کوزه همان برون تراود که در اوست|هر کس همان را نشان می‌دهد که در درون دارد.|درباره‌ی رفتار و گفتار آدم‌ها.",
+"کار نیکو کردن از پرکردن است|کار خوب با تمرین و تکرار به دست می‌آید.|برای کسی که تازه شروع کرده است.",
+"مشک آن است که خود ببوید نه آن که عطار بگوید|ارزش واقعی هر چیز خودش را نشان می‌دهد، نیاز به تعریف نیست.|برای هنر و کار بی‌ادعا.",
+"جوجه را آخر پاییز می‌شمارند|نتیجه‌ی کار را در پایان می‌سنجند، نه در آغاز.|وقتی کسی زود شادمان شده است.",
+"کار را که کرد؟ آن که تمام کرد|کار آن است که به انجام برسد.|وقتی کسی کار را نیمه‌کاره گذاشته.",
+"هر کسی را بهر کاری ساخته‌اند|هر کس برای کاری خاص توانایی دارد.|وقتی نقش‌ها را بین افراد تقسیم می‌کنند.",
+"حلوا حلوا گفتن دهان شیرین نمی‌شود|فقط گفتن کافی نیست، باید عمل کرد.|برای کسی که فقط وعده می‌دهد."]},
+{id:"sabr",fa:"صبر و کوشش",p:[
+"صبر تلخ است ولیکن بر شیرین دارد|شکیبایی در پایان نتیجه‌ی خوب می‌دهد.|برای کسی که خسته شده است.",
+"کار از محکم‌کاری عیب نمی‌کند|دقت و احتیاط در کار زیان ندارد.|وقتی کسی با وسواس کار حساس را بررسی می‌کند.",
+"عجله کار شیطان است|شتاب‌زدگی به خطا و پشیمانی می‌انجامد.|وقتی کسی با شتاب تصمیم می‌گیرد.",
+"قطره قطره جمع گردد وانگهی دریا شود|کارهای کوچک با هم نتیجه‌ی بزرگ می‌دهند.|برای پس‌انداز و تمرین روزانه.",
+"آب که از سر گذشت چه یک نی چه صد نی|وقتی گرفتاری از حدی بگذرد، کم و زیادش فرقی ندارد.|وقتی کار از کار گذشته است.",
+"هر چه کاشتی همان را درو می‌کنی|هر کس نتیجه‌ی کار خود را می‌بیند.|درباره‌ی پیامد کارها.",
+"تا تنور داغ است نان را بچسبان|وقتی موقعیت مناسب است باید از آن بهره گرفت.|وقتی فرصت پیش آمده است.",
+"از تو حرکت از خدا برکت|اگر تلاش کنی، یاری می‌رسد.|برای تشویق به شروع."]},
+{id:"dost",fa:"دوستی و همکاری",p:[
+"یک دست صدا ندارد|بدون همکاری کار پیش نمی‌رود.|برای کار گروهی.",
+"با یک گل بهار نمی‌شود|با یک نمونه نمی‌توان به نتیجه‌ی کلی رسید یا کار بزرگ ساخت.|وقتی کسی از یک مورد نتیجه‌گیری کلی می‌کند.",
+"کوه به کوه نمی‌رسد، آدم به آدم می‌رسد|ممکن است آدم‌ها دوباره همدیگر را ببینند.|وقتی کسی را بعد از مدت‌ها می‌بینیم.",
+"از دل برود هر آن که از دیده برفت|کسی که دیده نشود کم‌کم فراموش می‌شود.|درباره‌ی دوری و فراموشی.",
+"مرغ همسایه غاز است|دیگران را برتر از خود می‌بینیم.|وقتی کسی به داشته‌های دیگران حسرت می‌خورد.",
+"دست بالای دست بسیار است|همیشه کسی هست که از ما تواناتر است.|برای غرور بی‌جا.",
+"حق به حق‌دار می‌رسد|سرانجام هر کس به حق خود می‌رسد.|وقتی ناحقی شده است.",
+"زبان خوش مار را از سوراخ بیرون می‌آورد|با مهربانی و خوش‌زبانی می‌توان کار سخت را پیش برد.|برای مذاکره."]},
+{id:"hoshyar",fa:"هشیاری و احتیاط",p:[
+"دیوار موش دارد، موش هم گوش دارد|رازها را نباید جلوی دیگران گفت.|وقتی نباید حرف حساسی را بلند گفت.",
+"آدم عاقل از یک سوراخ دو بار گزیده نمی‌شود|از اشتباه باید درس گرفت.|وقتی کسی دوباره فریب خورده است.",
+"زیر کاسه نیم‌کاسه‌ای هست|پشت ظاهر کار، چیز پنهانی هست.|وقتی چیزی مشکوک است.",
+"مار گزیده از ریسمان سیاه و سفید می‌ترسد|کسی که آسیب دیده از هر چیز مشابه می‌ترسد.|وقتی کسی بیش از حد محتاط است.",
+"آواز دهل شنیدن از دور خوش است|چیزی که از دور خوب به نظر می‌رسد ممکن است از نزدیک بد باشد.|درباره‌ی شنیده‌های بی‌دلیل.",
+"زبان سرخ سر سبز می‌دهد بر باد|بی‌احتیاطی در سخن به جان آدم ضرر می‌زند.|برای نصیحت به سکوت.",
+"اول چاه را بکن، بعد منار را بدزد|اول زمینه‌ی کار را فراهم کن، بعد اقدام.|برای برنامه‌ریزی.",
+"تخم مرغ دزد شتر دزد می‌شود|اگر کار کوچک نادرست را رها کنیم به کار بزرگ‌تر می‌کشد.|برای هشدار به خطای کوچک."]},
+{id:"zendegi",fa:"زندگی و حکمت",p:[
+"از ماست که بر ماست|گرفتاری‌های ما زاییده‌ی کار خود ماست.|وقتی کسی از اشتباه خود می‌نالد.",
+"از این ستون به آن ستون فرج است|هر سختی سرانجام گشایشی دارد.|برای امید دادن.",
+"هر گردی گردو نیست|هر چه ظاهر مشابه دارد یکسان نیست.|وقتی کسی زود قضاوت می‌کند.",
+"هر که طاووس خواهد جور هندوستان کشد|برای رسیدن به چیز با ارزش باید سختی کشید.|وقتی هدف بزرگ هزینه دارد.",
+"قدر عافیت کسی داند که به مصیبتی گرفتار آید|ارزش آسایش را در سختی می‌فهمند.|وقتی کسی تازه بیمار یا گرفتار شده است.",
+"هرچه بگندد نمکش می‌زنند، وای به روزی که بگندد نمک|هر چیز تباه را با نمک می‌توان نگه داشت، اما اگر خود نمک (پناه و چاره) تباه شود راهی نمی‌ماند.|وقتی نیکان و چاره‌گران خود دچار خطا شوند.",
+"خدا از دری ببندد، از دیگر بگشاید|وقتی راهی بسته می‌شود راه دیگری باز می‌شود.|وقتی کسی ناامید است.",
+"هر چه کنی به خود کنی گر همه نیک و بد کنی|نتیجه‌ی خوبی و بدی به خودمان برمی‌گردد.|درباره‌ی پیامد کارها."]},
+{id:"khane",fa:"خانه و روزمره",p:[
+"آشپز که دو تا شد آش یا شور می‌شود یا بی‌نمک|وقتی چند نفر در یک کار دخالت کنند، کار خراب می‌شود.|وقتی چند نفر دستور می‌دهند.",
+"نان را به نرخ روز بخور|مطابق شرایط زمانه رفتار کن.|وقتی باید خود را با تغییرات هماهنگ کرد.",
+"نه سیخ بسوزد نه کباب|راهی که به هیچ‌کس زیان نرساند.|وقتی دو طرف را باید راضی کرد.",
+"قران سفید به درد روز سیاه می‌خورد|پس‌انداز برای روز سخت لازم است.|برای پس‌انداز.",
+"چراغی که به خانه رواست به مسجد حرام است|چیزی که برای کار شخصی مجاز است برای کار همگانی ناروا است.|درباره‌ی اولویت‌ها.",
+"کاسه‌ی داغ‌تر از آش|کسی که بیش از صاحب کار دلسوزی می‌کند.|وقتی کسی بیش از لازم مداخله می‌کند.",
+"بار کج به منزل نمی‌رسد|کار نادرست به مقصد نمی‌رسد.|برای هشدار به ناراستی.",
+"آسه برو آسه بیا که گربه شاخت نزنه|با آرامش و آهستگی کار پیش می‌رود.|برای کسی که عجله دارد."]},
+{id:"tanz",fa:"کنایه و طنز",p:[
+"آفتابه لگن هفت دست، شام و ناهار هیچی|ظاهر پرزرق‌وبرق ولی درون خالی.|برای تجمل بی‌محتوا.",
+"خر ما از کرگی دم نداشت|کسی که با داشتن کمبود، ادعای بزرگی می‌کند و خود را کم از دیگران نمی‌داند.|وقتی کسی بی‌دلیل ادعا می‌کند.",
+"شتر دیدی ندیدی|از چیزی بگذر و به روی خود نیاور.|وقتی می‌خواهند چیزی را نادیده بگیرند.",
+"آب از سرچشمه گل‌آلود است|مشکل از ریشه است نه از پایین.|وقتی علت اصلی را نمی‌بینند.",
+"از این گوش می‌گیرد از آن گوش در می‌کند|پند را نمی‌شنود.|برای کسی که نصیحت را بی‌اثر می‌شنود.",
+"هر که بامش بیش، برفش بیشتر|هر چه ثروت یا مقام بیشتر باشد، مسئولیت و نگرانی هم بیشتر است.|درباره‌ی ثروت و مقام.",
+"خود را به کوچه‌ی علی چپ زدن|خود را به ندانستن یا بی‌خبری زدن.|وقتی کسی تظاهر می‌کند نمی‌داند.",
+"مو را از ماست کشیدن|بسیار با دقت و ظرافت کار کردن.|وقتی کسی ایراد بسیار ریز می‌گیرد."]}
+];
+
+const AR=[
+{id:"tashbih",fa:"تشبیه",k:"معنوی",i:"**تشبیه** یعنی مانند کردن چیزی به چیز دیگر که در یک ویژگی مشترک‌اند. چهار رکن دارد: مشبه، مشبه‌به، ادات و وجه شبه.",r:["**مشبه:** چیزی که توصیف می‌شود (چهره).","**مشبه‌به:** چیزی که با آن مقایسه می‌شود (ماه).","**ادات تشبیه:** چون، مانند، همچون، گویی، مثل، (ـوار، ـسان).","**وجه شبه:** ویژگی مشترک (روشنی).","وقتی ادات و وجه شبه حذف شود «تشبیه بلیغ» می‌شود: «چهره ماه است»."],ex:[["چهره‌اش چون ماه بود از روشنی","قامتش چون سرو در آزادگی","چهره = مشبه، ماه = مشبه‌به، چون = ادات، روشنی = وجه شبه."],["دانش چون چراغی در شب تار","راه را روشن کند بر هوشیار","دانش (مشبه) به چراغ (مشبه‌به) مانند شده؛ وجه شبه: روشن کردن راه."]],ph:["او مانند شیر بود|مشبه: او؛ مشبه‌به: شیر؛ ادات: مانند؛ وجه شبه: شجاعت.","دلش دریاست|تشبیه بلیغ؛ ادات و وجه شبه ندارد."]},
+{id:"este",fa:"استعاره",k:"معنوی",i:"**استعاره** تشبیهی است که یک سوی آن حذف شده؛ فقط «مشبه‌به» را می‌آورند و منظور «مشبه» است. «ماه» یعنی معشوق، بدون این‌که بگوییم «مانند».",r:["اگر مشبه‌به ذکر شود و مشبه حذف: **استعاره‌ی مصرحه** («شیر» یعنی مرد دلیر).","اگر مشبه ذکر شود و ویژگی مشبه‌به بیاید: **استعاره‌ی مکنیه** («دست روزگار»).","استعاره نیاز به قرینه دارد، نشانه‌ای که معنی اصلی را کنار می‌زند.","تفاوت با تشبیه: در استعاره ادات نیست و یک طرف ناپیدا است."],ex:[["ماه من از پشت ابر شب برآمد","آسمانم زین شعاع خوش درآمد","«ماه» استعاره از معشوق؛ قرینه: «من» و «برآمد از پشت ابر»."],["شیر میدان آمد و لشکر گریخت","پرده‌ی ترس از رخ دشمن ریخت","«شیر» استعاره از پهلوان دلیر."]],ph:["شیر نیامد|«شیر» استعاره از مرد دلیر.","غنچه‌ی لبش|«غنچه» استعاره (لب مانند غنچه).","دست روزگار|استعاره‌ی مکنیه؛ روزگار مانند انسان."]},
+{id:"kenaye",fa:"کنایه",k:"معنوی",i:"**کنایه** یعنی گفتن سخنی که معنی اصلی‌اش را می‌شود اراده کرد ولی منظور اصلی گوینده معنی دور و ضمنی آن است. در کنایه هر دو معنی ممکن است.",r:["«سر به زیر انداختن» می‌تواند یعنی سر پایین آوردن و می‌تواند یعنی فروتنی یا شرم.","فرق با مجاز: در مجاز معنی اول ممکن نیست؛ در کنایه ممکن است.","کنایه از چیز، فعل، صفت، موصوف.","بسیاری از ضرب‌المثل‌ها کنایی‌اند."],ex:[["سر به زیر آمد ز شرم و خامشی","دل تهی کرد از غرور و خودکامگی","«سر به زیر آمدن» کنایه از شرمندگی و فروتنی."]],ph:["دست از جان شستن|از جان گذشتن، آماده‌ی خطر.","پا پس کشیدن|از کار منصرف شدن.","دست و دل‌باز|بخشنده.","چشم بر راه بودن|منتظر بودن."]},
+{id:"majaz",fa:"مجاز",k:"معنوی",i:"**مجاز** یعنی به‌کار بردن واژه در معنی غیر از معنی اصلی، به‌شرط علاقه‌ای میان آن دو و وجود قرینه که از معنی اصلی بازدارد.",r:["علاقه‌ها: کل و جزء («سر» به جای آدم)، ظرف و مظروف («خانه» به جای ساکنان)، علت و معلول، لازم و ملزوم، آنچه بوده.","فرق با کنایه: در مجاز معنی اصلی مراد نیست.","قرینه معنی اصلی را رد می‌کند: «شهر خوابید»: خود شهر نمی‌خوابد؛ مردمش."],ex:[["شهر خفته بود و من در خیال بودم تا سحر","","«شهر» مجاز از مردم شهر (ظرف و مظروف)."]],ph:["دست‌ها به آسمان برداشتند|«دست» مجاز از کل؛ مردم.","چهل سر|«سر» مجاز از آدم.","شهر بیدار شد|مجاز از مردم."]},
+{id:"jenas",fa:"جناس",k:"لفظی",i:"**جناس** یعنی کنار هم آمدن دو واژه که در تلفظ یکی یا شبیه‌اند ولی معنی‌شان فرق دارد.",r:["**تام:** هر دو واژه عیناً یکسان: شیر (جانور) و شیر (نوشیدنی).","**ناقص:** با اختلاف در یک حرف یا حرکت: دل / گل، کار / کام.","**اشتقاق:** از یک ریشه: نیکو / نیکی، دانا / دانش.","جناس موسیقی کلام را بیشتر می‌کند."],ex:[["گل را به گِل نشاند و از گِل گُل برآورد","","گل / گِل / گُل: جناس ناقص حرکتی."]],ph:["شیر و شیر|جناس تام.","بار و بر|جناس ناقص.","سخن و سخت|جناس ناقص."]},
+{id:"tezad",fa:"تضاد",k:"معنوی",i:"**تضاد** یعنی آوردن دو واژه‌ی متضاد کنار هم در یک جمله یا بیت.",r:["متضاد: روز / شب، پیر / جوان، سرد / گرم، باز / بسته.","با «پارادوکس» اشتباه نشود: در پارادوکس دو معنی ناسازگار در یک تعبیر می‌آید."],ex:[["روز و شب در جست‌وجوی او بودم","","روز و شب متضادند."]],ph:["پیر و جوان|تضاد.","خنده و گریه|تضاد.","نزدیک و دور|تضاد."]},
+{id:"morat",fa:"مراعات نظیر",k:"معنوی",i:"**مراعات نظیر** (تناسب) یعنی آوردن واژه‌هایی که با هم ارتباط و تناسب معنایی دارند و ضد هم نیستند.",r:["مثال: باغ و گل و بلبل و بهار.","دایره‌ی واژه‌ها از یک حوزه‌اند.","با تضاد فرق دارد: در تضاد معنی ها متضادند."],ex:[["باغ و گل و بلبل و بهار و نسیم","","همه از دنیای بهار و باغ‌اند."]],ph:["قلم و کاغذ و مرکب|مراعات نظیر.","ماه و ستاره و شب|مراعات نظیر.","شمع و پروانه و محفل|مراعات نظیر."]},
+{id:"tashkhis",fa:"تشخیص (جان‌بخشی)",k:"معنوی",i:"**تشخیص** یعنی دادن ویژگی‌های انسانی به چیزهای غیرانسانی؛ جان‌بخشی به طبیعت و اشیا.",r:["خندیدن گل، آه کشیدن باد، سخن گفتن کوه.","بسیار پرکاربرد در شعر کودکان و شعر طبیعت.","با استعاره‌ی مکنیه هم‌پوشانی دارد."],ex:[["گل خندید و بلبل در ناله آمد","","گل می‌خندد و بلبل ناله می‌کند: تشخیص."]],ph:["باد زمزمه کرد|تشخیص.","خورشید از خواب برخاست|تشخیص.","کوه صبر کرد|تشخیص."]},
+{id:"eghraq",fa:"اغراق",k:"معنوی",i:"**اغراق** یعنی بزرگ یا کوچک نشان‌دادن چیزی بیش از اندازه‌ی واقعی تا تأثیر بیشتر شود.",r:["اغراق شاید ناممکن باشد ولی از نظر هنری پذیرفتنی است.","ممکن است درباره‌ی شجاعت، عشق، اندوه یا زیبایی باشد."],ex:[["آه من کوه را از جا کند","","اغراق در اثر آه."]],ph:["از شدت سرما یخ بستم|اغراق.","هزار بار گفتم|اغراق در شمار.","آسمان را به زمین می‌دوزم|اغراق."]},
+{id:"talmih",fa:"تلمیح",k:"معنوی",i:"**تلمیح** یعنی اشاره به داستان، آیه، حدیث، باور یا واقعه‌ای مشهور بدون آوردن همه‌ی ماجرا.",r:["مانند یوسف و چاه، رستم و سهراب، فرهاد و کوه، لیلی و مجنون، موسی و طور.","خواننده باید داستان را بداند تا تلمیح را دریابد."],ex:[["همچو یوسف در چه افتادم ز نیرنگ برادر","","اشاره به داستان یوسف و برادرانش."]],ph:["فرهاد کوهکن|اشاره به داستان شیرین و فرهاد.","دست موسی|اشاره به معجزه‌ی موسی.","خضر و آب حیات|اشاره به افسانه."]},
+{id:"hesamizi",fa:"حس‌آمیزی",k:"معنوی",i:"**حس‌آمیزی** یعنی درآمیختن دو حس یا بیشتر در یک تعبیر، مثلاً شنیدن چیزی با حس چشایی یا بساوایی.",r:["حس‌ها: بینایی، شنوایی، بویایی، چشایی، بساوایی (لامسه).","«صدای گرم»: شنوایی + لامسه.","«سخن شیرین»: شنوایی + چشایی.","«رنگ تلخ»: بینایی + چشایی."],ex:[["صدای گرمش در گوشم شیرین بود","","صدا (شنوایی)، گرم (بساوایی)، شیرین (چشایی)."]],ph:["نگاه سنگین|بینایی + بساوایی.","بوی سبز|بویایی + بینایی.","سکوت تلخ|شنوایی + چشایی."]},
+{id:"vajaraye",fa:"واج‌آرایی",k:"لفظی",i:"**واج‌آرایی** یعنی تکرار یک صامت یا مصوت در شعر یا نثر برای ایجاد آهنگ.",r:["تکرار صامت: «سایه‌ی سبز سرو» (س).","تکرار مصوت: «بنیادِ دادِ شاد» (ا).","موسیقی و آهنگ کلام را بیشتر می‌کند.","غیر از تکرار واژه است؛ اینجا واج تکرار می‌شود."],ex:[["سایه‌ی سبز سرو سرکش سر برافراشت","","تکرار حرف «س»."]],ph:["شب شد شعر شیرین|تکرار «ش».","باد بوی باغ بیاورد|تکرار «ب».","خوش خاطر خوشبو|تکرار «خ».","نازک نغز نرم|تکرار «ن»."]},
+{id:"tekrar",fa:"تکرار",k:"لفظی",i:"**تکرار** یعنی آوردن واژه یا عبارتی چند بار برای تأکید یا آهنگ.",r:["تکرار واژه: «بیا بیا».","تکرار جمله یا بند در ابتدای هر بیت (ترجیع).","با واج‌آرایی فرق دارد: تکرار واژه است."],ex:[["بیا بیا که بهار آمد بیا","","«بیا» سه بار تکرار شده."]],ph:["دوباره دوباره|تکرار.","می‌روم می‌روم|تکرار.","ای دوست ای دوست|تکرار."]},
+{id:"paradox",fa:"پارادوکس (متناقض‌نما)",k:"معنوی",i:"**پارادوکس** یعنی سخنی که به ظاهر خودش را نقض می‌کند ولی با اندیشه معنی درستی دارد.",r:["«خاموشی‌اش فریاد بود»: سکوتی که از فریاد پرمعنی تر است.","«زنده‌ام ولی مرده‌ام در دوری تو».","ترکیب دو معنی ناسازگار در یک عبارت."],ex:[["خاموشی‌اش فریاد دل بود","","خاموشی و فریاد در ظاهر متناقض‌اند."]],ph:["سکوت پرغوغا|پارادوکس.","زنده‌ی مرده|پارادوکس.","تاریکی روشن|پارادوکس."]},
+{id:"hosn",fa:"حسن تعلیل",k:"معنوی",i:"**حسن تعلیل** یعنی دلیلی ادبی و خیالی برای پدیده‌ای بیاوریم که علت واقعی آن نیست.",r:["علت علمی می‌تواند چیز دیگری باشد، ولی شاعر علت زیبا می‌سازد.","مثلاً «برگ از غم رفتن بهار زرد شد».","باید هم شاعرانه باشد و هم بر پایه‌ی خیال."],ex:[["برگ از غم رفتن بهار زرد شد","","علت واقعی پاییز است؛ شاعر غم را علت می‌داند."]],ph:["ابر از شادی می‌بارد|حسن تعلیل.","ستاره از رشک او می‌لرزد|حسن تعلیل."]},
+{id:"lof",fa:"لف و نشر",k:"معنوی",i:"**لف و نشر** یعنی چند چیز را ابتدا می‌آوریم (لف) و سپس هر یک را جداگانه توصیف می‌کنیم (نشر).",r:["اگر ترتیب نشر مطابق ترتیب لف باشد: **مرتب**.","اگر برعکس یا نامنظم باشد: **مشوش**.","«سرو و گل را دیدم: آن بلند و این خندان»."],ex:[["گل و سرو را دیدم: آن خندان و این بلند","","«گل و سرو» لف؛ «خندان و بلند» نشر."]],ph:["آتش و آب، یکی سوزنده یکی نوشین|لف و نشر مرتب.","شب و روز، یکی تاریک یکی روشن|لف و نشر مرتب."]}
+];
+const PG=[
+{id:"bayt",fa:"بیت، مصراع و قالب‌های شعر",i:"**شعر** از بیت‌ها ساخته می‌شود. هر **بیت** دو **مصراع** دارد. مصراع اول و دوم باید هم‌وزن باشند.",r:["**مصراع:** نیمی از بیت. **بیت:** دو مصراع. **مطلع:** بیت اول. **مقطع:** بیت آخر (اغلب تخلص دارد).","**غزل:** قافیه‌ی هر بیت در مصراع دوم و بیت اول هر دو مصراع قافیه دارند.","**قصیده:** شبیه غزل ولی بلندتر، با مضمون ستایش یا پند.","**مثنوی:** هر بیت قافیه‌ی جداگانه دارد (aa، bb، cc).","**رباعی و دوبیتی:** چهار مصراع؛ رباعی وزن خاص دارد.","**قطعه:** مصراع اول بیت‌ها قافیه ندارد و فقط مصراع دوم بیت‌ها هم‌قافیه است.","**نیمایی:** مصراع‌ها بلند و کوتاه‌اند و قافیه آزاد است. **سپید:** بدون وزن و قافیه."],ex:[["هر که با تو همنشین شد، دل‌نواز است","هر که با تو همسخن شد، سرفراز است","بیت نمونه با دو مصراع و ردیف «است»."]]},
+{id:"qafiye",fa:"قافیه و ردیف",i:"**قافیه** هم‌صدایی واج‌های پایانی مصراع‌ها است. **ردیف** واژه یا عبارتی است که بعد از قافیه عیناً تکرار می‌شود.",r:["قافیه: واج‌های مشترک آخر واژه‌های قافیه (دل‌نواز / سرفراز: ـاز).","**حرف روی:** حرف اصلی قافیه که در همه‌ی واژه‌ها هست (در «ـاز» حرف «ز»).","**ردف:** حرف مد (ا، و، ی) پیش از روی. در نواز/فراز حرف «ا» ردف است.","**ردیف:** بعد از قافیه می‌آید و باید همان واژه باشد (است).","شعر بی‌ردیف ممکن است، ولی بی‌قافیه نه (جز شعر سپید)."],ex:[["هر که با تو همنشین شد، دل‌نواز است","هر که با تو همسخن شد، سرفراز است","ردیف: «است»؛ قافیه: دل‌نواز / سرفراز (روی: ز؛ ردف: ا)."],["شب‌ها به یاد روی تو بیدار می‌مانم","روزها به شوق کوی تو بیمار می‌مانم","ردیف: «می‌مانم»؛ قافیه: بیدار / بیمار (روی: ر؛ ردف: ا)."]]},
+{id:"vazn",fa:"وزن و هجا در شعر",i:"**وزن** یعنی تکرار منظم هجاهای کوتاه و بلند در مصراع‌ها. برای فهم وزن نخست باید هجا (سیلاب) را شناخت.",r:["هجای **کوتاه** (U): صامت + مصوت کوتاه (کَ).","هجای **بلند** (–): صامت + مصوت بلند (دا) یا صامت + مصوت کوتاه + صامت (دَر).","هجای **کشیده** (–U ، در عروض معادل بلند + کوتاه): صامت + مصوت بلند + صامت (تاب).","**ارکان** (افاعیل) اجزای تکرارشونده‌اند: فَعولُن (U – –)، فاعلاتُن (– U – –)، مفاعیلن (U – – –).","هر مصراع از چند رکن تشکیل می‌شود و مصراع‌ها یک وزن دارند.","«خدایا» = خُ + دا + یا → U – – (فعولن)."],ex:[["خدایا","","خُ | دا | یا → U – –  (فعولن)"],["کتابم","","کَ | تا | بَم → U – –  (فعولن)"]]},
+{id:"tarkib",fa:"ترتیب ارکان جمله در شعر",i:"در نثر فعل آخر جمله است، ولی در شعر برای وزن و قافیه ترتیب ارکان جابه‌جا می‌شود. به این **تقدیم و تأخیر** می‌گویند.",r:["نثر: «من دل به دست تو سپردم».","شعر: «سپردم دل به دست تو» یا «به دست تو دل سپردم».","برای فهم بیت، آن را به نثر بازگردان.","ابتدا فعل را پیدا کن، سپس نهاد و بعد مفعول و متمم.","حذف فعل به قرینه در شعر زیاد است."],ex:[["دل به دست تو سپردم","","نثر: من دل را به دست تو سپردم."],["ماه من از پشت ابر شب برآمد","آسمانم زین شعاع خوش درآمد","نثر: ماه من از پشت ابر شب برآمد؛ آسمان من از این پرتو خوش شد."]]},
+{id:"kohan",fa:"واژه‌ها و دستور کهن",i:"فارسی کهن واژه‌ها و ساخت‌هایی دارد که در شعر مانده‌اند. دانستنشان خواندن شعر را آسان می‌کند.",r:["**همی:** نشان استمرار (امروز «می»). «همی‌گفت» = می‌گفت.","**اندر:** در. **زی:** به سوی. **ایدر:** اینجا. **آنگه:** آن‌گاه. **بسی:** بسیار. **همی:** پیوسته.","**مر… را:** نشانه‌ی مفعول در نثر کهن.","**گفتا:** گفت (الف اطلاق). **بُوَد** = بود. **شود** = می‌شود.","**که** گاه به معنی «تا» یا «زیرا» است.","**ی** قیدساز: «بسی»؛ «ی» اطلاق.","حذف حرف ربط «که» و حذف «را» در شعر رایج است."],ex:[["اندر زمان بنشست بر تخت","","اندر = در. (جمله‌ی ساخته‌ی نمونه)"],["همی‌گفت و دل می‌نواخت","","همی = پیوسته؛ همی‌گفت = پیوسته می‌گفت."]]},
+{id:"sabk",fa:"سبک‌های شعر فارسی",i:"شعر فارسی در چند دوره سبک‌های متفاوتی داشته است.",r:["**سبک خراسانی** (قرن ۳ تا ۵): ساده، واژه‌های کهن، طبیعت، وصف.","**سبک عراقی** (قرن ۶ تا ۸): عرفان و غزل، روانی و نرم‌خویی.","**سبک هندی** (قرن ۱۰ تا ۱۲): مضمون‌یابی و تصویرهای باریک.","**بازگشت ادبی** (قرن ۱۲ و ۱۳): پیروی از شیوه‌ی کهن.","**مشروطه و نو:** نوآوری و اجتماع.","**نیمایی و سپید:** شعر نو از نیما یوشیج و پس از او."],ex:[]},
+{id:"tahlil",fa:"روش تحلیل دستوری یک بیت",i:"برای یافتن نقش واژه‌ها در بیت این مراحل را پیش ببر.",r:["۱. بیت را به نثر ساده تبدیل کن؛ ارکان را به ترتیب نثر بچین.","۲. فعل‌ها را پیدا کن و تعداد جمله‌ها را بشمار.","۳. برای هر جمله نهاد، مفعول، متمم، قید و مسند را مشخص کن.","۴. کسره‌ی اضافه‌ها را بخوان تا ترکیب‌ها روشن شود.","۵. آرایه‌ها و قافیه و ردیف را پیدا کن.","۶. معنی کلی بیت را با زبان خودت بنویس."],ex:[["دل به دست تو سپردم","","نثر: من دل را به دست تو سپردم. نهاد: من (محذوف)، مفعول: دل، متمم: به دست تو، فعل: سپردم."],["گل خندید و بلبل در ناله آمد","","گل: نهاد، خندید: فعل؛ بلبل: نهاد، در ناله آمد: فعل مرکب؛ تشخیص: خندیدن گل."]]}
+];
+const PQ=[
+["چهره‌اش چون ماه بود از روشنی","tashbih","«چون» ادات تشبیه است؛ چهره به ماه مانند شده."],
+["دانش چون چراغی در شب تار / راه را روشن کند بر هوشیار","tashbih","دانش به چراغ مانند شده."],
+["ماه من از پشت ابر شب برآمد / آسمانم زین شعاع خوش درآمد","este","«ماه» استعاره از معشوق؛ ادات و مشبه ندارد."],
+["شیر میدان آمد و لشکر گریخت / پرده‌ی ترس از رخ دشمن ریخت","este","«شیر» استعاره از مرد دلیر."],
+["سر به زیر آمد ز شرم و خامشی / دل تهی کرد از غرور و خودکامگی","kenaye","«سر به زیر آمدن» کنایه از شرمنده یا فروتن شدن."],
+["دست از جان شستم و رفتم به راه","kenaye","کنایه از از جان گذشتن."],
+["شهر خفته بود و من در خیال بودم تا سحر","majaz","«شهر» مجاز از مردم شهر."],
+["گل را به گِل نشاند و از گِل گُل برآورد","jenas","گل / گِل / گُل جناس ناقص."],
+["روز و شب در جست‌وجوی او بودم","tezad","«روز» و «شب» متضادند."],
+["پیر و جوان همه در بند او بودند","tezad","پیر و جوان متضادند."],
+["باغ و گل و بلبل و بهار و نسیم","morat","همه با هم تناسب دارند."],
+["قلم و کاغذ و مرکب و دفتر","morat","همه به نوشتن مربوط‌اند."],
+["گل خندید و بلبل در ناله آمد","tashkhis","خندیدن گل جان‌بخشی است."],
+["باد در گوش درختان زمزمه کرد","tashkhis","زمزمه‌ی باد تشخیص است."],
+["آه من کوه را از جا کند","eghraq","بیش از اندازه بزرگ‌نمایی."],
+["همچو یوسف در چه افتادم ز نیرنگ برادر","talmih","اشاره به داستان یوسف."],
+["صدای گرمش در گوشم شیرین بود","hesamizi","آمیختن شنوایی، بساوایی و چشایی."],
+["سایه‌ی سبز سرو سرکش سر برافراشت","vajaraye","تکرار حرف «س»."],
+["بیا بیا که بهار آمد بیا","tekrar","تکرار واژه‌ی «بیا»."],
+["خاموشی‌اش فریاد دل بود","paradox","خاموشی و فریاد ناسازگارند."],
+["برگ از غم رفتن بهار زرد شد","hosn","علت زرد شدن برگ را غم قرار داده."],
+["گل و سرو را دیدم: آن خندان و این بلند","lof","لف: گل و سرو؛ نشر: خندان و بلند."],
+["شب‌ها به یاد روی تو بیدار می‌مانم / روزها به شوق کوی تو بیمار می‌مانم","tezad","شب و روز متضادند (و ردیف و قافیه هم دارد)."]];
+const RQ=[
+["هر که با تو همنشین شد، دل‌نواز است / هر که با تو همسخن شد، سرفراز است","ردیف","«است» پس از قافیه تکرار شده است.","قافیه"],
+["شب‌ها به یاد روی تو بیدار می‌مانم / روزها به شوق کوی تو بیمار می‌مانم","ردیف","«می‌مانم» ردیف است.","قافیه"],
+["هر که با تو همنشین شد، دل‌نواز است / هر که با تو همسخن شد، سرفراز است","قافیه","«دل‌نواز / سرفراز» قافیه است (ردیف: است).","ردیف"],
+["شب‌ها به یاد روی تو بیدار می‌مانم / روزها به شوق کوی تو بیمار می‌مانم","قافیه","«بیدار / بیمار» قافیه است.","ردیف"]];
+
+const ARN={};AR.forEach(a=>ARN[a.id]=a.fa);
+const PVALL=[];PV.forEach(c=>c.p.forEach(l=>{const [t,m,u]=l.split("|");PVALL.push({t,m,u,cat:c.id,cf:c.fa})}));
+const NQ=G.reduce((a,t)=>a+t.q.length,0)+PVALL.length+PQ.length+4;
+let learned=new Set(store.get("pn-learned",[]));
+const S={mode:store.get("pn-mode","gram"),lv:store.get("pn-lv",1),id:store.get("pn-id","esm"),pt:"ar",pid:"tashbih",cat:"all",q:"",open:false};
+let Q=null;
+function setLv(n){document.documentElement.style.setProperty("--lv",`var(${LVN[n].c})`)}
+function setCol(v){document.documentElement.style.setProperty("--lv",v)}
+/* ---------- quiz helpers ---------- */
+function qHTML(q,key,col){return `<div class="q" data-key="${key}" data-ans="${q[2]}"><div class="qt${q.length>4&&q[4]==="v"?" v":""}">${rich(q[0])}</div><div class="opts${col?" col":""}">${q[1].map((o,j)=>`<button data-j="${j}">${esc(o)}</button>`).join("")}</div><div class="why" hidden data-why="${esc(q[3])}"></div></div>`}
+function answer(btn){const box=btn.closest(".q"),ans=+box.dataset.ans,j=+btn.dataset.j,bs=box.querySelectorAll(".opts button");bs.forEach(b=>b.disabled=true);bs[ans].classList.add("ok");if(j!==ans)btn.classList.add("bad");const w=box.querySelector(".why");w.hidden=false;w.className="why "+(j===ans?"ok":"bad");w.innerHTML=(j===ans?"<b>درست است. </b>":"<b>نادرست. </b>")+rich(w.dataset.why);return j===ans}
+function bayt(a,b){return `<div class="bayt${b?"":" one"}"><span class="m">${esc(a)}</span>${b?`<span class="g" aria-hidden="true">✦</span><span class="m">${esc(b)}</span>`:""}</div>`}
+function verseQ(t){const p=t.split(" / ");return bayt(p[0],p[1]||"")}
+/* ---------- grammar ---------- */
+const lvList=n=>G.filter(t=>t.lv===n);
+function renderGram(){
+  setLv(S.lv);const L=lvList(S.lv);if(!L.some(t=>t.id===S.id))S.id=L[0].id;
+  const t=G.find(x=>x.id===S.id),i=L.indexOf(t);
+  const lvb=[1,2,3].map(n=>{const ts=lvList(n),d=ts.filter(x=>learned.has(x.id)).length;return `<button class="lvb" style="--c:var(${LVN[n].c});--p:${Math.round(d/ts.length*100)}%" data-lv="${n}" aria-pressed="${S.lv===n}"><b>${LVN[n].n}</b><small>${fd(d)} از ${fd(ts.length)} درس</small></button>`}).join("");
+  $("#main").innerHTML=`<h2 class="sec">دستور زبان فارسی</h2><p class="lead">سه مرحله: پایه برای واژه و جمله، میانه برای فعل و ترکیب، پیشرفته برای ساخت جمله و نقش‌ها. هر درس مثال و تمرین دارد.</p>
+  <div class="levels">${lvb}</div>
+  <div class="grid"><aside class="list" aria-label="درس‌ها"><h3>درس‌های ${LVN[S.lv].n}</h3><ol>${L.map(x=>`<li><button data-id="${x.id}" aria-current="${x.id===t.id}"><span class="dot${learned.has(x.id)?" on":""}">${learned.has(x.id)?"✓":fd(L.indexOf(x)+1)}</span><span>${esc(x.fa)}</span></button></li>`).join("")}</ol></aside>
+  <article class="card" id="lesson"><div class="eyebrow"><span class="tag">${LVN[S.lv].n}</span><span>درس ${fd(i+1)} از ${fd(L.length)}</span></div>
+  <h2>${esc(t.fa)}</h2><p class="intro">${rich(t.i)}</p>
+  <h3>قاعده‌ها</h3><ul class="rules">${t.r.map(r=>`<li>${rich(r)}</li>`).join("")}</ul>
+  <h3>مثال‌ها</h3><div class="exs">${t.x.map(e=>{const [a,b]=e.split("|");return `<div class="ex"><div class="s">${esc(a)}</div><div class="n">${esc(b||"")}</div></div>`}).join("")}</div>
+  <h3>تمرین</h3>${t.q.map((q,k)=>qHTML(q,"g"+k)).join("")}<div class="pscore" id="pscore">پاسخ بده تا امتیازت را ببینی.</div>
+  <div class="foot"><button class="btn" id="prev" ${i===0&&S.lv===1?"disabled":""}>→ درس قبل</button><button class="btn${learned.has(t.id)?"":" primary"}" id="mark">${learned.has(t.id)?"✓ یاد گرفتم (برای برداشتن بزن)":"این درس را یاد گرفتم"}</button><button class="btn" id="next" ${G.indexOf(t)===G.length-1?"disabled":""}>درس بعد ←</button></div></article></div>`;
+}
+/* ---------- proverbs ---------- */
+function renderProv(){
+  setCol("var(--fir)");
+  const q=S.q.trim();let L=PVALL.filter(p=>(S.cat==="all"||p.cat===S.cat)&&(!q||p.t.includes(q)||p.m.includes(q)));
+  $("#main").innerHTML=`<h2 class="sec">ضرب‌المثل‌های فارسی</h2><p class="lead">هر ضرب‌المثل را بخوان، معنی‌اش را حدس بزن و بعد باز کن. جمله‌ی کاربرد نشان می‌دهد کجا به کار می‌رود.</p>
+  <div class="tools"><input id="psearch" type="search" placeholder="جست‌وجو در ضرب‌المثل و معنی…" value="${esc(S.q)}" aria-label="جست‌وجو"><button class="btn" id="popen">${S.open?"بستن همه‌ی معنی‌ها":"باز کردن همه‌ی معنی‌ها"}</button></div>
+  <div class="cats"><button data-cat="all" aria-pressed="${S.cat==="all"}">همه (${fd(PVALL.length)})</button>${PV.map(c=>`<button data-cat="${c.id}" aria-pressed="${S.cat===c.id}">${esc(c.fa)}</button>`).join("")}</div>
+  <div class="pvs" id="pvs">${L.map((p,i)=>pvCard(p,i)).join("")||'<p class="lead">چیزی پیدا نشد.</p>'}</div>`;
+}
+function pvCard(p,i){return `<article class="pv"><div class="c">${esc(p.cf)}</div><div class="t">${esc(p.t)}</div><div class="mm" ${S.open?"":"hidden"}><p>${esc(p.m)}</p><p class="us">${esc(p.u)}</p></div><button class="btn show" data-pv="${i}">${S.open?"بستن":"معنی"}</button></article>`}
+/* ---------- poetry ---------- */
+function renderPoet(){
+  setCol("var(--gold)");
+  const ar=S.pt==="ar",items=ar?AR:PG;if(!items.some(x=>x.id===S.pid))S.pid=items[0].id;
+  const x=items.find(y=>y.id===S.pid);
+  const exs=(x.ex||[]).map(e=>bayt(e[0],e[1])+`<div class="bn">${rich(e[2])}</div>`).join("");
+  const phs=ar&&x.ph?`<h3>نمونه‌ی کوتاه</h3><div class="phs">${x.ph.map(l=>{const [a,b]=l.split("|");return `<div class="ph"><b>${esc(a)}</b><span>${esc(b||"")}</span></div>`}).join("")}</div>`:"";
+  let prac="";
+  if(ar){const items=PQ.filter(q=>q[1]===x.id);if(items.length)prac=`<h3>تمرین: کدام آرایه است؟</h3>`+items.map((q,k)=>qHTML(pqQ(q),"p"+k,0)).join("")}
+  else if(x.id==="qafiye"){prac=`<h3>تمرین</h3>`+rqList().slice(0,2).map((q,k)=>qHTML(q,"r"+k)).join("")}
+  $("#main").innerHTML=`<h2 class="sec">شعر و آرایه‌ها</h2><p class="lead">آرایه‌های ادبی را با تعریف و بیت نمونه یاد بگیر و دستور زبان شعر را بخوان: قافیه، وزن، ردیف و ساخت جمله‌ها در بیت. بیت‌های نمونه برای آموزش در همین صفحه ساخته شده‌اند.</p>
+  <div class="ptabs"><button data-pt="ar" aria-pressed="${ar}">آرایه‌های ادبی (${fd(AR.length)})</button><button data-pt="pg" aria-pressed="${!ar}">دستور زبان شعر (${fd(PG.length)})</button></div>
+  <div class="grid"><aside class="list"><h3>${ar?"آرایه‌ها":"درس‌ها"}</h3><ol>${items.map((y,k)=>`<li><button data-pid="${y.id}" aria-current="${y.id===x.id}"><span class="dot">${fd(k+1)}</span><span>${esc(y.fa)}</span></button></li>`).join("")}</ol></aside>
+  <article class="card"><div class="eyebrow"><span class="tag">${ar?x.k:"دستور شعر"}</span></div><h2>${esc(x.fa)}</h2><p class="intro">${rich(x.i)}</p>
+  <h3>${ar?"ویژگی‌ها":"نکته‌ها"}</h3><ul class="rules">${x.r.map(r=>`<li>${rich(r)}</li>`).join("")}</ul>
+  ${exs?`<h3>بیت نمونه</h3>${exs}`:""}${phs}${prac}</article></div>`;
+}
+function pqQ(q){const names=Object.values(ARN),c=ARN[q[1]],o=shuf(names.filter(n=>n!==c)).slice(0,3);const opts=shuf([c,...o]);return [q[0],opts,opts.indexOf(c),q[2],"v"]}
+function rqPool(){return [
+ ["هر که با تو همنشین شد، دل‌نواز است / هر که با تو همسخن شد، سرفراز است","ردیف این بیت کدام است؟","است",["دل‌نواز","سرفراز","همنشین"],"«است» بعد از قافیه تکرار شده است."],
+ ["شب‌ها به یاد روی تو بیدار می‌مانم / روزها به شوق کوی تو بیمار می‌مانم","ردیف این بیت کدام است؟","می‌مانم",["بیدار","روی تو","شوق"],"«می‌مانم» بعد از قافیه تکرار شده است."],
+ ["هر که با تو همنشین شد، دل‌نواز است / هر که با تو همسخن شد، سرفراز است","قافیه‌ی این بیت کدام است؟","دل‌نواز / سرفراز",["است","همنشین / همسخن","تو / تو"],"کلمه‌های هم‌آهنگ پیش از ردیف «است»."],
+ ["شب‌ها به یاد روی تو بیدار می‌مانم / روزها به شوق کوی تو بیمار می‌مانم","قافیه‌ی این بیت کدام است؟","بیدار / بیمار",["می‌مانم","روی / کوی","تو / تو"],"پیش از ردیف «می‌مانم»؛ حرف روی «ر»."]]}
+function rqList(){return shuf(rqPool()).map(r=>{const opts=shuf([r[2],...r[3]]);return [r[1]+"\n"+r[0],opts,opts.indexOf(r[2]),r[4],"v"]})}
+/* ---------- quiz ---------- */
+function renderQuizSetup(){
+  setCol("var(--lap)");const ty=store.get("pn-qty",["g","p","a"]);
+  $("#main").innerHTML=`<div class="quizbox"><h2 class="sec" style="margin:0">آزمون مخلوط</h2><p class="lead">۱۰ پرسش تصادفی از بخش‌هایی که انتخاب می‌کنی. در پایان اشتباه‌هایت را با توضیح می‌بینی.</p>
+  <div class="picks">${[["g","دستور زبان"],["p","معنی ضرب‌المثل"],["a","آرایه، قافیه و ردیف"]].map(([v,n])=>`<label><input type="checkbox" class="ty" value="${v}" ${ty.includes(v)?"checked":""}> ${n}</label>`).join("")}</div>
+  <button class="btn primary" id="qstart">شروع آزمون</button></div>`;
+}
+function startQuiz(){
+  const ty=[...document.querySelectorAll(".ty:checked")].map(i=>i.value);if(!ty.length)return;store.set("pn-qty",ty);
+  const g=[],p=[],a=[];
+  if(ty.includes("g"))G.forEach(t=>t.q.forEach(q=>g.push({q,from:t.fa,go:"g:"+t.id})));
+  if(ty.includes("p"))PVALL.forEach(x=>{const o=shuf(PVALL.filter(y=>y.t!==x.t)).slice(0,3).map(y=>y.m);const opts=shuf([x.m,...o]);p.push({q:["معنی ضرب‌المثل «"+x.t+"» کدام است؟",opts,opts.indexOf(x.m),x.u,"v",1],from:x.cf,go:"p:"+x.cat})});
+  if(ty.includes("a")){PQ.forEach(q=>a.push({q:pqQ(q),from:ARN[q[1]],go:"a:"+q[1]}));rqList().forEach(q=>a.push({q,from:"قافیه و ردیف",go:"r:qafiye"}))}
+  const groups=[g,p,a].filter(x=>x.length),per=Math.ceil(10/groups.length);
+  const items=shuf(groups.flatMap(x=>shuf(x).slice(0,per))).slice(0,10);Q={items,n:0,ok:0,miss:[]};renderQ();
+}
+function renderQ(){const it=Q.items[Q.n];$("#main").innerHTML=`<div class="quizbox"><div class="qprog"><span>پرسش ${fd(Q.n+1)} از ${fd(Q.items.length)}</span><span>${esc(it.from)}</span></div>${qHTML(it.q,"quiz",it.q[5])}<div class="foot" style="border:0;margin-top:14px;padding:0"><span class="pscore">درست: ${fd(Q.ok)}</span><button class="btn primary" id="qnext" hidden>${Q.n===Q.items.length-1?"دیدن نتیجه":"پرسش بعد ←"}</button></div></div>`}
+function renderResult(){const pc=Math.round(Q.ok/Q.items.length*100);const msg=pc>=90?"آفرین! این بخش‌ها را خوب می‌دانی.":pc>=60?"خوب است. اشتباه‌ها را مرور کن.":"اشکالی ندارد. دوباره درس‌ها را بخوان و دوباره امتحان کن.";
+  $("#main").innerHTML=`<div class="quizbox"><div class="score">${fd(Q.ok)}/${fd(Q.items.length)}</div><p style="font-weight:800">${msg}</p>${Q.miss.length?`<h3>اشتباه‌ها</h3><ul class="miss">${Q.miss.map(m=>`<li><div>${rich(m.q[0].split("\n")[0])}</div><div><b>پاسخ درست:</b> ${esc(m.q[1][m.q[2]])}</div><div class="pscore">${rich(m.q[3])}</div><button class="link" data-goto="${m.go}">برو به درس: ${esc(m.from)}</button></li>`).join("")}</ul>`:""}<div class="foot"><button class="btn primary" id="qagain">آزمون دوباره</button><button class="btn" id="qsetup">تغییر بخش‌ها</button></div></div>`}
+/* ---------- nav ---------- */
+function render(){
+  document.querySelectorAll(".tabs button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.mode===S.mode));
+  store.set("pn-mode",S.mode);store.set("pn-lv",S.lv);store.set("pn-id",S.id);
+  S.mode==="gram"?renderGram():S.mode==="prov"?renderProv():S.mode==="poet"?renderPoet():renderQuizSetup();
+}
+function toTop(sel){const e=$(sel||"main");if(e)e.scrollIntoView({behavior:"smooth",block:"start"})}
+function goto(k){const [t,id]=k.split(":");if(t==="g"){const x=G.find(y=>y.id===id);S.mode="gram";S.lv=x.lv;S.id=id}else if(t==="p"){S.mode="prov";S.cat=id}else if(t==="a"){S.mode="poet";S.pt="ar";S.pid=id}else{S.mode="poet";S.pt="pg";S.pid=id}render();toTop(".bar")}
+/* ---------- header / footer ---------- */
+const DAY=Math.floor((Date.now()-new Date(new Date().getFullYear(),0,0))/864e5);let ti=DAY%PVALL.length;
+function today(){const p=PVALL[ti];$("#tdT").textContent=p.t;$("#tdM").textContent=p.m}
+function fillStats(){$("#st-g").textContent=fd(G.length);$("#st-p").textContent=fd(PVALL.length);$("#st-a").textContent=fd(AR.length);$("#st-q").textContent=fd(NQ)}
+function toggleTheme(){const r=document.documentElement;const cur=r.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");const n=cur==="dark"?"light":"dark";r.dataset.theme=n;store.set("pn-theme",n)}
+/* ---------- events ---------- */
+document.addEventListener("click",e=>{
+  const b=e.target.closest("button");if(!b)return;
+  if(b.dataset.mode){S.mode=b.dataset.mode;render();return}
+  if(b.dataset.fmode){S.mode=b.dataset.fmode;render();toTop(".bar");return}
+  if(b.id==="theme"){toggleTheme();return}
+  if(b.id==="tdN"){ti=(ti+1)%PVALL.length;today();return}
+  if(b.id==="totop"){scrollTo({top:0,behavior:"smooth"});return}
+  if(b.matches(".lvb")){S.lv=+b.dataset.lv;S.id=lvList(S.lv)[0].id;render();return}
+  if(b.dataset.id){S.id=b.dataset.id;render();toTop("#lesson");return}
+  if(b.dataset.pid){S.pid=b.dataset.pid;render();toTop(".card");return}
+  if(b.dataset.pt){S.pt=b.dataset.pt;S.pid=(S.pt==="ar"?AR:PG)[0].id;render();return}
+  if(b.dataset.cat){S.cat=b.dataset.cat;render();return}
+  if(b.id==="popen"){S.open=!S.open;render();return}
+  if(b.dataset.pv!==undefined){const a=b.closest(".pv"),m=a.querySelector(".mm");m.hidden=!m.hidden;b.textContent=m.hidden?"معنی":"بستن";return}
+  if(b.matches(".opts button")){const ok=answer(b);
+    if(S.mode==="gram"){const qs=[...document.querySelectorAll("#lesson .q")],done=qs.filter(q=>q.querySelector("button:disabled")),right=done.filter(q=>!q.querySelector(".bad"));const ps=$("#pscore");if(ps)ps.innerHTML=`امتیاز: <b>${fd(right.length)}</b> درست از ${fd(done.length)} پاسخ (کل: ${fd(qs.length)} پرسش)`}
+    if(Q&&S.mode==="quiz"&&b.closest('[data-key="quiz"]')){const it=Q.items[Q.n];if(ok)Q.ok++;else Q.miss.push(it);$("#qnext").hidden=false;$("#qnext").focus()}return}
+  if(b.id==="mark"){learned.has(S.id)?learned.delete(S.id):learned.add(S.id);store.set("pn-learned",[...learned]);render();return}
+  if(b.id==="prev"||b.id==="next"){const i=G.findIndex(x=>x.id===S.id)+(b.id==="next"?1:-1);if(G[i]){S.lv=G[i].lv;S.id=G[i].id;render();toTop("#lesson")}return}
+  if(b.id==="qstart"||b.id==="qagain"){startQuiz();return}
+  if(b.id==="qsetup"){renderQuizSetup();return}
+  if(b.id==="qnext"){Q.n++;Q.n<Q.items.length?renderQ():renderResult();return}
+  if(b.dataset.goto){goto(b.dataset.goto);return}
+});
+document.addEventListener("input",e=>{if(e.target.id==="psearch"){S.q=e.target.value;const pos=e.target.selectionStart;renderProv();const i=$("#psearch");i.focus();try{i.setSelectionRange(pos,pos)}catch(x){}}});
+const th=store.get("pn-theme",null);if(th)document.documentElement.dataset.theme=th;
+const h=location.hash.replace("#","");if(["gram","prov","poet","quiz"].includes(h))S.mode=h;
+fillStats();today();render();
+window.__pn={G,PVALL,AR,PG,PQ};
+})();
+
+</script></body></html>
