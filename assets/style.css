@@ -826,7 +826,7 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 .lang-btn { display: inline-flex; align-items: center; gap: 6px; }
 .lang-list { position: absolute; top: calc(100% + 8px); inset-inline-end: 0; z-index: 60; min-width: 170px; margin: 0; padding: 6px; list-style: none; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; box-shadow: var(--shadow); }
 .lang-list[hidden] { display: none; }
-.lang-list a { display: block; padding: 8px 12px; border-radius: 9px; color: var(--fg); text-decoration: none; white-space: nowrap; direction: ltr; unicode-bidi: isolate; text-align: left; }
+.lang-list a { display: block; padding: 8px 12px; border-radius: 9px; color: var(--fg); text-decoration: none; white-space: nowrap; }
 .lang-list a:hover, .lang-list a:focus-visible { background: color-mix(in srgb, var(--accent) 12%, transparent); outline: none; }
 .lang-list a[aria-current="true"] { color: var(--accent); font-weight: 600; }
 
