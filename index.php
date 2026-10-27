@@ -62,13 +62,6 @@ function render_pane(string $lang, array $shared): array {
       <?php if (($profile['show_projects'] ?? '1') !== '0'): ?><a href="#projects"><?= e(t('projects', $lang)) ?></a><?php endif; ?>
       <?php if (($profile['show_research'] ?? '1') !== '0'): ?><a href="#research"><?= e(t('papers', $lang)) ?></a><?php endif; ?>
       <?php if (($profile['show_slides'] ?? '1') !== '0'): ?><a href="#slides"><?= e(t('presentations', $lang)) ?></a><?php endif; ?>
-      <div class="lang-menu" data-lang-menu>
-        <button type="button" class="tool lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="tutorial-list"><span class="lang-label"><?= e(t('tutorial', $lang)) ?></span> <span class="arr" aria-hidden="true">▾</span></button>
-        <ul class="lang-list" id="tutorial-list" hidden>
-          <li><a href="persian/" hreflang="fa"><?= e(t('tutorial_fa', $lang)) ?></a></li>
-          <li><a href="english/" hreflang="en"><?= e(t('tutorial_en', $lang)) ?></a></li>
-        </ul>
-      </div>
     </nav>
     <div class="nav-actions">
       <span class="p-mark p-mark-top" aria-hidden="true"></span>
@@ -186,6 +179,13 @@ function render_pane(string $lang, array $shared): array {
           <ul class="skill-grid">
             <?php foreach ($languageGroups as $group): ?><?= language_card_html($group, $lang) ?><?php endforeach; ?>
           </ul>
+          <div class="lang-menu" data-lang-menu>
+            <button type="button" class="btn btn-outline lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="tutorial-list"><span class="lang-label"><?= e(t('tutorial', $lang)) ?></span> <span class="arr" aria-hidden="true">▾</span></button>
+            <ul class="lang-list" id="tutorial-list" hidden>
+              <li><a href="english/" hreflang="en">English</a></li>
+              <li><a href="persian/" hreflang="fa">فارسی</a></li>
+            </ul>
+          </div>
         <?php endif; ?>
       </div>
     <?php endif; ?>

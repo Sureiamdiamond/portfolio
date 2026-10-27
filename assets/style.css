@@ -548,8 +548,6 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
   .nav-links { order: 2; width: calc(100% + 24px); margin-inline: -12px; overflow-x: auto; scrollbar-width: none; }
   .nav-links::-webkit-scrollbar { display: none; }
   .nav-links a { flex: none; white-space: nowrap; }
-  /* The scrolling link row would clip the Misc dropdown, so it is fixed under the header (the header is 109px tall here) */
-  .nav-links .lang-list { position: fixed; top: 117px; inset-inline-end: 12px; }
 }
 
 /* Back to top: bottom-left, away from the CV button */
@@ -810,6 +808,9 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 
 /* Language menu: Persian, English, Binary */
 .lang-menu { position: relative; }
+/* The tutorial dropdown sits under the Languages list, shrink-wrapped so its menu opens from the button */
+.skills-langs .lang-menu { display: inline-block; margin-top: 14px; }
+.skills-langs .lang-menu .lang-list { inset-inline-start: 0; inset-inline-end: auto; }
 /* After the binary game's OK: a pulsing ring on the language button and a hint that stays until it is clicked or hovered */
 .lang-btn.bin-attn { color: #39ff7a; border-color: #39ff7a; animation: bin-ring 1.1s ease-in-out infinite; }
 @keyframes bin-ring {
