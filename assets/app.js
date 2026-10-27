@@ -767,7 +767,7 @@ document.querySelectorAll('.pane').forEach((pane) => initPane(pane, pane.dataset
         // OK closes the whole game, and the language button gets a short attention effect
         closePanel();
         // The hint stays until the visitor clicks or hovers the language button
-        const btn = document.querySelector('.pane:not([hidden]) .lang-btn');
+        const btn = document.querySelector('.pane:not([hidden]) .nav-actions .lang-btn');
         const menu = btn && btn.closest('.lang-menu');
         if (!btn || !menu) return;
         btn.scrollIntoView({ block: 'nearest' });

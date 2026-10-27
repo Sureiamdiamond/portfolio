@@ -548,6 +548,8 @@ details[open] > summary .chev::before { transform: rotate(45deg); }
   .nav-links { order: 2; width: calc(100% + 24px); margin-inline: -12px; overflow-x: auto; scrollbar-width: none; }
   .nav-links::-webkit-scrollbar { display: none; }
   .nav-links a { flex: none; white-space: nowrap; }
+  /* The scrolling link row would clip the Misc dropdown, so it is fixed under the header (the header is 109px tall here) */
+  .nav-links .lang-list { position: fixed; top: 117px; inset-inline-end: 12px; }
 }
 
 /* Back to top: bottom-left, away from the CV button */
