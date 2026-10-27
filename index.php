@@ -73,6 +73,13 @@ function render_pane(string $lang, array $shared): array {
           <li><a href="?lang=bin" data-lang-choice="bin" aria-label="<?= e(t('lang_bin', $lang)) ?>">01010</a></li>
         </ul>
       </div>
+      <div class="lang-menu" data-lang-menu>
+        <button type="button" class="tool lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="tutorial-list"><span class="lang-label"><?= e(t('tutorial', $lang)) ?></span> <span class="arr" aria-hidden="true">▾</span></button>
+        <ul class="lang-list" id="tutorial-list" hidden>
+          <li><a href="persian/" hreflang="fa"><?= e(t('tutorial_fa', $lang)) ?></a></li>
+          <li><a href="english/" hreflang="en"><?= e(t('tutorial_en', $lang)) ?></a></li>
+        </ul>
+      </div>
       <button type="button" class="tool" id="theme-toggle" aria-label="<?= e(t('toggle_theme', $lang)) ?>"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor"/></svg></button>
       <a class="btn btn-primary" href="#contact"><?= e(t('contact_me', $lang)) ?></a>
     </div>
