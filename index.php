@@ -178,14 +178,16 @@ function render_pane(string $lang, array $shared): array {
           <p class="skills-label"><?= e(t('languages', $lang)) ?></p>
           <ul class="skill-grid">
             <?php foreach ($languageGroups as $group): ?><?= language_card_html($group, $lang) ?><?php endforeach; ?>
+            <li class="skill lang-card lang-tutorial">
+              <div class="lang-menu" data-lang-menu>
+                <button type="button" class="lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="tutorial-list"><span class="lang-label"><?= e(t('tutorial', $lang)) ?></span> <span class="arr" aria-hidden="true">▾</span></button>
+                <ul class="lang-list" id="tutorial-list" hidden>
+                  <li><a href="english/" hreflang="en">English</a></li>
+                  <li><a href="persian/" hreflang="fa">فارسی</a></li>
+                </ul>
+              </div>
+            </li>
           </ul>
-          <div class="lang-menu" data-lang-menu>
-            <button type="button" class="btn btn-outline lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="tutorial-list"><span class="lang-label"><?= e(t('tutorial', $lang)) ?></span> <span class="arr" aria-hidden="true">▾</span></button>
-            <ul class="lang-list" id="tutorial-list" hidden>
-              <li><a href="english/" hreflang="en">English</a></li>
-              <li><a href="persian/" hreflang="fa">فارسی</a></li>
-            </ul>
-          </div>
         <?php endif; ?>
       </div>
     <?php endif; ?>

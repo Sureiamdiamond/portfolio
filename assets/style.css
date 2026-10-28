@@ -808,9 +808,14 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 
 /* Language menu: Persian, English, Binary */
 .lang-menu { position: relative; }
-/* The tutorial dropdown sits under the Languages list, shrink-wrapped so its menu opens from the button */
-.skills-langs .lang-menu { display: inline-block; margin-top: 14px; }
-.skills-langs .lang-menu .lang-list { inset-inline-start: 0; inset-inline-end: auto; }
+/* The tutorial dropdown is a language card in the same grid: same width, height and border. Its menu opens under the card. */
+.skills-langs .lang-tutorial { padding: 0; }
+.skills-langs .lang-tutorial .lang-menu { flex: 1; min-width: 0; align-self: stretch; }
+.skills-langs .lang-tutorial .lang-btn { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 67px; padding: 8px 12px; margin: 0; background: none; border: 0; border-radius: 12px; color: inherit; font: 600 1rem/1.3 var(--sans); text-align: start; cursor: pointer; }
+.skills-langs .lang-tutorial .lang-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.skills-langs .lang-tutorial .lang-menu .lang-list { inset-inline-start: 0; inset-inline-end: auto; }
+/* Same height as a two-line language card on phones */
+@media (max-width: 560px) { .skills-langs .lang-tutorial .lang-btn { min-height: 61px; } }
 /* After the binary game's OK: a pulsing ring on the language button and a hint that stays until it is clicked or hovered */
 .lang-btn.bin-attn { color: #39ff7a; border-color: #39ff7a; animation: bin-ring 1.1s ease-in-out infinite; }
 @keyframes bin-ring {
