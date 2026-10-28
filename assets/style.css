@@ -819,7 +819,7 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 @media (prefers-reduced-motion: reduce) { .skills-langs .lang-tutorial .lang-btn::after { transition: none; } }
 .skills-langs .lang-tutorial .lang-menu .lang-list { inset-inline-start: 0; inset-inline-end: auto; }
 /* Same height as a two-line language card on phones */
-@media (max-width: 560px) { .skills-langs .lang-tutorial .lang-btn { min-height: 0; padding: 6px 8px; } }
+@media (max-width: 560px) { .skills-langs .lang-tutorial .lang-btn { min-height: 61px; padding: 6px 8px; } }
 /* After the binary game's OK: a pulsing ring on the language button and a hint that stays until it is clicked or hovered */
 .lang-btn.bin-attn { color: #39ff7a; border-color: #39ff7a; animation: bin-ring 1.1s ease-in-out infinite; }
 @keyframes bin-ring {

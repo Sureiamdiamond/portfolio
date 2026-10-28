@@ -180,7 +180,7 @@ function render_pane(string $lang, array $shared): array {
             <?php foreach ($languageGroups as $group): ?><?= language_card_html($group, $lang) ?><?php endforeach; ?>
             <li class="skill lang-card lang-tutorial">
               <div class="lang-menu" data-lang-menu>
-                <button type="button" class="lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="tutorial-list"><span class="lang-text"><span class="lang-name"><?= e(t('tutorial', $lang)) ?></span><span class="lang-level" aria-hidden="true">&nbsp;</span></span></button>
+                <button type="button" class="lang-btn" aria-haspopup="true" aria-expanded="false" aria-controls="tutorial-list"><span class="lang-name"><?= e(t('tutorial', $lang)) ?></span></button>
                 <ul class="lang-list" id="tutorial-list" hidden>
                   <li><a href="english/" hreflang="en">English</a></li>
                   <li><a href="persian/" hreflang="fa">فارسی</a></li>
