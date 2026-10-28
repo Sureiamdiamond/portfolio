@@ -811,11 +811,15 @@ html[dir="rtl"] .skill-child { transform: translateX(6px); }
 /* The tutorial dropdown is a language card in the same grid: same width, height and border. Its menu opens under the card. */
 .skills-langs .lang-tutorial { padding: 0; }
 .skills-langs .lang-tutorial .lang-menu { flex: 1; min-width: 0; align-self: stretch; }
-.skills-langs .lang-tutorial .lang-btn { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 67px; padding: 8px 12px; margin: 0; background: none; border: 0; border-radius: 12px; color: inherit; font: 600 1rem/1.3 var(--sans); text-align: start; cursor: pointer; }
+.skills-langs .lang-tutorial .lang-btn { display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%; min-height: 67px; padding: 8px 12px; margin: 0; background: none; border: 0; border-radius: 12px; color: inherit; font: inherit; text-align: start; cursor: pointer; }
 .skills-langs .lang-tutorial .lang-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+/* The same chevron as the other skill and language cards, turning when the list is open */
+.skills-langs .lang-tutorial .lang-btn::after { content: ""; margin-inline-start: auto; width: 7px; height: 7px; flex: none; border-inline-end: 2px solid currentColor; border-bottom: 2px solid currentColor; transform: rotate(45deg); transition: transform .3s cubic-bezier(.2,.7,.2,1); }
+.skills-langs .lang-tutorial .lang-btn[aria-expanded="true"]::after { transform: rotate(-135deg); }
+@media (prefers-reduced-motion: reduce) { .skills-langs .lang-tutorial .lang-btn::after { transition: none; } }
 .skills-langs .lang-tutorial .lang-menu .lang-list { inset-inline-start: 0; inset-inline-end: auto; }
 /* Same height as a two-line language card on phones */
-@media (max-width: 560px) { .skills-langs .lang-tutorial .lang-btn { min-height: 61px; } }
+@media (max-width: 560px) { .skills-langs .lang-tutorial .lang-btn { min-height: 0; padding: 6px 8px; } }
 /* After the binary game's OK: a pulsing ring on the language button and a hint that stays until it is clicked or hovered */
 .lang-btn.bin-attn { color: #39ff7a; border-color: #39ff7a; animation: bin-ring 1.1s ease-in-out infinite; }
 @keyframes bin-ring {
