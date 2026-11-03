@@ -148,6 +148,7 @@ function db(): PDO {
     run_helm_text_owner_v28_migration($pdo);
     run_helm_owner_names_v29_migration($pdo);
     run_fde_llm_view_v30_migration($pdo);
+    run_fde_llm_view_v31_migration($pdo);
     return $pdo;
 }
 

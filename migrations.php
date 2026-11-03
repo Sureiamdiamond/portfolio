@@ -2253,6 +2253,21 @@ function run_fde_llm_view_v30_migration(PDO $pdo): void {
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . FDE_LLM_VIEW_V30_MIGRATION . "', '1')");
 }
 
+const FDE_LLM_VIEW_V31_MIGRATION = 'migration_fde_llm_view_v31';
+
+/** The slide is titled "Social opinions prediction – LLM base agents" on the host, so the View button is set on that title. Only empty values are filled. */
+function run_fde_llm_view_v31_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . FDE_LLM_VIEW_V31_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $slide = $pdo->query("SELECT id, title, view_url FROM presentations WHERE UPPER(title) LIKE '%LLM BASE AGENTS%' OR UPPER(title_fa) LIKE '%LLM BASE AGENTS%' ORDER BY id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($slide) {
+        migration_log("fde llm view v31: presentation {$slide['id']} previous " . json_encode($slide, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare("UPDATE presentations SET view_url = ? WHERE id = ? AND (view_url IS NULL OR view_url = '')")->execute(['slides/fde-llm/', $slide['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . FDE_LLM_VIEW_V31_MIGRATION . "', '1')");
+}
+
 /** Helm's text names the task list in plain words, and the owner lines show the names only, in each language. Previous values are logged. */
 function run_helm_owner_names_v29_migration(PDO $pdo): void {
     if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . HELM_OWNER_NAMES_V29_MIGRATION . "'")->fetchColumn()) {
