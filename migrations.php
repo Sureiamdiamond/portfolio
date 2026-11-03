@@ -2238,6 +2238,20 @@ function run_helm_text_owner_v28_migration(PDO $pdo): void {
 }
 
 const HELM_OWNER_NAMES_V29_MIGRATION = 'migration_helm_owner_names_v29';
+const FDE_LLM_VIEW_V30_MIGRATION = 'migration_fde_llm_view_v30';
+
+/** The FDE LLM slide gets a View button that opens the interactive page kept in slides/fde-llm/. */
+function run_fde_llm_view_v30_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . FDE_LLM_VIEW_V30_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $slide = $pdo->query("SELECT id, title, view_url FROM presentations WHERE UPPER(title) LIKE '%FDE%LLM%' OR UPPER(title_fa) LIKE '%FDE%LLM%' ORDER BY id LIMIT 1")->fetch(PDO::FETCH_ASSOC);
+    if ($slide) {
+        migration_log("fde llm view: presentation {$slide['id']} previous " . json_encode($slide, JSON_UNESCAPED_UNICODE));
+        $pdo->prepare('UPDATE presentations SET view_url = ? WHERE id = ?')->execute(['slides/fde-llm/', $slide['id']]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . FDE_LLM_VIEW_V30_MIGRATION . "', '1')");
+}
 
 /** Helm's text names the task list in plain words, and the owner lines show the names only, in each language. Previous values are logged. */
 function run_helm_owner_names_v29_migration(PDO $pdo): void {

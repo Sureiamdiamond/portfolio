@@ -347,6 +347,7 @@ guest@parsa:~$ <span class="bin-caret">▌</span></pre>
           <div class="links">
             <?php if ($s['pptx']): ?><a href="<?= e($s['pptx']) ?>" download><?= e(t('download_pptx', $lang)) ?></a><?php endif; ?>
             <?php if ($s['pdf']): ?><a href="<?= e($s['pdf']) ?>" target="_blank" rel="noopener"><?= e(t('open_pdf', $lang)) ?></a><?php endif; ?>
+            <?php if (!empty($s['view_url'])): ?><a href="<?= e($s['view_url']) ?>"><?= e(t('open_view', $lang)) ?></a><?php endif; ?>
           </div>
         </div>
       </article>

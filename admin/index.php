@@ -80,7 +80,7 @@ function login_succeeded(string $ip): void {
 const TYPES = [
     'projects' => ['label' => 'Projects', 'fields' => ['title', 'title_fa', 'kind', 'summary', 'summary_fa', 'tags', 'url', 'github_url', 'owner', 'owner_fa', 'appstore_url', 'playstore_url', 'bazaar_url', 'extra_links', 'sort'], 'long' => ['summary', 'summary_fa', 'extra_links'], 'files' => []],
     'papers' => ['label' => 'Research', 'fields' => ['title', 'title_fa', 'venue', 'year', 'doi', 'sort'], 'long' => [], 'files' => ['pdf']],
-    'presentations' => ['label' => 'Slides', 'fields' => ['title', 'title_fa', 'event', 'year', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
+    'presentations' => ['label' => 'Slides', 'fields' => ['title', 'title_fa', 'event', 'year', 'view_url', 'sort'], 'long' => [], 'files' => ['pptx', 'pdf']],
     'timeline' => ['label' => 'Education & experience', 'fields' => ['kind', 'title', 'title_fa', 'org', 'org_fa', 'city', 'city_fa', 'period', 'period_fa', 'website', 'bullets', 'bullets_fa', 'details', 'details_fa', 'sort'], 'long' => ['bullets', 'bullets_fa', 'details', 'details_fa'], 'files' => []],
 ];
 const PROFILE_FIELDS = ['name', 'name_fa', 'headline', 'headline_fa', 'about', 'about_fa', 'email', 'phone', 'location', 'location_fa', 'linkedin', 'github', 'skills', 'skills_fa', 'languages', 'languages_fa', 'meta_description', 'footer_text'];

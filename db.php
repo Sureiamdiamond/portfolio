@@ -46,7 +46,7 @@ function db(): PDO {
     $persianColumns = [
         'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'icon', 'extra_links', 'owner', 'owner_fa'],
         'papers' => ['title_fa'],
-        'presentations' => ['title_fa'],
+        'presentations' => ['title_fa', 'view_url'],
         'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa', 'city', 'city_fa', 'website', 'logo', 'bullets', 'bullets_fa'],
     ];
     foreach ($persianColumns as $table => $columns) {
@@ -147,6 +147,7 @@ function db(): PDO {
     run_helm_project_v27_migration($pdo);
     run_helm_text_owner_v28_migration($pdo);
     run_helm_owner_names_v29_migration($pdo);
+    run_fde_llm_view_v30_migration($pdo);
     return $pdo;
 }
 
