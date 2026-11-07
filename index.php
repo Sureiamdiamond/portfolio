@@ -223,7 +223,7 @@ function render_pane(string $lang, array $shared): array {
             <?= project_tile($p) ?>
             <h3><?= e(loc($p, 'title', $lang)) ?></h3>
             <?php $owner = trim((string) (($lang === 'fa' ? ($p['owner_fa'] ?? '') : '') ?: ($p['owner'] ?? ''))); ?>
-            <?php if ($owner !== ''): ?><p class="pcard-owner"><bdi><?= e($owner) ?></bdi></p><p class="pcard-role"><?= e(t('contributor', $lang)) ?></p><?php endif; ?>
+            <?php if ($owner !== ''): ?><p class="pcard-owner"><bdi><?= e($owner) ?></bdi> · <bdi>Contributor</bdi></p><?php endif; ?>
             <?php $summaryText = loc($p, 'summary', $lang); ?>
             <p class="muted pcard-summary<?= substr_count($summaryText, "\n") === 1 && mb_strlen($summaryText) < 400 ? ' pcard-summary--lines' : '' ?>"><?= nl2br(e($summaryText)) ?></p>
             <?php $tags = array_filter(array_map('trim', explode(',', (string) $p['tags']))); ?>
