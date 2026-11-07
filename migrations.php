@@ -2291,3 +2291,34 @@ function run_helm_owner_names_v29_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . HELM_OWNER_NAMES_V29_MIGRATION . "', '1')");
 }
+
+const LIGHTNING_PROJECT_V32_MIGRATION = 'migration_lightning_project_v32';
+
+/** Lightning: a desktop download manager by Ali Sinaee. The card and the IDE folder lib/projects/lightning read these fields. */
+function run_lightning_project_v32_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . LIGHTNING_PROJECT_V32_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $exists = $pdo->prepare('SELECT 1 FROM projects WHERE title = ?');
+    $exists->execute(['Lightning']);
+    if (!$exists->fetchColumn()) {
+        $sort = (int) $pdo->query('SELECT COALESCE(MAX(sort), 0) + 1 FROM projects')->fetchColumn();
+        $insert = $pdo->prepare('INSERT INTO projects (title, title_fa, kind, summary, summary_fa, tags, url, github_url, icon, owner, owner_fa, sort)
+            VALUES (:title, :title_fa, :kind, :summary, :summary_fa, :tags, :url, :github_url, :icon, :owner, :owner_fa, :sort)');
+        $insert->execute([
+            'title' => 'Lightning',
+            'title_fa' => 'Lightning',
+            'kind' => 'work',
+            'summary' => "Lightning is a desktop download manager that uses every network you have at once. It splits a file into pieces and fetches them in parallel over Wi-Fi, Ethernet, a tethered phone or a VPN, so faster networks take more of the work. It handles direct links, magnet links and torrents, resumes safely, and offers per-network speed and data limits, DNS testing, proxies, schedules and a browser extension. It runs on macOS, Windows and Linux.",
+            'summary_fa' => "Lightning یک دانلود منیجر دسکتاپ است که همهٔ شبکه‌های شما را هم‌زمان به کار می‌گیرد. فایل را به چند تکه تقسیم می‌کند و تکه‌ها را به‌طور موازی از Wi-Fi، اترنت، گوشی متصل (تترینگ) یا VPN دانلود می‌کند تا شبکه‌های سریع‌تر سهم بیشتری بگیرند. لینک مستقیم، مگنت و تورنت را پشتیبانی می‌کند، ادامهٔ دانلود امن دارد و امکاناتی مثل محدودیت سرعت و حجم برای هر شبکه، تست DNS، پراکسی، زمان‌بندی و افزونهٔ مرورگر دارد. روی macOS، ویندوز و لینوکس اجرا می‌شود.",
+            'tags' => 'Electron, React, TypeScript, Networking',
+            'url' => '',
+            'github_url' => 'https://github.com/alisinaee/Lightning',
+            'icon' => 'assets/img/projects/lightning-icon.png',
+            'owner' => 'Ali Sinaee',
+            'owner_fa' => 'علی سینایی',
+            'sort' => $sort,
+        ]);
+    }
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LIGHTNING_PROJECT_V32_MIGRATION . "', '1')");
+}

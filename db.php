@@ -149,6 +149,7 @@ function db(): PDO {
     run_helm_owner_names_v29_migration($pdo);
     run_fde_llm_view_v30_migration($pdo);
     run_fde_llm_view_v31_migration($pdo);
+    run_lightning_project_v32_migration($pdo);
     return $pdo;
 }
 
