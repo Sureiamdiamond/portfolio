@@ -1119,7 +1119,10 @@ h2 { font-size: clamp(2.1rem, 4.4vw, 3.1rem); letter-spacing: -.025em; }
 .hero-text .actions { position: relative; z-index: 10; }
 
 /* The owner line under a project title: small and muted, in both languages */
-.pcard-owner { margin: -.4em 0 .7em; font-size: .72rem; color: color-mix(in srgb, var(--muted) 56%, var(--bg)); }
+.pcard-owner { margin: -.4em 0 .35em; font-size: .72rem; color: color-mix(in srgb, var(--muted) 56%, var(--bg)); }
+
+/* A project owned by someone else that Parsa contributed to: a small accent pill under the owner line */
+.pcard-role { display: inline-block; margin: 0 0 .8em; padding: 2px 9px; border-radius: 999px; font-size: .68rem; font-weight: 600; color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, transparent); }
 
 /* Research rows: the thumbnail runs the full height of the row, and the row is only as tall as its content needs */
 .media-rows .media-card { align-items: stretch; }

@@ -48,9 +48,9 @@ function project_generated_files(array $p, string $lang, string $slug): array {
     // Headings and labels follow the page language; the description is the project's text in that language
     $fa = $lang === 'fa';
     $h = $fa
-        ? ['kind' => 'نوع', 'stack' => 'فناوری‌ها', 'links' => 'لینک‌ها', 'nolinks' => 'هنوز لینکی ثبت نشده است.', 'nodesc' => 'توضیحی ثبت نشده است.',
+        ? ['kind' => 'نوع', 'stack' => 'فناوری‌ها', 'links' => 'لینک‌ها', 'nolinks' => 'هنوز لینکی ثبت نشده است.', 'nodesc' => 'توضیحی ثبت نشده است.', 'role' => 'نقش پارسا بنی‌طبا: مشارکت‌کننده', 'owner' => 'صاحب پروژه',
             'work' => 'کاری', 'academic' => 'دانشگاهی']
-        : ['kind' => 'Kind', 'stack' => 'Tech stack', 'links' => 'Links', 'nolinks' => 'No links yet.', 'nodesc' => 'No description yet.',
+        : ['kind' => 'Kind', 'stack' => 'Tech stack', 'links' => 'Links', 'nolinks' => 'No links yet.', 'nodesc' => 'No description yet.', 'role' => 'Parsa Banitaba\'s role: Contributor', 'owner' => 'Owner',
             'work' => 'Work', 'academic' => 'Academic'];
     $title = loc($p, 'title', $lang);
     $summary = trim(loc($p, 'summary', $lang));
@@ -61,7 +61,7 @@ function project_generated_files(array $p, string $lang, string $slug): array {
     $owner = trim((string) (($fa ? ($p['owner_fa'] ?? '') : '') ?: ($p['owner'] ?? '')));
     $readme = "# $title\n\n";
     if ($owner !== '') {
-        $readme .= "$owner\n\n";
+        $readme .= "{$h['owner']}: $owner\n\n{$h['role']}\n\n";
     }
     $readme .= "{$h['kind']}: $kind\n\n";
     $readme .= ($summary !== '' ? "$summary\n" : "{$h['nodesc']}\n");
