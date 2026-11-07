@@ -21,7 +21,8 @@ if ($previewToken !== '' && ($draftSettings = theme_draft_for($previewToken)) !=
     $themeSettings = $draftSettings;
     $isPreview = true;
 }
-$projects = $pdo->query('SELECT * FROM projects ORDER BY sort, id DESC')->fetchAll();
+// Projects hidden in /admin are left out of the public page (cards and IDE view)
+$projects = $pdo->query("SELECT * FROM projects WHERE COALESCE(hidden, '') <> '1' ORDER BY sort, id DESC")->fetchAll();
 $projectShots = [];
 foreach ($pdo->query('SELECT project_id, path FROM project_media ORDER BY sort, id') as $shot) {
     $projectShots[$shot['project_id']][] = $shot['path'];

@@ -44,7 +44,7 @@ function db(): PDO {
         SQL);
     // Backward-compatible migration: add Persian columns to existing databases.
     $persianColumns = [
-        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'icon', 'extra_links', 'owner', 'owner_fa'],
+        'projects' => ['title_fa', 'summary_fa', 'github_url', 'appstore_url', 'playstore_url', 'bazaar_url', 'icon', 'extra_links', 'owner', 'owner_fa', 'hidden'],
         'papers' => ['title_fa'],
         'presentations' => ['title_fa', 'view_url'],
         'timeline' => ['title_fa', 'org_fa', 'period_fa', 'details_fa', 'city', 'city_fa', 'website', 'logo', 'bullets', 'bullets_fa'],
@@ -150,6 +150,7 @@ function db(): PDO {
     run_fde_llm_view_v30_migration($pdo);
     run_fde_llm_view_v31_migration($pdo);
     run_lightning_project_v32_migration($pdo);
+    run_hide_helm_v33_migration($pdo);
     return $pdo;
 }
 

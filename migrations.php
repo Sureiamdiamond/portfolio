@@ -2322,3 +2322,14 @@ function run_lightning_project_v32_migration(PDO $pdo): void {
     }
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . LIGHTNING_PROJECT_V32_MIGRATION . "', '1')");
 }
+
+const HIDE_HELM_V33_MIGRATION = 'migration_hide_helm_v33';
+
+/** Helm is hidden from the public site (cards and IDE view). Its data stays and it can be shown again from /admin. */
+function run_hide_helm_v33_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . HIDE_HELM_V33_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $pdo->exec("UPDATE projects SET hidden = '1' WHERE title = 'Helm'");
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . HIDE_HELM_V33_MIGRATION . "', '1')");
+}

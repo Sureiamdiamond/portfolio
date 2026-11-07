@@ -577,6 +577,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 exit;
             }
 
+            // Hide or show one project on the public site; the project and its files are kept
+            if ($action === 'toggle_hidden') {
+                $id = (int) ($_POST['id'] ?? 0);
+                $pdo->prepare("UPDATE projects SET hidden = CASE WHEN COALESCE(hidden, '') = '1' THEN '' ELSE '1' END WHERE id = ?")->execute([$id]);
+                $notice = t('common.saved');
+            }
+
             if ($action === 'delete') {
                 $type = $_POST['type'] ?? '';
                 if (!isset(TYPES[$type])) {
@@ -1346,8 +1353,17 @@ if ($loggedIn) {
     <div class="card">
       <?php foreach ($rows as $row): ?>
         <div class="row">
-          <span><?= e($row['title']) ?> <span class="muted"><?= e((string) ($row['year'] ?? $row['kind'] ?? '')) ?></span></span>
+          <?php $isHidden = $tab === 'projects' && ($row['hidden'] ?? '') === '1'; ?>
+          <span<?= $isHidden ? ' style="opacity:.55"' : '' ?>><?= e($row['title']) ?> <span class="muted"><?= e((string) ($row['year'] ?? $row['kind'] ?? '')) ?></span><?php if ($isHidden): ?> <span class="muted">(<?= e(t('project.hidden')) ?>)</span><?php endif; ?></span>
           <span>
+            <?php if ($tab === 'projects'): ?>
+            <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0">
+              <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
+              <input type="hidden" name="action" value="toggle_hidden">
+              <input type="hidden" name="id" value="<?= (int) $row['id'] ?>">
+              <button type="submit"><?= e(t($isHidden ? 'project.show' : 'project.hide')) ?></button>
+            </form>
+            <?php endif; ?>
             <a href="index.php?t=<?= $tab ?>&id=<?= (int) $row['id'] ?>"><?= e(t('common.edit')) ?></a>
             <form method="post" style="display:inline;background:none;box-shadow:none;padding:0;margin:0" onsubmit="return confirm('<?= e(t('common.confirm_delete')) ?>')">
               <input type="hidden" name="csrf" value="<?= e(csrf_token()) ?>">
