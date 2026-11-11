@@ -7,11 +7,25 @@ RewriteCond %{HTTPS} off [OR]
 RewriteCond %{HTTP_HOST} ^www\. [NC]
 RewriteRule ^(.*)$ https://parsabanitaba.ir/$1 [R=301,L,QSA]
 
-# Never serve the database, the config file or the data folder
+# Security headers. The pages use inline scripts and styles, so the policy allows them, and it allows no other outside source except Google Fonts.
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+  Header always set Cross-Origin-Opener-Policy "same-origin"
+  Header always set Strict-Transport-Security "max-age=15552000" env=HTTPS
+  Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob:; media-src 'self' blob: data:; connect-src 'self'; frame-src 'self'; frame-ancestors 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+</IfModule>
+
+# Never serve the database, the config file, the data folder, the PHP includes or hidden files (the .well-known folder stays open)
 RedirectMatch 403 ^/data/
 RedirectMatch 403 ^/config\.php$
 RedirectMatch 403 ^/\.github/
-<FilesMatch "\.(db|sqlite|bak|md)$">
+RedirectMatch 403 ^/(db|theme|i18n|migrations|timeline|project_tree|skill_icons)\.php$
+RedirectMatch 403 ^/admin/lang\.php$
+RedirectMatch 403 (^|/)\.(?!well-known/)
+<FilesMatch "\.(db|sqlite|bak|md|log|json)$">
   Require all denied
 </FilesMatch>
 

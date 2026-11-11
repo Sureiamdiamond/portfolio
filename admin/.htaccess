@@ -1,0 +1,5 @@
+# The admin panel is private: never cached, never indexed
+<IfModule mod_headers.c>
+  Header set Cache-Control "no-store, no-cache, must-revalidate"
+  Header set X-Robots-Tag "noindex, nofollow"
+</IfModule>

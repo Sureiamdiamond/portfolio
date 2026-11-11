@@ -2,6 +2,7 @@
 declare(strict_types=1);
 // Admin-only diagnostics for project links: the stored values, what they look like with invisible characters shown, and what the card menu renders
 session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', 'httponly' => true, 'samesite' => 'Strict']);
+ini_set('session.use_strict_mode', '1');
 session_start();
 require __DIR__ . '/../db.php';
 

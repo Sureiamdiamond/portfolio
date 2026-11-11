@@ -2,7 +2,15 @@
 declare(strict_types=1);
 // Admin session: not readable from scripts, not sent cross-site, and sent only over HTTPS when the site uses it
 session_set_cookie_params(['lifetime' => 0, 'path' => '/', 'secure' => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off', 'httponly' => true, 'samesite' => 'Strict']);
+ini_set('session.use_strict_mode', '1'); // only session ids this server issued are accepted
 session_start();
+// Signed out after two hours without a request, so a forgotten open tab is not left logged in
+if (!empty($_SESSION['auth'])) {
+    if (time() - (int) ($_SESSION['seen'] ?? 0) > 7200) {
+        $_SESSION = [];
+    }
+    $_SESSION['seen'] = time();
+}
 require __DIR__ . '/../db.php';
 require __DIR__ . '/../theme.php';
 require __DIR__ . '/lang.php';
@@ -215,6 +223,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 login_succeeded($ip);
                 session_regenerate_id(true);
                 $_SESSION['auth'] = true;
+                $_SESSION['seen'] = time();
                 header('Location: index.php');
                 exit;
             }

@@ -843,8 +843,8 @@ canvas.addEventListener('pointerdown',e=>{dragging=true;lx=e.clientX;ly=e.client
 canvas.addEventListener('pointermove',e=>{if(!dragging)return;yaw-=(e.clientX-lx)*.008;pitch=clamp(pitch+(e.clientY-ly)*.006,.08,1.3);lx=e.clientX;ly=e.clientY});
 canvas.addEventListener('pointerup',()=>dragging=false);
 canvas.addEventListener('wheel',e=>{e.preventDefault();dist=clamp(dist+e.deltaY*.01,9,30)},{passive:false});
-function fitSquare(){const side=Math.max(280,Math.min(innerWidth,innerHeight));document.documentElement.style.setProperty('--side',side+'px');document.documentElement.style.setProperty('--k',side/1000)}
-addEventListener('resize',()=>{fitSquare();resize()});fitSquare();
+function fitSquare(){const side=Math.max(280,Math.min(document.documentElement.clientWidth,(visualViewport||{}).height||innerHeight));document.documentElement.style.setProperty('--side',side+'px');document.documentElement.style.setProperty('--k',side/1000)}
+addEventListener('resize',()=>{fitSquare();resize()});addEventListener('load',()=>{fitSquare();resize()});fitSquare();
 function resize(){const r=canvas.parentElement.getBoundingClientRect();renderer.setSize(r.width,r.height,false);camera.aspect=r.width/r.height;camera.updateProjectionMatrix()}
 new ResizeObserver(resize).observe(canvas.parentElement);
 
