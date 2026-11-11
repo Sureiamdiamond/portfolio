@@ -2336,7 +2336,7 @@ function run_hide_helm_v33_migration(PDO $pdo): void {
 
 const SURNAME_ALEF_V34_MIGRATION = 'migration_surname_alef_v34';
 
-/** The Persian surname is written «بنی طباء» (with a space and a final hamza) everywhere it is stored. Every text column is checked; only the surname is changed and the counts are logged. */
+/** The Persian surname is written «بنی‌طباء» (with a space and a final hamza) everywhere it is stored. Every text column is checked; only the surname is changed and the counts are logged. */
 function run_surname_alef_v34_migration(PDO $pdo): void {
     if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SURNAME_ALEF_V34_MIGRATION . "'")->fetchColumn()) {
         return;
@@ -2350,7 +2350,7 @@ function run_surname_alef_v34_migration(PDO $pdo): void {
             $find->execute();
             $update = $pdo->prepare("UPDATE \"$table\" SET \"$col\" = ? WHERE rowid = ?");
             foreach ($find->fetchAll(PDO::FETCH_ASSOC) as $row) {
-                $new = preg_replace($pattern, 'بنی طباء', (string) $row['v']);
+                $new = preg_replace($pattern, 'بنی‌طباء', (string) $row['v']);
                 if ($new !== $row['v']) {
                     $update->execute([$new, $row['id']]);
                     $changed["$table.$col"] = ($changed["$table.$col"] ?? 0) + 1;
@@ -2360,4 +2360,31 @@ function run_surname_alef_v34_migration(PDO $pdo): void {
     }
     migration_log('surname alef v34: ' . json_encode($changed, JSON_UNESCAPED_UNICODE));
     $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SURNAME_ALEF_V34_MIGRATION . "', '1')");
+}
+
+const SURNAME_ZWNJ_V35_MIGRATION = 'migration_surname_zwnj_v35';
+
+/** The surname is written with a half-space (U+200C) between بنی and طباء, so the hero highlights it as one word. Stored text with the plain space is changed. */
+function run_surname_zwnj_v35_migration(PDO $pdo): void {
+    if ($pdo->query("SELECT 1 FROM profile WHERE k = '" . SURNAME_ZWNJ_V35_MIGRATION . "'")->fetchColumn()) {
+        return;
+    }
+    $changed = [];
+    foreach ($pdo->query("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")->fetchAll(PDO::FETCH_COLUMN) as $table) {
+        foreach ($pdo->query("PRAGMA table_info(\"$table\")")->fetchAll(PDO::FETCH_ASSOC) as $column) {
+            $col = $column['name'];
+            $find = $pdo->prepare("SELECT rowid AS id, \"$col\" AS v FROM \"$table\" WHERE CAST(\"$col\" AS TEXT) LIKE '%بنی طباء%'");
+            $find->execute();
+            $update = $pdo->prepare("UPDATE \"$table\" SET \"$col\" = ? WHERE rowid = ?");
+            foreach ($find->fetchAll(PDO::FETCH_ASSOC) as $row) {
+                $new = str_replace('بنی طباء', "بنی\u{200C}طباء", (string) $row['v']);
+                if ($new !== $row['v']) {
+                    $update->execute([$new, $row['id']]);
+                    $changed["$table.$col"] = ($changed["$table.$col"] ?? 0) + 1;
+                }
+            }
+        }
+    }
+    migration_log('surname zwnj v35: ' . json_encode($changed, JSON_UNESCAPED_UNICODE));
+    $pdo->exec("INSERT INTO profile (k, v) VALUES ('" . SURNAME_ZWNJ_V35_MIGRATION . "', '1')");
 }

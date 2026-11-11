@@ -462,7 +462,7 @@ $personData = [
     '@context' => 'https://schema.org',
     '@type' => 'Person',
     'name' => 'Parsa Banitaba',
-    'alternateName' => 'پارسا بنی طباء',
+    'alternateName' => 'پارسا بنی‌طباء',
     'jobTitle' => $headline,
     'description' => $summary !== '' ? mb_substr($summary, 0, 300) : null,
     'url' => $siteUrl . '/',

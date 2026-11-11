@@ -152,6 +152,7 @@ function db(): PDO {
     run_lightning_project_v32_migration($pdo);
     run_hide_helm_v33_migration($pdo);
     run_surname_alef_v34_migration($pdo);
+    run_surname_zwnj_v35_migration($pdo);
     return $pdo;
 }
 
