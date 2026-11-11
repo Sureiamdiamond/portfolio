@@ -1,0 +1,1151 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>راهنمای بمبو استودیو برای A1 mini</title>
+<style>@font-face{font-family:'Vazirmatn';font-weight:400;font-display:swap;src:url(fonts/Vazirmatn-Regular.woff2) format('woff2')}@font-face{font-family:'Vazirmatn';font-weight:500;font-display:swap;src:url(fonts/Vazirmatn-Medium.woff2) format('woff2')}@font-face{font-family:'Vazirmatn';font-weight:700;font-display:swap;src:url(fonts/Vazirmatn-Bold.woff2) format('woff2')}@font-face{font-family:'Vazirmatn';font-weight:800;font-display:swap;src:url(fonts/Vazirmatn-Black.woff2) format('woff2')}</style>
+<style>
+:root{
+  --bg:#f3f5f2; --surface:#ffffff; --ink:#18221d; --muted:#5d6b63; --line:#d7ddd8;
+  --accent:#0b7d55; --accent-soft:#dff1e8; --warn:#a65a00; --warn-soft:#fbeedb;
+  --mock:#e9ece9; --mock-dark:#26302b; --mock-ink:#eef3ef;
+  --font:"Vazirmatn","Tahoma","Segoe UI",sans-serif;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#121815; --surface:#1a221e; --ink:#e8efe9; --muted:#9aa9a0; --line:#2e3a33;
+    --accent:#4cc793; --accent-soft:#193427; --warn:#f0b262; --warn-soft:#3a2c14;
+    --mock:#222b26; --mock-dark:#0c110e; --mock-ink:#e8efe9;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#121815; --surface:#1a221e; --ink:#e8efe9; --muted:#9aa9a0; --line:#2e3a33;
+  --accent:#4cc793; --accent-soft:#193427; --warn:#f0b262; --warn-soft:#3a2c14;
+  --mock:#222b26; --mock-dark:#0c110e; --mock-ink:#e8efe9;
+}
+:root[data-theme="light"]{ color-scheme:light; }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.95}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 16px 80px;display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px}
+nav{position:sticky;top:16px;align-self:start;display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 32px);overflow:auto}
+nav .brand{font-weight:800;font-size:17px;line-height:1.5;margin-bottom:10px}
+nav .brand small{display:block;font-weight:400;color:var(--muted);font-size:13px}
+nav a{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;color:var(--ink);text-decoration:none;font-size:14.5px}
+nav a:hover{background:var(--accent-soft)}
+nav a .n{font-variant-numeric:tabular-nums;color:var(--muted);width:1.4em}
+nav a.done .n{color:var(--accent)}
+nav a.done::after{content:"✓";margin-inline-start:auto;color:var(--accent);font-weight:700}
+.prog{margin-top:12px;font-size:13px;color:var(--muted)}
+.bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .3s}
+main{display:flex;flex-direction:column;gap:28px;min-width:0}
+header h1{font-size:30px;line-height:1.5;margin:0 0 6px;text-wrap:balance;font-weight:800}
+header p{margin:0;color:var(--muted);max-width:65ch}
+section{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px;scroll-margin-top:16px}
+section>h2{margin:0 0 4px;font-size:22px;line-height:1.6;text-wrap:balance}
+section>h2 .n{color:var(--accent);font-variant-numeric:tabular-nums;margin-inline-end:8px}
+section>.lead{margin:0 0 16px;color:var(--muted);max-width:65ch}
+h3{font-size:17px;margin:24px 0 8px}
+p{max-width:68ch;margin:8px 0}
+b,.path{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:var(--font);font-weight:500;font-size:.88em;line-height:1.5;padding:1px 7px;border-radius:6px;background:var(--mock);border:1px solid var(--line);white-space:nowrap}
+.path{background:var(--accent-soft);border-color:transparent;color:var(--accent);font-weight:700;white-space:normal}
+kbd{direction:ltr;unicode-bidi:isolate;display:inline-block;font-family:var(--mono);font-size:.82em;padding:0 6px;border:1px solid var(--line);border-bottom-width:2px;border-radius:5px;background:var(--surface)}
+.badge{display:inline-block;font-size:12px;line-height:1.6;padding:0 8px;margin-inline-start:4px;border-radius:999px;border:1px solid var(--line);color:var(--muted);background:var(--bg);white-space:nowrap;vertical-align:middle}
+.badge.comm{color:var(--warn);background:var(--warn-soft);border-color:transparent}
+.badge.unv{color:var(--muted);background:transparent;border-style:dashed}
+ol.steps{list-style:none;counter-reset:s;padding:0;margin:12px 0;display:flex;flex-direction:column;gap:10px}
+ol.steps>li{counter-increment:s;position:relative;padding:10px 52px 10px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg)}
+ol.steps>li::before{content:counter(s,persian);position:absolute;right:12px;top:10px;width:28px;height:28px;border-radius:50%;background:var(--accent);color:var(--surface);display:grid;place-items:center;font-weight:700;font-size:14px}
+ol.steps>li strong{display:block}
+ul{padding-inline-start:22px;margin:8px 0;max-width:68ch}
+.note{border-inline-start:4px solid var(--warn);background:var(--warn-soft);padding:10px 14px;border-radius:8px;margin:14px 0;max-width:70ch}
+.tip{border-inline-start:4px solid var(--accent);background:var(--accent-soft);padding:10px 14px;border-radius:8px;margin:14px 0;max-width:70ch}
+.done-btn{margin-top:18px;font:inherit;font-size:14px;padding:6px 14px;border-radius:999px;border:1px solid var(--accent);background:transparent;color:var(--accent);cursor:pointer}
+.done-btn[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+button:focus-visible,a:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.tablewrap{overflow-x:auto;margin:12px 0}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:520px}
+th,td{text-align:right;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:500;font-size:13px}
+td.num{font-variant-numeric:tabular-nums;direction:ltr;text-align:right}
+
+/* theme switcher */
+.theme-group{display:flex;gap:4px;margin:0 0 10px;padding:3px;border:1px solid var(--line);border-radius:999px;background:var(--surface)}
+.theme-group button{flex:1;font:inherit;font-size:13.5px;padding:4px 6px;border-radius:999px;border:1px solid transparent;background:transparent;color:var(--ink);cursor:pointer}
+.theme-group button:hover{border-color:var(--accent)}
+.theme-group button[aria-pressed="true"]{background:var(--accent);color:var(--surface);font-weight:700}
+
+/* real screenshots */
+.shotfig{margin:14px 0;max-width:100%}
+.shotfig img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.shotfig figcaption{font-size:14px;line-height:1.8;color:var(--muted);margin-top:6px;max-width:70ch}
+.figgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:12px 0}
+.figgrid .shotfig{margin:0}
+.shot{position:relative;direction:ltr;max-width:100%;margin:14px 0}
+.shot>img{display:block;width:100%;height:auto;border:1px solid var(--line);border-radius:10px;background:var(--surface)}
+.hs{position:absolute;padding:0;margin:0;background:transparent;border:2px solid transparent;border-radius:6px;cursor:pointer}
+.hs:hover,.hs:focus-visible,.hs.on{border-color:var(--accent);background:rgba(76,199,147,.14)}
+.hs:focus-visible{outline-offset:1px}
+.legend{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0;padding:0;list-style:none}
+.legend button{font:inherit;font-size:13.5px;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.legend button[aria-pressed="true"]{border-color:var(--accent);color:var(--accent);font-weight:700}
+
+/* choosers */
+.info{border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;padding:12px 16px;min-height:92px;margin:12px 0}
+.info h4{margin:0 0 4px;font-size:15.5px}
+.info p{margin:0;max-width:none}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chips button{font:inherit;font-size:14.5px;padding:6px 14px;border-radius:999px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+.chips button[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--surface);font-weight:700}
+.recipe{border:1px solid var(--line);border-radius:10px;padding:6px 16px 12px;background:var(--bg)}
+.recipe table{min-width:460px}
+.connbox{border:1px solid var(--line);border-radius:10px;padding:10px 16px;background:var(--bg)}
+footer{color:var(--muted);font-size:13.5px}
+@media (max-width:820px){
+  .wrap{grid-template-columns:1fr;gap:16px}
+  nav{position:static;flex-direction:row;flex-wrap:wrap;max-height:none}
+  nav .brand,nav .prog,.theme-group{flex-basis:100%}
+  nav a{border:1px solid var(--line);background:var(--surface)}
+  section{padding:16px}
+  header h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<nav aria-label="فصل‌ها">
+  <div class="brand">راهنمای بمبو استودیو<small>A1 mini + AMS lite · نسخهٔ ۲.۹</small></div>
+  <div class="theme-group" role="group" aria-label="تم نمایش">
+    <button type="button" data-mode="auto" aria-pressed="true">خودکار</button>
+    <button type="button" data-mode="light" aria-pressed="false">روشن</button>
+    <button type="button" data-mode="dark" aria-pressed="false">تیره</button>
+  </div>
+  <a href="#start"><span class="n">۱</span>راه‌اندازی اولیه</a>
+  <a href="#map"><span class="n">۲</span>نقشهٔ برنامه</a>
+  <a href="#first"><span class="n">۳</span>اولین پرینت</a>
+  <a href="#quality"><span class="n">۴</span>سطح صاف و باکیفیت</a>
+  <a href="#support"><span class="n">۵</span>چینش و ساپورت</a>
+  <a href="#cut"><span class="n">۶</span>برش و کانکتور</a>
+  <a href="#color"><span class="n">۷</span>رنگ‌ها و AMS lite</a>
+  <a href="#logo"><span class="n">۸</span>لوگو و متن</a>
+  <a href="#fix"><span class="n">۹</span>رفع اشکال</a>
+    <a href="#waste"><span class="n">۱۰</span>کم کردن هدررفت (poop)</a>
+  <a href="#connect"><span class="n">۱۱</span>وصل کردن پرینتر</a>
+  <a href="#scale"><span class="n">۱۲</span>تغییر اندازه و چفت‌شدن</a>
+  <a href="#svg"><span class="n">۱۳</span>لوگو روی شکل (SVG)</a>
+  <a href="#profiles"><span class="n">۱۴</span>پروفایل‌ها</a>
+  <a href="#extras"><span class="n">۱۵</span>منوها و میان‌برها</a>
+  <div class="prog"><span id="progtxt">۰ از ۱۵ فصل</span><div class="bar"><i id="progbar"></i></div></div>
+</nav>
+
+<main>
+<header>
+  <h1>بمبو استودیو از صفر، برای A1 mini و AMS lite</h1>
+  <p>پانزده فصل به ترتیبِ کاری که واقعاً انجام می‌دهی. همهٔ تصویرها عکس واقعی از خود برنامه‌اند. اسم دکمه‌ها و تنظیم‌ها همان‌طور که در برنامه می‌بینی انگلیسی نوشته شده تا راحت پیدایشان کنی. هر فصل را که یاد گرفتی تیک بزن.</p>
+</header>
+
+<!-- 1 -->
+<section id="start">
+  <h2><span class="n">۱</span>راه‌اندازی اولیه</h2>
+  <p class="lead">یک‌بار انجام می‌دهی و تمام.</p>
+  <ol class="steps">
+    <li><strong>نصب</strong>فایل dmg مربوط به macOS را باز کن و Bambu Studio را به پوشهٔ Applications بکش.</li>
+    <li><strong>راه‌انداز اولیه</strong>منطقه را انتخاب کن. در صفحهٔ انتخاب پرینتر، <b>Bambu Lab A1 mini</b> با نازل <b>0.4</b> را انتخاب کن. در مرحلهٔ فیلامنت‌ها، جنس موادی را که داری مثل PLA علامت بزن.</li>
+    <li><strong>ورود به حساب (اختیاری)</strong>برای برش دادن (Slice) لازم نیست وارد حساب شوی. اگر بخواهی امکانات مربوط به پرینتر در تب <b>Device</b> را ببینی، با حساب Bambu وارد شو.</li>
+    <li><strong>کارت پرینتر و صفحه</strong>در ستون چپ، کارت <b>Printer</b> را روی <b>Bambu Lab A1 mini</b> نگه دار و <b>Plate type</b> را روی صفحه‌ای بگذار که واقعاً روی دستگاه است. در تصویر زیر این صفحه <b>Textured PEI Plate</b> است.</li>
+    <li><strong>هماهنگی با AMS lite</strong>قرقره‌ها را در AMS lite بگذار و دکمهٔ <b>Sync info</b> را بزن تا اطلاعات فیلامنت‌ها خوانده شود.</li>
+  </ol>
+  <figure class="shotfig">
+    <img src="img/ch1-sidebar.webp" width="690" height="830" loading="lazy" alt="ستون چپ Bambu Studio با کارت پرینتر، نوع صفحه، دکمهٔ Sync info، نازل و فیلامنت‌های پروژه">
+    <figcaption>ستون چپ برنامه، عکس واقعی. ۱: کارت Printer. ۲: Plate type. ۳: دکمهٔ Sync info. ۴: Project Filaments. ۵: بخش Process.</figcaption>
+  </figure>
+  <div class="note">اگر پرینتر و مک در یک شبکه نیستند یا اینترنت ضعیف است، در پرینتر <b>LAN Only</b> را روشن کن و در تب Device با کد دسترسی وصل شو. روش دیگر: فایل را روی کارت microSD ذخیره کن (<b>Export plate sliced file</b>). <span class="badge">طبق مستندات رسمی</span></div>
+  <p><a href="#connect">روش وصل کردن پرینتر در فصل ۱۱</a></p>
+  <button class="done-btn" data-done="start" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 2 -->
+<section id="map">
+  <h2><span class="n">۲</span>نقشهٔ برنامه</h2>
+  <p class="lead">این عکس واقعی پنجرهٔ اصلی برنامه است. روی هر قسمت بزن یا موس را رویش نگه دار تا توضیحش را ببینی. همچنین می‌توانی از فهرست زیر عکس هم انتخاب کنی.</p>
+  <div class="shot" id="shot">
+    <img src="img/01-overview.webp" width="1400" height="707" alt="پنجرهٔ کامل Bambu Studio در تب Prepare با یک مدل Benchy روی صفحه">
+    <button type="button" class="hs" data-hs="prepare" aria-label="Prepare" style="left:2.448%;top:3.571%;width:7.023%;height:3.316%"></button>
+    <button type="button" class="hs" data-hs="preview" aria-label="Preview" style="left:10.631%;top:3.571%;width:6.443%;height:3.316%"></button>
+    <button type="button" class="hs" data-hs="device" aria-label="Device" style="left:17.719%;top:3.571%;width:6.121%;height:3.316%"></button>
+    <button type="button" class="hs" data-hs="project" aria-label="Project" style="left:24.807%;top:3.571%;width:4.832%;height:3.316%"></button>
+    <button type="button" class="hs" data-hs="calibration" aria-label="Calibration" style="left:31.572%;top:3.571%;width:5.477%;height:3.316%"></button>
+    <button type="button" class="hs" data-hs="slice" aria-label="Slice plate" style="left:86.018%;top:3.571%;width:6.572%;height:3.061%"></button>
+    <button type="button" class="hs" data-hs="print" aria-label="Print plate" style="left:93.428%;top:3.571%;width:6.186%;height:3.061%"></button>
+    <button type="button" class="hs" data-hs="printer" aria-label="Printer" style="left:0.322%;top:10.842%;width:10.954%;height:10.204%"></button>
+    <button type="button" class="hs" data-hs="plate" aria-label="Plate type" style="left:11.469%;top:10.842%;width:5.090%;height:10.204%"></button>
+    <button type="button" class="hs" data-hs="sync" aria-label="Sync info" style="left:16.753%;top:10.842%;width:4.961%;height:9.949%"></button>
+    <button type="button" class="hs" data-hs="nozzle" aria-label="Nozzle" style="left:0.322%;top:22.577%;width:21.585%;height:9.311%"></button>
+    <button type="button" class="hs" data-hs="filaments" aria-label="Project Filaments" style="left:0%;top:33.546%;width:21.907%;height:17.474%"></button>
+    <button type="button" class="hs" data-hs="process" aria-label="Process" style="left:0%;top:52.679%;width:21.907%;height:5.357%"></button>
+    <button type="button" class="hs" data-hs="objects" aria-label="Objects list" style="left:0%;top:58.673%;width:21.907%;height:10.842%"></button>
+    <button type="button" class="hs" data-hs="tabs" aria-label="Process tabs" style="left:0%;top:73.342%;width:21.907%;height:2.551%"></button>
+    <button type="button" class="hs" data-hs="values" aria-label="Settings values" style="left:0%;top:76.276%;width:21.907%;height:15.561%"></button>
+    <button type="button" class="hs" data-hs="toolbar" aria-label="Toolbar" style="left:35.631%;top:7.270%;width:53.157%;height:4.847%"></button>
+    <button type="button" class="hs" data-hs="bed" aria-label="Build plate" style="left:43.170%;top:30.612%;width:36.405%;height:49.107%"></button>
+  </div>
+  <ul class="legend" id="legend" aria-label="فهرست قسمت‌های برنامه"></ul>
+  <div class="info" id="mapinfo" aria-live="polite"></div>
+  <div class="tip">برای فهرست میان‌برها، منوی <b>Help</b> را باز کن و <b>Keyboard Shortcuts - Shift+?</b> را بزن. در صفحهٔ سه‌بعدی: کلیک چپ و کشیدن می‌چرخاند، کلیک راست و کشیدن جابه‌جا می‌کند، چرخ موس زوم می‌کند.</div>
+  <div class="note"><strong>مهم:</strong> میان‌برهای تک‌حرفی (مثل <kbd>F</kbd> و <kbd>C</kbd> و <kbd>T</kbd>) فقط با <b>کیبورد انگلیسی</b> کار می‌کنند. با چیدمان فارسی، کلیدها کار نمی‌کنند و گاهی متن را داخل فیلدهای دیگر می‌نویسند. قبل از کار، زبان کیبورد را روی انگلیسی بگذار. جزئیات در فصل ۱۵.</div>
+  <button class="done-btn" data-done="map" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 3 -->
+<section id="first">
+  <h2><span class="n">۳</span>اولین پرینت، قدم به قدم</h2>
+  <p class="lead">با یک مدل سادهٔ تک‌رنگ شروع کن تا مسیر کامل را یک‌بار بروی. مدل نمونه در تصویرها Benchy است.</p>
+  <ol class="steps">
+    <li><strong>مدل را وارد کن</strong>فایل STL یا 3MF یا STEP را روی صفحه بکش، یا از دکمهٔ <b>Add</b> در نوار ابزار استفاده کن. صفحهٔ A1 mini ۱۸۰ در ۱۸۰ در ۱۸۰ میلی‌متر است. مدل بزرگ‌تر را باید کوچک کنی یا برش بزنی (فصل ۶).</li>
+    <li><strong>درست روی صفحه بنشان</strong>ابزار <b>Lay on face</b> را با کلید <kbd>F</kbd> فعال کن و روی سطحی کلیک کن که باید کف قطعه شود. بهترین کف، بزرگ‌ترین سطح صاف است.</li>
+    <li><strong>فیلامنت را انتخاب کن</strong>در بخش <b>Project Filaments</b>، برای خانهٔ ۱ از لیست بازشو جنس و رنگ را انتخاب کن تا با قرقرهٔ واقعی یکی باشد.</li>
+    <li><strong>ارتفاع لایه را بگذار</strong>در بخش <b>Process</b> تاگل <b>Global</b> را روی Global بگذار؛ در حالت Objects لیست پروفایل بالای پنل دیده نمی‌شود. بالای پنل پروفایل <b>0.20mm Standard @BBL A1M</b> را می‌بینی. ارتفاع لایه را در تب <b>Frequent</b> پیدا می‌کنی و روی <b>0.2 mm</b> بگذار. این مقدار استاندارد است. کمتر یعنی لایهٔ ریزتر و چاپ کندتر.</li>
+    <li><strong>اسلایس کن</strong><b>Slice plate</b> را بزن. برنامه به تب <b>Preview</b> می‌رود.</li>
+    <li><strong>پیش‌نمایش را واقعاً نگاه کن</strong>نوار عمودی سمت راست را بالا و پایین ببر. بالا <b>240 / 48.00 mm</b> و پایین <b>1 / 0.20 mm</b> است. دنبال قسمت‌های معلق در هوا و لایهٔ اول ناقص بگرد.</li>
+    <li><strong>بفرست</strong><b>Print plate</b> را بزن. پنجرهٔ ارسال باز می‌شود. (این پنجره در عکس‌های این راهنما نیامده؛ شرح آن <span class="badge">طبق مستندات رسمی</span> است.) در آن پرینتر را انتخاب کن، گزینه‌های تراز صفحه و کالیبراسیون را بررسی کن و ارسال را بزن. اگر از حالت Print plate استفاده نکنی، فایل اسلایس‌شده را هم می‌توانی جدا ذخیره کنی.</li>
+    <li><strong>پروژه را ذخیره کن</strong>از منوی <b>File</b> گزینهٔ <b>Save Project</b> را بزن. فایل 3MF مدل، چینش، رنگ‌ها و همهٔ تنظیم‌ها را داخلش نگه می‌دارد.</li>
+  </ol>
+
+  <figure class="shotfig">
+    <img src="img/ch3-process-global.webp" width="816" height="228" loading="lazy" alt="بخش Process در حالت Global با تاگل Global و لیست پروفایل 0.20mm Standard و تب‌ها">
+    <figcaption>بخش <b>Process</b> در حالت Global. ۱: تاگل <b>Global</b>. ۲: لیست پروفایل <b>0.20mm Standard @BBL A1M</b>. ۳: تب‌ها: Quality و Strength و Speed و Support و Others.</figcaption>
+  </figure>
+  <h3>دو نگاه به نوار بالا و پیش‌نمایش</h3>
+  <figure class="shotfig">
+    <img src="img/ch3-plate-buttons.webp" width="598" height="132" loading="lazy" alt="دکمه‌های Slice plate و Print plate در گوشهٔ بالا سمت راست برنامه">
+    <figcaption>گوشهٔ بالا سمت راست. ۱: <b>Slice plate</b> برای اسلایس. ۲: <b>Print plate</b> که تا قبل از اسلایس خاکستری است.</figcaption>
+  </figure>
+  <figure class="shotfig">
+    <img src="img/ch3-preview.webp" width="1400" height="707" loading="lazy" alt="تب Preview بعد از اسلایس با پنل Slicing Result و نوار لایه‌ها">
+    <figcaption>تب Preview بعد از اسلایس. ۱: پنل Slicing Result. ۲: نوار لایه‌ها در سمت راست.</figcaption>
+  </figure>
+  <div class="figgrid">
+    <figure class="shotfig">
+      <img src="img/ch3-slicing-result.webp" width="744" height="594" loading="lazy" alt="پنل Slicing Result با مقدار فیلامنت و زمان چاپ">
+      <figcaption>۱: مصرف فیلامنت (مثال Benchy: ۳٫۸۷ متر و ۱۱٫۷۴ گرم). ۲: زمان کل (مثال: ۴۶ دقیقه و ۳۸ ثانیه). ۳: گزینه‌های نمایش مسیر.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch3-layer-slider.webp" width="179" height="976" loading="lazy" alt="نوار عمودی لایه‌ها با برچسب بالا و پایین">
+      <figcaption>۱: لایهٔ بالا (۲۴۰ از ۴۸٫۰۰ میلی‌متر). ۲: لایهٔ پایین (۱ از ۰٫۲۰ میلی‌متر).</figcaption>
+    </figure>
+  </div>
+  <div class="tip">قبل از هر پرینت صفحه را با آب گرم و مایع ظرفشویی بشوی و با دست لمسش نکن. چربیِ انگشت شایع‌ترین دلیل نچسبیدن لایهٔ اولی است.</div>
+  <button class="done-btn" data-done="first" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 4 -->
+<section id="quality">
+  <h2><span class="n">۴</span>سطح صاف و باکیفیت</h2>
+  <p class="lead">هدفت را انتخاب کن تا بگویم کدام تنظیم را کجا عوض کنی. مقادیر برای نازل ۰٫۴ و PLA است.</p>
+  <div class="chips" id="qchips" role="group" aria-label="هدف کیفیت"></div>
+  <div class="recipe" id="qrecipe" aria-live="polite"></div>
+  <p>اگر اسم یک تنظیم در نسخهٔ تو کمی فرق داشت، جست‌وجوی بالای بخش <b>Process</b> را بزن. نشانِ <span class="badge">طبق مستندات رسمی</span> یعنی آن گزینه را در عکس‌های این راهنما ندیده‌ام.</p>
+
+  <h3>تنظیم‌های واقعی در خود برنامه</h3>
+  <div class="figgrid">
+    <figure class="shotfig">
+      <img src="img/ch4-layer-height.webp" width="680" height="388" loading="lazy" alt="تب Quality با Layer height و گروه Line width">
+      <figcaption>تب <b>Quality</b>. ۱: <b>Layer height</b> که ۰٫۲ میلی‌متر است. زیرش گروه Line width با Default و Outer wall و Inner wall و Top surface است.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch4-smart-seam.webp" width="680" height="388" loading="lazy" alt="گروه Seam در تب Quality با Smart scarf seam application">
+      <figcaption>گروه <b>Seam</b>. ۱: <b>Smart scarf seam application</b> (تیک خورده). ۲: <b>Scarf application angle threshold</b> که ۱۵۵ است. ۳: <b>Scarf steps</b> که ۱۰ است.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch4-ironing.webp" width="680" height="388" loading="lazy" alt="تنظیم‌های Precise Z height و Ironing و Wall generator">
+      <figcaption>۱: <b>Precise Z height</b>. ۲: <b>Ironing Type</b> که پیش‌فرض No ironing است. ۳: <b>Wall generator</b> که در این نسخه Classic است.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch4-infill.webp" width="680" height="388" loading="lazy" alt="تب Strength با Infill direction و Sub-top surface pattern">
+      <figcaption>تب <b>Strength</b>. ۱: <b>Infill direction</b> که ۴۵ درجه است. ۲: <b>Sub-top surface pattern</b> که روی Monotonic است.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch4-speed.webp" width="680" height="388" loading="lazy" alt="تب Speed با Bridge و Support interface">
+      <figcaption>تب <b>Speed</b>. ۱: <b>Bridge</b> که ۵۰ میلی‌متر بر ثانیه است. ۲: <b>Support interface</b> که ۸۰ است.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch4-variable-layer.webp" width="640" height="284" loading="lazy" alt="پنل Variable layer height با Adaptive و Smooth و Radius">
+      <figcaption>پنل <b>Variable layer height</b>. ۱: <b>Adaptive</b>. ۲: نوار <b>Quality / Speed</b>. ۳: <b>Smooth</b>. ۴: <b>Radius</b>.</figcaption>
+    </figure>
+  </div>
+
+  <h3>پروفایل‌های رسمی Bambu (طبق مستندات؛ ممکن است در منوی پروفایل نسخهٔ شما با اسم کمی متفاوت باشند)</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>پروفایل</th><th>ارتفاع لایه</th><th>مناسب برای</th></tr></thead>
+    <tbody>
+      <tr><td><b>0.08mm Extra Fine</b></td><td class="num">0.08 mm</td><td>فیگور و قطعهٔ نمایشی. زمان حدود دو و نیم برابر</td></tr>
+      <tr><td><b>0.12mm Fine</b></td><td class="num">0.12 mm</td><td>سطح خیلی خوب با زمان معقول</td></tr>
+      <tr><td><b>0.16mm Optimal</b></td><td class="num">0.16 mm</td><td>تعادل خوب برای محصول فروشی</td></tr>
+      <tr><td><b>0.20mm Standard</b></td><td class="num">0.20 mm</td><td>پیش‌فرض، کارهای روزمره</td></tr>
+      <tr><td><b>0.24mm Draft</b></td><td class="num">0.24 mm</td><td>نمونهٔ سریع و قطعهٔ فنی</td></tr>
+    </tbody>
+  </table></div>
+  <p>نام‌های جدول زیر طبق مستندات است. پروفایل <b>0.20mm Standard @BBL A1M</b> را در حالت Global، بالای پنل Process، دیده‌ام و تأیید شده است. ارتفاع لایه را همان‌طور که در فصل ۳ گفتیم، در تب <b>Frequent</b> یا <b>Quality</b> عوض کن.</p>
+
+  <h3>چیزهایی که به نرم‌افزار ربط ندارند ولی اثرشان بیشتر است</h3>
+  <ul>
+    <li>فیلامنت خشک. PLA نم‌کشیده سطح زبر و پر از نخ می‌دهد.</li>
+    <li>جهت قطعه. سطحی که مهم است را عمودی یا رو به بالا بگذار. زیرِ قسمت‌های شیب‌دار و جای ساپورت همیشه زبرتر است.</li>
+    <li>صفحهٔ <b>Smooth PEI Plate</b> کفِ براق می‌دهد و صفحهٔ Textured کف مات و دانه‌دار. <span class="badge">طبق مستندات رسمی</span></li>
+    <li>فیلامنت مات (<b>PLA Matte</b>) خط لایه را خیلی کمتر نشان می‌دهد.</li>
+  </ul>
+  <div class="note">اگر تنظیمی را پیدا نکردی، کلید <b>Advanced</b> را بالای بخش Process روشن کن تا تنظیم‌های پیشرفته دیده شوند. بعد از تغییر، پروفایل را با اسم خودت ذخیره کن. روش ذخیره و خروجی گرفتن از پروفایل در فصل ۱۴ آمده است.</div>
+  <button class="done-btn" data-done="quality" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 5 -->
+<section id="support">
+  <h2><span class="n">۵</span>چینش، جهت و ساپورت</h2>
+  <p class="lead">جهت درست، نصف کیفیت است.</p>
+  <h3>چینش روی صفحه</h3>
+  <ul>
+    <li><b>Lay on face</b> (<kbd>F</kbd>) سطحی را که کلیک می‌کنی کف قطعه می‌کند. پنلش دو حالت <b>Mode</b> دارد: <b>Convex hull</b> و <b>Triangular facet</b>.</li>
+    <li><b>Arrange</b> و <b>Auto orient</b> در نوار ابزار هستند. Auto orient جهتی با ساپورت کمتر پیشنهاد می‌دهد؛ همیشه بهترین نیست، خودت هم نگاه کن. <span class="badge">طبق مستندات رسمی</span></li>
+    <li><b>Move</b> و <b>Rotate</b> و <b>Scale</b> برای جابه‌جایی، چرخش و تغییر اندازه‌اند. اسم هر آیکون را با نگه داشتن موس روی آن ببین.</li>
+  </ul>
+  <figure class="shotfig">
+    <img src="img/ch5-lay-on-face.webp" width="786" height="138" loading="lazy" alt="پنل Lay on face با گزینه‌های Convex hull و Triangular facet">
+    <figcaption>پنل <b>Lay on face</b>. ۱: حالت <b>Convex hull</b>. ۲: حالت <b>Triangular facet</b>.</figcaption>
+  </figure>
+
+  <h3>ساپورت</h3>
+  <ol class="steps">
+    <li><strong>روشن کردن</strong>در تب <b>Frequent</b> تیک <b>Enable support</b> را بزن.</li>
+    <li><strong>تنظیم در تب Support</strong>در بخش Advanced مقدار <b>Initial layer density</b> (پیش‌فرض ۹۰٪)، <b>Top Z distance</b> و <b>Bottom Z distance</b> (هر دو ۰٫۲) و <b>Base pattern</b> را می‌بینی.</li>
+    <li><strong>نوع</strong>نوع ساپورت (مثلاً <b>tree(auto)</b> برای فیگور و <b>normal(auto)</b> برای قطعهٔ هندسی) <span class="badge">طبق مستندات رسمی</span></li>
+    <li><strong>کجا</strong>گزینهٔ <b>On build plate only</b> باعث می‌شود ساپورت فقط روی صفحه بنشیند. <span class="badge">طبق مستندات رسمی</span></li>
+    <li><strong>کنترل دستی</strong>ابزار <b>Support painting</b> (<kbd>L</kbd>): با کلیک چپ جایی را که حتماً ساپورت می‌خواهد علامت بزن و با کلیک راست جایی را که نباید داشته باشد.</li>
+  </ol>
+  <div class="figgrid">
+    <figure class="shotfig">
+      <img src="img/ch5-enable-support.webp" width="680" height="260" loading="lazy" alt="تب Frequent با چک‌باکس Enable support">
+      <figcaption>تب <b>Frequent</b>. ۱: چک‌باکس <b>Enable support</b>.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch5-support-tab.webp" width="680" height="388" loading="lazy" alt="تب Support با Initial layer density و Top Z distance و Base pattern">
+      <figcaption>تب <b>Support</b>. ۱: <b>Initial layer density</b>. ۲: <b>Top Z distance</b>. ۳: <b>Base pattern</b>.</figcaption>
+    </figure>
+  </div>
+  <figure class="shotfig">
+    <img src="img/ch5-support-paint.webp" width="672" height="179" loading="lazy" alt="بخشی از نوار ابزار با آیکون Support painting فعال">
+    <figcaption>۱: آیکون ابزار <b>Support painting</b> که فعال است (کلید <kbd>L</kbd>). آیکون را از جایگاهش در نوار ابزار تشخیص داده‌ام؛ اگر کمی فرق داشت، با نگه داشتن موس اسمش را ببین.</figcaption>
+  </figure>
+  <h3>لبه‌ها و Brim</h3>
+  <p>قطعهٔ باریک و بلند یا قطعه‌ای که گوشه‌هایش بلند می‌شود، به <b>Brim</b> نیاز دارد. در تب <b>Others</b> بخش <b>Bed adhesion</b> را ببین.</p>
+  <figure class="shotfig">
+    <img src="img/ch5-brim.webp" width="680" height="388" loading="lazy" alt="بخش Bed adhesion در تب Others با Brim type و Brim-object gap">
+    <figcaption>بخش <b>Bed adhesion</b>. ۱: <b>Brim type</b> که روی Auto است. ۲: <b>Brim-object gap</b> که ۰٫۱ میلی‌متر است. گزینهٔ <b>Outer brim only</b> را برای قطعه‌های بلند از این منو انتخاب کن. <span class="badge">طبق مستندات رسمی</span></figcaption>
+  </figure>
+  <button class="done-btn" data-done="support" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 6 -->
+<section id="cut">
+  <h2><span class="n">۶</span>برش زدن و کانکتور گذاشتن</h2>
+  <p class="lead">برای مدل‌های بزرگ‌تر از صفحهٔ ۱۸۰ میلی‌متری، یا وقتی می‌خواهی دو نیمه جدا چاپ شوند. اگر بعد از برش اندازهٔ کانکتورها یا سوراخ‌ها باید دقیق بماند، فصل ۱۲ را هم ببین؛ تغییر اندازه با درصد، همهٔ اندازه‌ها را با هم عوض می‌کند.</p>
+  <ol class="steps">
+    <li><strong>ابزار برش را باز کن</strong>قطعه را انتخاب کن و <b>Cut</b> را بزن (<kbd>C</kbd>). پنل برش بالای صفحه باز می‌شود. برای برگشت از دکمهٔ <b>return</b> بالا سمت چپ پنل استفاده کن.</li>
+    <li><strong>نوع برش</strong>در <b>Mode</b> حالت <b>Planar</b> (برش تخت) انتخاب شده است. <b>Dovetail</b> که لبهٔ دم‌چلچله‌ای می‌سازد، <span class="badge">طبق مستندات رسمی</span></li>
+    <li><strong>صفحهٔ برش را جابه‌جا کن</strong>در بخش‌های <b>Rotation</b> (X و Y و Z) و <b>Movement</b> و <b>Height</b> عدد را تایپ کن یا صفحهٔ برش را روی مدل بکش.</li>
+    <li><strong>کانکتور اضافه کن</strong>دکمهٔ <b>Add connectors</b> را بزن. با پنل کانکتور، نوع و اندازه را تعیین می‌کنی. دو تا سه کانکتور کافی است و قرینه نگذار تا قطعه فقط در یک جهت جا برود.</li>
+    <li><strong>مشخصات کانکتور</strong>در <b>Type</b> یکی از <b>Plug</b> و <b>Dowel</b> و <b>Snap</b> و <b>Thread</b> را انتخاب کن (پیش‌فرض Plug). بعد <b>Style</b> و <b>Shape</b> و <b>Depth ratio</b> و <b>Size</b> را تنظیم کن. هر عدد یک فیلد تلرانس کنارش دارد. وقتی تمام شد <b>Confirm connectors</b> را بزن.</li>
+    <li><strong>بعد از برش چه شود</strong>در بخش <b>After cut</b> برای هر تکه <b>Keep orientation</b> و <b>Place on cut</b> و <b>Flip</b> را تنظیم کن. با راست‌کلیک روی یک تکه، آن را به سمت دیگر برش منتقل می‌کنی.</li>
+    <li><strong>برش بزن</strong><b>Perform cut</b> را بزن. دو قطعهٔ جدا می‌گیری. با <b>Reset</b> همه‌چیز به حالت اول برمی‌گردد.</li>
+  </ol>
+  <figure class="shotfig">
+    <img src="img/ch6-cut-tool.webp" width="724" height="646" loading="lazy" alt="پنل Cut با Mode و Rotation و Movement و Height و After cut">
+    <figcaption>پنل <b>Cut</b>. ۱: <b>Mode</b> (Planar). ۲: <b>Rotation</b> X و Y و Z. ۳: <b>Movement</b>. ۴: <b>Height</b>. ۵: <b>Add connectors</b>. ۶: بخش <b>After cut</b> برای ObjectA و ObjectB. ۷: <b>Perform cut</b>. ۸: <b>Reset</b>.</figcaption>
+  </figure>
+
+  <h3>کدام کانکتور؟</h3>
+  <p>این پنل بعد از <b>Add connectors</b> باز می‌شود. انواع را از فهرست زیر ببین.</p>
+  <div class="chips" id="cchips" role="group" aria-label="نوع کانکتور"></div>
+  <div class="connbox"><div id="cdesc" aria-live="polite"></div></div>
+  <figure class="shotfig">
+    <img src="img/ch6-connectors.webp" width="744" height="440" loading="lazy" alt="پنل Connectors با Type و Style و Shape و Depth ratio و Size">
+    <figcaption>پنل <b>Connectors</b>. ۱: <b>Type</b> (Plug، Dowel، Snap، Thread). ۲: <b>Style</b> که در این نسخه Prizm است. ۳: <b>Shape</b> که Circle است. ۴: <b>Depth ratio</b>. ۵: <b>Size</b>. ۶: <b>Middle of geometry</b>. ۷: <b>Confirm connectors</b>.</figcaption>
+  </figure>
+  <div class="note">تلرانس به فیلامنت و پرینتر بستگی دارد. قبل از چاپ قطعهٔ اصلی، یک مکعب کوچک را با همین کانکتور برش بزن و چاپ کن تا سفتی‌اش را امتحان کنی. ده دقیقه وقت می‌گیرد و جلوی هدر رفتن یک پرینت چندساعته را می‌گیرد.</div>
+  <button class="done-btn" data-done="cut" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 7 -->
+<section id="color">
+  <h2><span class="n">۷</span>رنگ‌ها و AMS lite</h2>
+  <p class="lead">AMS lite چهار رنگ را در یک پرینت جا می‌دهد. سه روش برای رنگ دادن داری.</p>
+
+  <h3>قدم اول: لیست فیلامنت</h3>
+  <ol class="steps">
+    <li><strong>همگام‌سازی</strong>در بخش <b>Project Filaments</b> دکمهٔ <b>Sync info</b> را در ستون چپ بزن تا چهار خانهٔ AMS با رنگ واقعی بیایند. اگر پرینتر وصل نیست، با <b>+</b> دستی فیلامنت اضافه کن.</li>
+    <li><strong>شماره‌ها را به خاطر بسپار</strong>هر فیلامنت یک شماره دارد (۱ تا ۴). در همهٔ بخش‌ها با همین شماره‌ها کار می‌کنی.</li>
+  </ol>
+  <figure class="shotfig">
+    <img src="img/ch7-filament-list.webp" width="842" height="368" loading="lazy" alt="بخش Project Filaments با چهار خانه و تگ Purging volumes">
+    <figcaption>بخش <b>Project Filaments</b>. ۱: تگ نارنجی <b>Purging volumes</b>. ۲: دکمه‌های <b>+</b> و <b>-</b>. ۳: <b>Add Mixed Filament</b>.</figcaption>
+  </figure>
+
+  <h3>قدم دوم: رنگ دادن به مدل</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>روش</th><th>چطور</th><th>کی</th></tr></thead>
+    <tbody>
+      <tr><td>کل قطعه یک رنگ</td><td>قطعه را انتخاب کن و از لیست فیلامنت، شمارهٔ مورد نظر را بده. گزینهٔ Change filament را از منوی راست‌کلیک ببین. <span class="badge">طبق مستندات رسمی</span></td><td>چند قطعهٔ جدا با رنگ‌های مختلف</td></tr>
+      <tr><td>هر تکه یک رنگ</td><td>فایل چندتکه (3MF رنگی) را باز کن، یا از <b>Split</b> استفاده کن. بعد در لیست Objects به هر تکه رنگ بده. <span class="badge">طبق مستندات رسمی</span></td><td>مدل‌هایی که طراح از قبل تکه‌تکه کرده</td></tr>
+      <tr><td>نقاشی روی مدل</td><td>ابزار <b>Color Painting</b> (<kbd>N</kbd>)</td><td>مدل یک‌تکه که خودت می‌خواهی رنگش کنی</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ابزار Color Painting</h3>
+  <figure class="shotfig">
+    <img src="img/ch7-color-toolbar.webp" width="1400" height="84" loading="lazy" alt="نوار ابزار با دکمهٔ Color Painting و دکمهٔ return">
+    <figcaption>۱: <b>Color Painting [N]</b> در نوار ابزار. ۲: دکمهٔ <b>return</b> برای خروج از حالت نقاشی.</figcaption>
+  </figure>
+  <figure class="shotfig">
+    <img src="img/ch7-color-panel.webp" width="524" height="600" loading="lazy" alt="پنل Color Painting با جعبه‌های رنگ، Tool type، Pen size و Erase all painting">
+    <figcaption>پنل <b>Color Painting</b>. ۱: جعبه‌های رنگ ۱ تا ۴. ۲: ردیف <b>Tool type</b> با شش آیکون (دایره، کره، مثلث، لایه، سطل و نقطه‌چین؛ طبق مستندات، آیکون‌ها بی‌برچسب‌اند). ۳: <b>Pen size</b>. ۴: <b>Vertical</b> و <b>Horizontal</b>. ۵: <b>Erase all painting</b>.</figcaption>
+  </figure>
+  <ul>
+    <li>رنگ را از جعبه‌های ۱ تا ۴ انتخاب کن و روی سطح بکش.</li>
+    <li>برای جزئیات، <b>Pen size</b> را کم کن. برای لایه‌های افقی از ردیف Tool type استفاده کن.</li>
+    <li>اگر اشتباه کردی، <b>Erase all painting</b> همهٔ رنگ‌ها را پاک می‌کند.</li>
+  </ul>
+
+  <h3>قدم سوم: کم کردن ضایعات تعویض رنگ</h3>
+  <p>در هر تعویض رنگ، نازل باید از رنگ قبلی خالی شود و مقداری فیلامنت دور ریخته می‌شود. این مقدار به تعداد تعویض‌ها بستگی دارد، نه به مقدار رنگ.</p>
+  <figure class="shotfig">
+    <img src="img/ch7-purge-dialog.webp" width="656" height="740" loading="lazy" alt="دیالوگ Purging volumes for filament change با جدول from/to و Multiplier">
+    <figcaption>دیالوگ <b>Purging volumes for filament change</b>. ۱: <b>Re-calculate</b>. ۲: جدول <b>from/to</b> برای فیلامنت‌های ۱ تا ۴ (واحد میلی‌متر مکعب). ۳: <b>Multiplier</b> که ۰٫۷ است و بازهٔ مجاز آن از ۰ تا ۳ است. ۴: <b>OK</b> و <b>Cancel</b>.</figcaption>
+  </figure>
+  <ul>
+    <li>برنامه با هر تغییر رنگ، مقدار دورریز را دوباره حساب می‌کند. اگر نمی‌خواهی، این خودکارسازی را در <b>Bambu Studio &gt; Preferences</b> خاموش کن. این پیام داخل همان دیالوگ هم نوشته شده است.</li>
+    <li>تیره به روشن چند برابرِ برعکسش فیلامنت دورریز دارد. جدول را بخوان و رنگ‌های روشن‌تر را پشت سر هم چاپ کن تا ضایعات کمتر شود.</li>
+    <li>پیشنهاد عملی: <b>Purge into objects' infill</b> دورریز را داخل پرکنندهٔ قطعه خرج می‌کند. برای قطعهٔ روشن یا شفاف روشنش نکن چون رنگ از زیر دیده می‌شود.</li>
+  </ul>
+  <figure class="shotfig">
+    <img src="img/ch7-purge-options.webp" width="680" height="368" loading="lazy" alt="بخش Purge options در تب Others">
+    <figcaption>بخش <b>Purge options</b> در تب <b>Others</b>. ۱: <b>Purge into objects' infill</b>. ۲: <b>Purge into this object</b>. ۳: <b>Purge into objects' support</b> که به طور پیش‌فرض تیک خورده است.</figcaption>
+  </figure>
+  <ul>
+    <li>رنگ را در لایه‌های کم متمرکز کن. لوگویی که فقط دو لایه ضخامت دارد دو تعویض می‌خواهد. همان لوگو روی دیوارهٔ عمودی صدها تعویض.</li>
+    <li>چند نسخه را با هم چاپ کن. تعداد تعویض ثابت می‌ماند و ضایعات بین همه تقسیم می‌شود.</li>
+    <li>برجک تعویض رنگ را خاموش نکن؛ بدون آن رنگ‌ها قاطی می‌شوند. <span class="badge">طبق مستندات رسمی</span></li>
+  </ul>
+
+  <h3>قدم چهارم: ارسال</h3>
+  <p>در پنجرهٔ <b>Print plate</b> هر رنگ پروژه به یک خانهٔ AMS وصل شده است. اگر اشتباه بود، خانهٔ درست را انتخاب کن. جنس فیلامنت پروژه و قرقره باید یکی باشد. <span class="badge">طبق مستندات رسمی</span></p>
+  <div class="note"><strong>محدودیت‌های AMS lite:</strong> TPU و TPE و PVA نم‌کشیده را داخلش نگذار، مستقیم از قرقرهٔ کناری چاپ کن. فیلامنت‌های خیلی سفت یا شکننده و بیشتر مواد الیاف‌دار (CF و GF) هم توصیه نمی‌شوند. قرقره باید ۴۰ تا ۶۸ میلی‌متر پهنا داشته باشد. <span class="badge">طبق مستندات رسمی</span></div>
+  <button class="done-btn" data-done="color" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 8 -->
+<section id="logo">
+  <h2><span class="n">۸</span>لوگو و متن روی قطعه</h2>
+  <p class="lead">برای مهر زدن اسم برند روی محصول. متن را مستقیم در برنامه می‌سازی؛ لوگوی SVG را هم می‌توانی وارد کنی. مراحل کامل لوگوی SVG (برجسته، حکاکی و رنگی) در فصل ۱۳ آمده است.</p>
+  <h3>متن</h3>
+  <ol class="steps">
+    <li><strong>ابزار متن</strong>قطعه را انتخاب کن و کلید <kbd>T</kbd> را بزن. یک بخش متن به قطعهٔ انتخاب‌شده اضافه می‌شود و پنل <b>Text</b> باز می‌شود. اسم بخش در لیست Objects دیده می‌شود.</li>
+    <li><strong>تنظیم</strong>در فیلد <b>Input text</b> متن را بنویس (پیش‌فرض Text). <b>Font</b> (پیش‌فرض Helvetica) و <b>Size</b> (پیش‌فرض ۱۳ میلی‌متر) را تنظیم کن.</li>
+    <li><strong>نوع</strong>در <b>Operation</b> یکی از سه گزینه را انتخاب کن (جدول پایین).</li>
+  </ol>
+  <figure class="shotfig">
+    <img src="img/ch8-text-tool.webp" width="724" height="700" loading="lazy" alt="پنل Text با فیلدهای Input text و Font و Size و Operation">
+    <figcaption>پنل <b>Text</b>. ۱: <b>Input text</b>. ۲: <b>Font</b>. ۳: <b>Size</b>. ۴: <b>Thickness</b> و <b>Embedded depth</b>. ۵: <b>Text Gap</b>. ۶: <b>Line Gap</b>. ۷: <b>Angle</b>. ۸: <b>Mode</b> که Surround surface است. ۹: <b>Operation</b> با سه گزینه Part و Cut و Modifier.</figcaption>
+  </figure>
+  <figure class="shotfig">
+    <img src="img/ch8-objects.webp" width="680" height="200" loading="lazy" alt="لیست Objects با بخش متن زیر قطعه">
+    <figcaption>بخش متن در لیست <b>Objects</b> به اسم <b>text_shape</b> زیر قطعه نشان داده می‌شود.</figcaption>
+  </figure>
+  <div class="tablewrap"><table>
+    <thead><tr><th>نتیجه‌ای که می‌خواهی</th><th>Operation</th><th>مقدار پیشنهادی</th></tr></thead>
+    <tbody>
+      <tr><td>متن برجسته</td><td><b>Part</b></td><td>بیرون‌زدگی ۰٫۶ تا ۱ میلی‌متر (در فیلد Thickness)</td></tr>
+      <tr><td>متن حکاکی‌شده (فرورفته)</td><td><b>Cut</b></td><td>عمق ۰٫۴ تا ۰٫۶ میلی‌متر</td></tr>
+      <tr><td>متن رنگی هم‌سطح</td><td><b>Modifier</b> با رنگ دیگر</td><td>عمق ۰٫۴ میلی‌متر، یعنی دو لایهٔ ۰٫۲</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>لوگوی SVG <span class="badge">طبق مستندات رسمی</span></h3>
+  <p>این بخش را در این نسخه روی عکس ندیده‌ام؛ مراحل زیر از مستندات است و منوی دقیقش ممکن است کمی فرق داشته باشد.</p>
+  <ol class="steps">
+    <li><strong>آماده کردن فایل</strong>اگر لوگو PNG است، در Inkscape (رایگان) با <b>Path › Trace Bitmap</b> به SVG تبدیلش کن. لوگوی ساده و تک‌رنگ بهترین نتیجه را می‌دهد.</li>
+    <li><strong>وارد کردن</strong>فایل SVG را روی قطعه بکش یا از منوی File &gt; Import استفاده کن.</li>
+    <li><strong>جاگذاری</strong>لوگو را روی سطح بکش، اندازه و عمق را تنظیم کن.</li>
+    <li><strong>رنگ</strong>لوگو را در لیست Objects انتخاب کن و رنگ جدا به آن بده.</li>
+  </ol>
+  <div class="tip"><strong>تمیزترین لوگوی رنگی:</strong> لوگو را روی کفِ قطعه بگذار، یعنی سطحی که روی صفحه می‌نشیند، با عمق دو لایه. لایهٔ اول روی صفحه کاملاً تخت و تیز چاپ می‌شود و فقط دو تعویض رنگ لازم است. خطوط لوگو را نازک‌تر از ۰٫۸ میلی‌متر نگیر.</div>
+  <button class="done-btn" data-done="logo" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 9 -->
+<section id="fix">
+  <h2><span class="n">۹</span>رفع اشکال سریع</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>مشکل</th><th>اول این را امتحان کن</th></tr></thead>
+    <tbody>
+      <tr><td>لایهٔ اول نمی‌چسبد</td><td>صفحه را بشوی. <b>Plate type</b> را با صفحهٔ واقعی یکی کن. <b>Bed Leveling</b> را در پنجرهٔ ارسال روشن بگذار. <span class="badge">طبق مستندات رسمی</span></td></tr>
+      <tr><td>نخ‌کشی بین قسمت‌ها</td><td>فیلامنت را خشک کن. پروفایل فیلامنت را درست انتخاب کن.</td></tr>
+      <tr><td>خط عمودی روی دیواره (درز)</td><td>ابزار <b>Seam painting</b> (<kbd>P</kbd>) را بزن و جای درز را خودت روی گوشهٔ پنهان مشخص کن. یا گزینهٔ <span class="path">Quality › Seam position</span> را تغییر بده. <span class="badge">طبق مستندات رسمی</span></td></tr>
+      <tr><td>سطح بالا موج‌دار یا سوراخ‌دار</td><td>تعداد <span class="path">Top shell layers</span> را بالا ببر و <b>Ironing Type</b> را روی یکی از گزینه‌های ironing بگذار. <span class="badge">طبق مستندات رسمی</span></td></tr>
+      <tr><td>گوشه‌ها بلند می‌شوند</td><td>Brim اضافه کن (<span class="path">Others › Bed adhesion › Brim type</span>). جریان هوای اتاق را کم کن.</td></tr>
+      <tr><td>پیغام خطا روی قطعه بعد از وارد کردن</td><td>راست‌کلیک روی قطعه و گزینهٔ <b>Fix model</b>. <span class="badge">طبق مستندات رسمی</span></td></tr>
+      <tr><td>اندازه‌ها جا نمی‌روند</td><td>با <b>Measure</b> (<kbd>U</kbd>) اندازه بگیر. <span class="path">Quality › X-Y hole compensation</span> را کمی زیاد کن. <span class="badge">طبق مستندات رسمی</span></td></tr>
+      <tr><td>مدل از صفحه بزرگ‌تر است</td><td><b>Scale</b> یا برش با <b>Cut</b> (<kbd>C</kbd>)</td></tr>
+    </tbody>
+  </table></div>
+  <div class="figgrid">
+    <figure class="shotfig">
+      <img src="img/ch9-measure.webp" width="426" height="444" loading="lazy" alt="پنل Measure با Selection 1 و Selection 2 و دکمهٔ Measure">
+      <figcaption>ابزار <b>Measure</b> (<kbd>U</kbd>). ۱: <b>Selection 1</b>. ۲: <b>Selection 2</b>. ۳: <b>Measure</b>. دو سطح یا لبه را انتخاب کن تا اندازه‌اش دیده شود.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch9-seam-paint.webp" width="780" height="198" loading="lazy" alt="نوار ابزار با آیکون Seam painting فعال">
+      <figcaption>۱: آیکون ابزار <b>Seam painting</b> (کلید <kbd>P</kbd>) که فعال است. آیکون را از جایگاهش در نوار ابزار تشخیص داده‌ام.</figcaption>
+    </figure>
+  </div>
+  <button class="done-btn" data-done="fix" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 10 -->
+<section id="waste">
+  <h2><span class="n">۱۰</span>کم کردن هدررفت (poop) در AMS lite</h2>
+  <p class="lead">هر تعویض رنگ مقداری فیلامنت دور ریخته می‌شود. با تصمیم درست در طراحی و چند تنظیم در برنامه، این مقدار را کم کن. عدد‌هایی که از خود برنامه خوانده‌ام بی‌نشان‌اند؛ بقیه نشان دارند.</p>
+
+  <h3>چرا تعویض رنگ فیلامنت هدر می‌دهد</h3>
+  <ul>
+    <li>A1 mini با AMS lite برش خودکار فیلامنت ندارد و یک نازل دارد. پس در هر تعویض، رنگ قبلی باید از نازل بیرون رانده شود. <span class="badge">طبق مستندات رسمی</span></li>
+    <li>مقدار دورریز به جفت رنگ بستگی دارد، نه فقط به تعداد تعویض. تیره به روشن خیلی بیشتر از روشن به تیره فیلامنت می‌خواهد؛ سیاه به سفید چند برابرِ سفید به سیاه. <span class="badge">طبق مستندات رسمی</span></li>
+    <li>فیلامنت شفاف مشکل جدا دارد؛ دورریز را داخل پرکنندهٔ قطعه نریز. <span class="badge">طبق مستندات رسمی</span></li>
+    <li>Studio مقدار دورریز را از رنگ‌های From و To و از فیلامنت ساپورت حساب می‌کند. <span class="badge">طبق مستندات رسمی</span></li>
+    <li>در دیالوگ Purging volumes این عدد‌ها را می‌بینی. مثلاً از رنگ ۱ به رنگ ۲ مقدار ۳۱۳ و از ۲ به ۱ مقدار ۱۵۳ میلی‌متر مکعب است. جهت تعویض هم مهم است. طبق برچسب from/to، ردیف رنگ قبلی و ستون رنگ بعدی است.</li>
+    <li>تخمین کاربران: هر تعویض حدود ۰٫۳ تا ۱٫۵ گرم دورریز می‌دهد و مدل‌هایی با صدها تعویض، چند ده گرم. <span class="badge comm">تجربهٔ کاربران</span></li>
+    <li>مقدار پیش‌فرض برنامه حدود ۲۸۰ میلی‌متر مکعب برای هر تعویض است. <span class="badge unv">تأییدنشده</span></li>
+  </ul>
+  <figure class="shotfig">
+    <img src="img/ch7-filament-list.webp" width="842" height="368" loading="lazy" alt="بخش Project Filaments با تگ نارنجی Purging volumes">
+    <figcaption>تگ نارنجی <b>Purging volumes</b> کنار عنوان Project Filaments. ۱: همین تگ که دیالوگ دورریز را باز می‌کند.</figcaption>
+  </figure>
+
+  <h3>نقطهٔ شروع پیشنهادی: حداقل هدررفت</h3>
+  <p>این ترتیب را از قدم اول دنبال کن. نقطهٔ شروع پیشنهادی است و با یک پرینت تست امتحانش کن، چون عدد دقیق به رنگ‌هایت بستگی دارد.</p>
+  <ol class="steps">
+    <li><strong>تعداد تعویض را کم کن</strong>رنگ را روی لایه‌های کم بگذار؛ مثلاً لوگویی که فقط دو لایه ضخامت دارد دو تعویض می‌خواهد و همان لوگو روی دیوارهٔ عمودی صدها تعویض. هر رنگ را به یک بخش از مدل بده و از رنگ‌هایی که لایه‌به‌لایه جابه‌جا می‌شوند پرهیز کن. اگر چند نسخه داری، همه را روی یک صفحه با هم بچین. <span class="badge comm">تجربهٔ کاربران</span></li>
+    <li><strong>رنگ‌ها و ترتیبشان</strong>رنگ‌های نزدیک را کنار هم بگذار و از پرش تیره به روشن، جفت‌های سفید و سیاه، و جفت‌های شفاف پرهیز کن. اگر طرح اجازه می‌دهد، از روشن به تیره برو. فیلامنت لایه‌های اول و بعدی را روی Auto نگه دار؛ Studio ترتیبی را انتخاب می‌کند که کمترین دورریز را داشته باشد. شمارهٔ اسلات خودش اثر کمی دارد. <span class="badge">طبق مستندات رسمی</span></li>
+    <li><strong>مقدار دورریز را محاسبه کن</strong>در دیالوگ Purging volumes روی <b>Re-calculate</b> بزن و عدد‌های برنامه را نگه دار. <b>Multiplier</b> در برنامه از قبل روی ۰٫۷ است؛ همان را شروع کن. فقط در یک پرینت تستِ دو رنگ ۰٫۶ یا ۰٫۵ را امتحان کن و به محض دیدن قاطی شدن رنگ، یک پله برگرد. هیچ عددی را زیر بازهٔ پیشنهادی (۴۸ تا ۹۰۰) نگذار. کاهش حدود ۲۰ تا ۳۰٪ برای جفت‌های نزدیک (۰٫۷ تا ۰٫۸) گزارش شده است؛ پایین‌تر از آن، رنگ قاطی می‌شود. <span class="badge comm">تجربهٔ کاربران</span></li>
+    <li><strong>گزینه‌های Purge options</strong>گزینهٔ <b>Purge into objects' support</b> را روشن نگه دار؛ اگر ساپورت داری، تعویض روی ساپورت از برجک انجام می‌شود. <span class="badge">طبق مستندات رسمی</span> گزینهٔ <b>Purge into objects' infill</b> را فقط برای قطعهٔ توپر، غیرشفاف و با دیوارهٔ ضخیم روشن کن؛ هر وقت پرکنندهٔ کافی داری (پیش‌فرض ۱۵٪) و استحکام را هم چک کرده‌ای. برای قطعهٔ شفاف یا روشن با دیوارهٔ نازک روشنش نکن. در یک مثال کاربر با Multiplier ۰٫۵ دورریز یک مدل ۱۲۰ گرمی از ۱۱۵ گرم به حدود ۶۰ گرم رسید، اما زمان چاپ بیشتر شد و رنگ از دیوارهٔ نازک دیده شد. <span class="badge comm">تجربهٔ کاربران</span> در حالت Objects هم گزینهٔ <b>Purge into this object</b> هست.</li>
+    <li><strong>برجک تعویض رنگ</strong><b>Enable</b> را روشن نگه دار؛ بدون برجک رنگ‌ها قاطی می‌شوند. <span class="badge">طبق مستندات رسمی</span> <b>Skip points</b> را روشن نگه دار. اگر برجک را کوچک‌تر می‌خواهی، ابتدا <b>Rib wall</b> را ببین؛ <b>Width</b> زمانی قابل تغییر است که Rib wall خاموش باشد. دلیلش را در زیر همین فصل، در بخش «برجک کوچک‌تر، مصرف کمتر» آورده‌ام. بعد از هر تغییر، صفحه را با Arrange دوباره مرتب کن.</li>
+    <li><strong>اندازه‌گیری کن</strong>بعد از اسلایس به تب Preview برو و پنل Slicing Result را ببین. ردیف <b>Filament change times</b> تعداد تعویض را نشان می‌دهد. در پرینت چندرنگ ستون‌های دیگری ممکن است ظاهر شوند؛ در تصویرهای من فقط ستون Model دیده می‌شود، چون پرینت تک‌رنگ است. نام ستون‌ها را بخوان و عدد قبل و بعد از هر تغییر را یادداشت کن.</li>
+  </ol>
+
+  <h3>تنظیم‌ها را کجا ببینم</h3>
+  <div class="figgrid">
+    <figure class="shotfig">
+      <img src="img/ch10-purge-dialog.webp" width="656" height="740" loading="lazy" alt="دیالوگ Purging volumes با Re-calculate و جدول from/to و Multiplier و خط Suggestion">
+      <figcaption>دیالوگ <b>Purging volumes for filament change</b>. ۱: <b>Re-calculate</b>. ۲: جدول from/to برای فیلامنت‌های ۱ تا ۴ (میلی‌متر مکعب). ۳: <b>Multiplier</b> که ۰٫۷ است و بازه‌اش ۰ تا ۳ است. ۴: <b>OK</b> و <b>Cancel</b>. ۵: خط <b>Suggestion</b> با بازهٔ ۴۸ تا ۹۰۰.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch10-plate-sequence.webp" width="680" height="340" loading="lazy" alt="بخش Plate Settings با First layer filament sequence و Other layers filament sequence روی Auto">
+      <figcaption>بخش <b>Plate Settings</b> در تب Preview. ۱: <b>First layer filament sequence</b> که Auto است. ۲: <b>Other layers filament sequence</b> که Auto است.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch10-purge-global.webp" width="680" height="140" loading="lazy" alt="بخش Purge options در حالت Global با دو گزینهٔ infill و support">
+      <figcaption>بخش <b>Purge options</b> در حالت Global، تب Others. ۱: <b>Purge into objects' infill</b> که به‌طور پیش‌فرض خاموش است. ۲: <b>Purge into objects' support</b> که روشن است.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch7-purge-options.webp" width="680" height="368" loading="lazy" alt="بخش Purge options در حالت Objects با Purge into this object">
+      <figcaption>بخش <b>Purge options</b> در حالت Objects، برای قطعهٔ انتخاب‌شده. ۱: <b>Purge into objects' infill</b>. ۲: <b>Purge into this object</b>. ۳: <b>Purge into objects' support</b>.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch10-prime-tower-a.webp" width="680" height="248" loading="lazy" alt="گروه Prime tower با Enable و Skip points و Width">
+      <figcaption>گروه <b>Prime tower</b> (بخش بالا). ۱: <b>Enable</b>. ۲: <b>Skip points</b>. ۳: <b>Width</b>، که در این تصویر غیرفعال است.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch10-prime-tower-b.webp" width="680" height="240" loading="lazy" alt="گروه Prime tower با Width و Brim width و Infill gap و Rib wall">
+      <figcaption>گروه <b>Prime tower</b> (بخش میانی). ۱: <b>Width</b>، که چون Rib wall روشن است غیرفعال است. ۲: <b>Brim width</b> که ۳ میلی‌متر است (برای برجک خودش). ۳: <b>Infill gap</b> که ۱۵۰٪ است. ۴: <b>Rib wall</b> که تیک خورده است؛ با خاموش کردنش Width باز می‌شود.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch10-slicing-result.webp" width="784" height="594" loading="lazy" alt="پنل Slicing Result با Filament change times و Model">
+      <figcaption>پنل <b>Slicing Result</b> بعد از اسلایس. ۱: <b>Filament change times</b> (در این عکس ۰ است، چون تک‌رنگ است). ۲: ستون <b>Model</b> با مصرف فیلامنت و وزن.</figcaption>
+    </figure>
+  </div>
+
+  <h3>برجک کوچک‌تر، مصرف کمتر</h3>
+  <p>برجک تعویض رنگ هر بار در یک جای ثابت از صفحه پاک می‌شود. هرچه بزرگ‌تر باشد، جای بیشتری از صفحه و فیلامنت بیشتری می‌گیرد. اما اندازهٔ کوچک‌ترش را حجم پاک‌سازی تعیین می‌کند؛ برنامه اجازه نمی‌دهد از آن کوچک‌تر شود. پس اول تعداد تعویض را کم کن و بعد برجک را کوچک کن.</p>
+  <ol class="steps">
+    <li><strong>اول تعویض‌ها را کم کن</strong>کوچک‌کردن برجک فقط وقتی اثر دارد که حجم پاک‌سازی کم شده باشد. ترتیب بخش‌های بالا را دنبال کن.</li>
+    <li><strong>Rib wall را انتخاب کن</strong>دو راه داری. <b>راه اول</b>: Rib wall را روشن نگه دار و <b>Extra rib length</b> را منفی کن (مثلاً ۵- میلی‌متر) تا دیوارهٔ دنده‌ها کوچک‌تر شود. <b>راه دوم</b>: Rib wall را خاموش کن. در این حالت <b>Width</b> قابل تغییر می‌شود و آن را در قدم‌های کوچک (مثلاً ۲ میلی‌متر) پایین بیاور.</li>
+    <li><strong>تعادل را در نظر بگیر</strong>برجک کوچک‌تر یعنی فیلامنت و جای کمتر، ولی پایداری و حاشیهٔ پاک‌سازی هم کمتر. برای برجک بلند، فیلامنت PETG یا تعویض‌های زیاد، Rib wall را روشن نگه دار. وقتی صفحه تنگ است و برجک کوتاه، می‌توانی خاموشش کنی.</li>
+    <li><strong>نتیجه را بسنج</strong>بعد از اسلایس، عدد فیلامنت را در Slicing Result قبل و بعد از تغییر یادداشت کن و در Preview برجک را ببین. یک تست کوتاه دو رنگی چاپ کن و ببین رنگ‌ها تمیز از هم جدا می‌شوند.</li>
+    <li><strong>Brim width را تنظیم کن</strong>برای برجک باریک، یک مقدار مثبت کوچک (پیش‌فرض این نسخه ۳ میلی‌متر) به چسبیدن کمک می‌کند. مقدار منفی یعنی برنامه پهنای brim را بر اساس ارتفاع برجک خودکار حساب کند.</li>
+  </ol>
+  <figure class="shotfig">
+    <img src="img/ch10-tower-width.webp" width="842" height="696" loading="lazy" alt="تولتیپ Width در تب Others با Rib wall تیک خورده و یادداشت محدودیت Width">
+    <figcaption>تولتیپ <b>Width</b> در تب <b>Others</b>. ۱: <b>Width</b> که چون Rib wall روشن است غیرفعال است. ۲: <b>Rib wall</b> که تیک خورده. ۳: یادداشت برنامه: «The width cannot be customized when the rib outer wall is enabled» (پهنا وقتی دیوارهٔ دنده‌ها روشن است قابل تغییر نیست).</figcaption>
+  </figure>
+  <figure class="shotfig">
+    <img src="img/ch10-tower-skip-points.webp" width="842" height="490" loading="lazy" alt="تولتیپ Skip points با Rib wall تیک خورده و Extra rib length">
+    <figcaption>۱: <b>Skip points</b>، که تولتیپش می‌گوید دیوارهٔ برجک از نقطه‌های شروع مسیر پاک‌سازی رد می‌شود. ۲: تولتیپ همین گزینه. ۳: <b>Rib wall</b> که روشن است.</figcaption>
+  </figure>
+  <div class="tablewrap"><table>
+    <thead><tr><th>تنظیم</th><th>متن راهنمای برنامه (انگلیسی، همان‌طور که دیده شد)</th><th>یعنی</th></tr></thead>
+    <tbody>
+      <tr><td><b>Width</b></td><td>A larger width gives more purge margin and a more stable tower, but uses more material and bed space.</td><td>پهنای بزرگ‌تر حاشیهٔ پاک‌سازی و پایداری بیشتری می‌دهد ولی فیلامنت و جای بیشتری می‌خواهد.</td></tr>
+      <tr><td><b>Rib wall</b></td><td>Recommended for tall prime towers, stickier materials such as PETG, or frequent color changes; turn it off when bed space is tight and the tower is short so the width can be narrowed.</td><td>برای برجک بلند، PETG و تعویض زیاد؛ اگر صفحه تنگ است و برجک کوتاه، خاموشش کن تا پهنا کم شود.</td></tr>
+      <tr><td><b>Extra rib length</b></td><td>Positive values can increase the size of the rib wall, while negative values can reduce the size. However, the size of the rib wall can not be smaller than that determined by the cleaning volume.</td><td>مقدار منفی دیوارهٔ دنده‌ها را کوچک می‌کند، اما نمی‌تواند از اندازهٔ لازم برای حجم پاک‌سازی کوچک‌تر شود.</td></tr>
+      <tr><td><b>Rib width</b></td><td>Rib width is always less than half the prime tower side length.</td><td>عرض دنده همیشه کمتر از نصف ضلع برجک است.</td></tr>
+      <tr><td><b>Internal ribs</b></td><td>Enable internal ribs to increase the stability of the prime tower.</td><td>دنده‌های داخلی برای پایداری بیشتر؛ در این نسخه خاموش است.</td></tr>
+      <tr><td><b>Skip points</b></td><td>The wall of prime tower will skip the start points of wipe path.</td><td>دیوارهٔ برجک از نقطه‌های شروع مسیر پاک‌سازی رد می‌شود.</td></tr>
+      <tr><td><b>Max speed</b></td><td>The maximum printing speed on the prime tower excluding ramming.</td><td>بیشینهٔ سرعت چاپ روی برجک (به جز ramming).</td></tr>
+      <tr><td><b>Brim width</b></td><td>Brim width of prime tower, negative number means auto calculated width based on the height of prime tower.</td><td>پهنای brim برجک؛ مقدار منفی یعنی خودکار بر اساس ارتفاع.</td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">صرفه‌جویی دقیق فیلامنت از این تغییرها در این راهنما اندازه‌گیری نشده است، پس عددی برایش نمی‌دهم. <span class="badge unv">تأییدنشده</span> نتیجه را با یک اسلایس قبل و بعد خودت بسنج.</div>
+
+  <h3>جدول اهرم‌ها</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>اهرم</th><th>کجا در برنامه</th><th>صرفه‌جویی (تخمین)</th><th>ریسک</th></tr></thead>
+    <tbody>
+      <tr><td>تعداد تعویض رنگ</td><td>طراحی و چیدمان قطعه</td><td>بیشترین اثر، تقریباً متناسب با کم شدن تعویض‌ها <span class="badge comm">تجربهٔ کاربران</span></td><td>نیاز به بازطراحی؛ ظاهر مدل ممکن است عوض شود</td></tr>
+      <tr><td>ترتیب رنگ‌ها</td><td>Preview › Plate Settings</td><td>بستگی به جفت رنگ دارد؛ Auto را نگه دار <span class="badge">طبق مستندات رسمی</span></td><td>ترتیب دستی ممکن است دورریز را بالا ببرد <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>Multiplier</td><td>دیالوگ Purging volumes</td><td>حدود ۲۰ تا ۳۰٪ برای رنگ‌های نزدیک (۰٫۷ تا ۰٫۸) <span class="badge comm">تجربهٔ کاربران</span></td><td>پایین‌تر از ۰٫۵ احتمال قاطی شدن رنگ <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>Purge into objects' infill</td><td>Global › Others › Purge options</td><td>در یک مثال کاربر تا حدود نصف <span class="badge comm">تجربهٔ کاربران</span></td><td>زمان بیشتر؛ رنگ از دیوارهٔ نازک دیده می‌شود <span class="badge comm">تجربهٔ کاربران</span>؛ برای قطعهٔ شفاف ممنوع <span class="badge">طبق مستندات رسمی</span></td></tr>
+      <tr><td>قطعهٔ کمکی برای دورریز</td><td>Objects</td><td>در یک مثال کاربر حدود ۵ گرم <span class="badge comm">تجربهٔ کاربران</span></td><td>قطعهٔ اضافه و زمان بیشتر</td></tr>
+      <tr><td>Width برجک</td><td>Others › Prime tower</td><td>بستگی به اندازهٔ برجک دارد؛ کوچک‌تر یعنی فیلامنت کمتر</td><td>با Rib wall روشن قفل است؛ خاموش کردن Rib wall یا منفی کردن Extra rib length را ببین (بخش برجک کوچک‌تر)</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>چک‌لیست قبل از اسلایس</h3>
+  <ul>
+    <li>تعداد تعویض رنگ را کم کرده‌ام و رنگ‌ها روی بخش‌های بزرگ‌تر نشسته‌اند.</li>
+    <li>فیلامنت‌های لایه‌های اول و بعدی در Plate Settings روی Auto است.</li>
+    <li>Re-calculate را زده‌ام و Multiplier را ۰٫۷ یا عدد تست‌شدهٔ خودم گذاشته‌ام.</li>
+    <li>هیچ عددی زیر ۴۸ نیست.</li>
+    <li>Enable برجک روشن است.</li>
+    <li>Purge into objects' infill فقط برای قطعهٔ توپر و غیرشفاف روشن است.</li>
+    <li>Purge into objects' support روشن است، اگر ساپورت داری.</li>
+    <li>بعد از اسلایس، Filament change times را با نسخهٔ قبل مقایسه کرده‌ام.</li>
+  </ul>
+  <div class="note">عددهای این فصل تضمین‌شده نیستند. صرفه‌جویی واقعی به رنگ‌ها، مدل و تنظیمات بستگی دارد. عددهای «تجربهٔ کاربران» را جهت کار بدان، نه وعدهٔ قطعی.</div>
+  <button class="done-btn" data-done="waste" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 11 -->
+<section id="connect">
+  <h2><span class="n">۱۱</span>وصل کردن پرینتر به بمبو استودیو</h2>
+  <p class="lead">دو راه داری: حالت Cloud با حساب Bambu، یا حالت LAN Only که فقط در شبکهٔ محلی کار می‌کند. اول تصمیم بگیر، بعد قدم‌های همان حالت را برو.</p>
+
+  <h3>تصمیم سریع: کدام حالت؟ <span class="badge">طبق مستندات رسمی</span></h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>حالت</th><th>وقتی مناسب است</th><th>مزایا</th><th>معایب</th></tr></thead>
+    <tbody>
+      <tr><td><b>Cloud</b> (حساب Bambu)</td><td>اینترنت داری و می‌خواهی از بیرون شبکه هم چاپ یا پایش کنی</td><td>ارسال و کنترل از راه دور؛ پایش با Bambu Handy؛ تاریخچهٔ چاپ</td><td>نیاز به اینترنت و حساب؛ منطقه باید درست تنظیم شود</td></tr>
+      <tr><td><b>LAN Only</b></td><td>اینترنت نداری یا نمی‌خواهی حساب بسازی</td><td>بدون اینترنت؛ ارسال داخل همان شبکه</td><td>بیرون از شبکه کنترلی نیست؛ پایش با Handy و تاریخچه نیست؛ کد دسترسی لازم است</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>حالت Cloud <span class="badge">طبق مستندات رسمی</span></h3>
+  <ol class="steps">
+    <li><strong>منطقه را درست بگذار</strong>در Studio منطقه را تنظیم کن. اگر منطقه اشتباه باشد، حسابی که از منطقهٔ دیگری ساخته شده وارد نمی‌شود.</li>
+    <li><strong>افزونهٔ شبکه را نصب کن</strong>قبل از ورود، <b>Bambu Network plug-in</b> باید نصب باشد. نصب آن به اینترنت نیاز دارد.</li>
+    <li><strong>با حساب درست وارد شو</strong>با همان حسابی وارد شو که پرینتر به آن بسته شده است. بستن پرینتر به حساب با اپ Bambu Handy و اسکن کد QR روی صفحهٔ Account پرینتر انجام می‌شود.</li>
+    <li><strong>پرینتر را در Device پیدا کن</strong>بعد از ورود، پرینتر در تب <b>Device</b> دیده می‌شود.</li>
+    <li><strong>هر دو را روی یک شبکه بگذار</strong>برای ارسال از Wi-Fi، کامپیوتر و پرینتر باید در یک شبکهٔ محلی باشند.</li>
+  </ol>
+  <div class="figgrid">
+    <figure class="shotfig">
+      <img src="img/ch11-device-tab.webp" width="450" height="102" loading="lazy" alt="نوار تب‌های بالا با Device">
+      <figcaption>نوار تب‌های بالا. ۱: تب <b>Device</b>، جایی که پرینتر بعد از ورود دیده می‌شود.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch11-printer-panel.webp" width="690" height="230" loading="lazy" alt="کارت Printer با Bambu Lab A1 mini و دکمهٔ Sync info">
+      <figcaption>کارت <b>Printer</b>. ۱: کارت <b>Bambu Lab A1 mini</b>. ۲: دکمهٔ <b>Sync info</b> که اطلاعات پرینتر و AMS lite را می‌خواند.</figcaption>
+    </figure>
+  </div>
+
+  <h3>حالت LAN Only <span class="badge">طبق مستندات رسمی</span></h3>
+  <ol class="steps">
+    <li><strong>حالت را روی پرینتر روشن کن</strong>روی صفحهٔ لمسی پرینتر به <b>Settings</b> برو، به صفحهٔ ۳ برو، <b>LAN Only Mode</b> را بزن و روشنش کن تا سبز شود.</li>
+    <li><strong>کد دسترسی را یادداشت کن</strong>کد <b>Access Code</b> و IP را روی صفحه ببین. نام‌ها و محل آن‌ها روی صفحه در نسخه‌های مختلف فرق می‌کند. <span class="badge unv">تأییدنشده</span></li>
+    <li><strong>لیست پرینتر را باز کن</strong>در Studio به تب <b>Device</b> برو و ۲۰ تا ۶۰ ثانیه صبر کن تا پرینتر پیدا شود.</li>
+    <li><strong>پرینتر را انتخاب کن</strong>پرینتری را انتخاب کن که قفل دارد؛ قفل نشانهٔ پرینتر LAN است. کد دسترسی را وارد کن و <b>Confirm</b> را بزن.</li>
+    <li><strong>موفقیت را ببین</strong>آیکون Wi-Fi سبز می‌شود و Live view باز می‌شود.</li>
+  </ol>
+  <div class="note">کلید <b>Developer mode</b> زیر Access Code در بخش General است. روشن کردنش MQTT و FTP را هم فعال می‌کند. این حالت پشتیبانی رسمی ندارد و فقط از یک منبع ثانویه می‌دانم. <span class="badge unv">تأییدنشده</span></div>
+
+  <h3>ارسال فایل به پرینتر</h3>
+  <ol class="steps">
+    <li><strong>Print plate را بزن</strong>بعد از اسلایس، دکمهٔ <b>Print plate</b> در گوشهٔ بالا سمت راست فعال می‌شود. در عکس زیر، Slice plate خاکستری و Print plate سبز است.</li>
+    <li><strong>پرینتر را انتخاب کن</strong>در پنجرهٔ ارسال پرینتر را از فهرست انتخاب کن، گزینه‌های Bed leveling یا کالیبراسیون را بررسی کن و <b>Send</b> را بزن. <span class="badge">طبق مستندات رسمی</span> این مرحله را در برنامه اجرا نکرده‌ام و شرحش از مستندات است.</li>
+    <li><strong>یا روی microSD بریز</strong>فایل اسلایس‌شده را ذخیره کن تا در ریشهٔ کارت قرار بگیرد. قبل از برداشتن کارت از منوی پرینتر آن را خارج کن و کارت را هنگام کار جابه‌جا نکن؛ سری A1 تعویض داغ کارت را پشتیبانی نمی‌کند. <span class="badge">طبق مستندات رسمی</span></li>
+  </ol>
+  <div class="figgrid">
+    <figure class="shotfig">
+      <img src="img/ch11-print-flow.webp" width="605" height="125" loading="lazy" alt="گوشهٔ بالا سمت راست با Slice plate خاکستری و Print plate سبز">
+      <figcaption>گوشهٔ بالا سمت راست بعد از اسلایس. ۱: <b>Slice plate</b> خاکستری است. ۲: <b>Print plate</b> سبز و فعال است. پنجرهٔ ارسال در این عکس نیست.</figcaption>
+    </figure>
+    <figure class="shotfig">
+      <img src="img/ch3-plate-buttons.webp" width="598" height="132" loading="lazy" alt="دکمه‌های Slice plate و Print plate">
+      <figcaption>۱: <b>Slice plate</b>. ۲: <b>Print plate</b>.</figcaption>
+    </figure>
+  </div>
+  <div class="note">آیا برای ارسال از Studio حتماً کارت SD لازم است؟ مستندات می‌گوید ارسال بدون کارت هم ممکن است، اما این را در برنامه تأیید نکرده‌ام. <span class="badge unv">تأییدنشده</span></div>
+
+  <h3>عیب‌یابی</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>مشکل</th><th>اول این را امتحان کن</th></tr></thead>
+    <tbody>
+      <tr><td>خطای Failed to get network plugin</td><td>آنتی‌ویروس، فایروال یا امنیت macOS ممکن است دانلود افزونه را بسته باشد. نسخهٔ Studio را در منوی Bambu Studio › About ببین. <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>افزونه مدام دوباره بارگذاری می‌شود</td><td>گزارش‌ها دربارهٔ نسخهٔ ۲٫۷٫۱ روی مک است و برای بعضی کاربران در ۲٫۷٫۱٫۶۲ رفع شده. اگر نسخهٔ تو جدیدتر است، ممکن است این مشکل را نداشته باشی. راه‌حل موقت: کارت SD یا Bambu Connect. <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>پرینتر در لیست LAN پیدا نمی‌شود</td><td>پرینتر و کامپیوتر را در یک زیرشبکه بگذار و حالت LAN Only را روشن کن. ۲۰ تا ۶۰ ثانیه صبر کن. شبکهٔ مهمان، Client isolation، VPN، VLAN یا فایروال ممکن است جست‌وجو را ببندد. <span class="badge">طبق مستندات رسمی</span></td></tr>
+      <tr><td>Wi-Fi پرینتر ضعیف است</td><td>پرینتر را چند متری روتر بگذار، SSID ساده با حروف انگلیسی بساز و با هات‌اسپات گوشی امتحان کن. <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>پرینتر وصل نمی‌شود و شبکه ۲٫۴ گیگاهرتزی نیست</td><td>پرینتر فقط روی ۲٫۴ گیگاهرتز وصل می‌شود؟ نمی‌دانم. پشتیبانی از WPA3 یا شبکهٔ سازمانی را هم تأیید نکرده‌ام. <span class="badge unv">تأییدنشده</span></td></tr>
+      <tr><td>کد دسترسی قبول نمی‌شود</td><td>کد را دوباره از صفحهٔ پرینتر بخوان و LAN Only Mode را یک بار خاموش و روشن کن. این کار را خودم تأیید نکرده‌ام. <span class="badge unv">تأییدنشده</span></td></tr>
+    </tbody>
+  </table></div>
+  <div class="note">این راهنما اطلاعی ندارد که سرویس ابری Bambu در کدام منطقه‌ها در دسترس است. اگر ابری برای تو کار نمی‌کند، حالت LAN Only مسیر مستندشده است و به اینترنت نیاز ندارد.</div>
+  <button class="done-btn" data-done="connect" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 12 -->
+<section id="scale">
+  <h2><span class="n">۱۲</span>تغییر اندازه بدون بهم‌ریختن چفت‌شدن قطعه‌ها</h2>
+  <p class="lead">قطعه‌ای را بزرگ یا کوچک می‌کنی و بعد چفت نمی‌شود. دلیلش معمولاً تغییر یکنواخت همهٔ فاصله‌ها و نبودن جبران برای چاپ است. این فصل قاعده‌ها را می‌گوید.</p>
+
+  <h3>چرا بعد از تغییر اندازه چفت نمی‌شود؟</h3>
+  <ul>
+    <li>تغییر یکنواخت همهٔ ابعاد را با یک درصد ضرب می‌کند؛ پس فاصلهٔ ۰٫۲ میلی‌متری بین دو قطعه در ۵۰٪ می‌شود ۰٫۱ میلی‌متر.</li>
+    <li>خطای پرینتر با کوچک کردن قطعه کوچک‌تر نمی‌شود. خطا معمولاً در حد چند دهم میلی‌متر ثابت است، پس در قطعهٔ کوچک نسبتش بیشتر می‌شود.</li>
+    <li>پیچ، مهره، آهنربا و بلبرینگ اندازهٔ استاندارد ثابت دارند. اگر جای آن‌ها را با درصد کوچک کنی، دیگر جور نیستند.</li>
+    <li>فیلامنت هم کمی جمع می‌شود. در مثال ویکی، یک قطعهٔ ۱۰۰ میلی‌متری بعد از چاپ ۹۴ میلی‌متر اندازه‌گیری شد. <span class="badge">طبق مستندات رسمی</span> این عدد به فیلامنت بستگی دارد و بیشتر در جهت X و Y است.</li>
+  </ul>
+
+  <h3>قاعدهٔ اول: از نرم‌افزار طراحی دوباره خروجی بگیر</h3>
+  <p>بهترین راه این است که در نرم‌افزار طراحی، اندازه‌ها را مستقیم با میلی‌متر عوض کنی، فاصله‌ها را ثابت نگه داری و دوباره STL بگیری. <span class="badge comm">تجربهٔ کاربران</span></p>
+
+  <h3>قاعدهٔ دوم: اگر در Studio تغییر می‌دهی، همهٔ قطعه‌های جفت‌شونده را با یک درصد عوض کن</h3>
+  <ol class="steps">
+    <li><strong>همهٔ قطعه‌های مرتبط را انتخاب کن</strong>قطعه‌هایی که به هم می‌چسبند را با <kbd>⌘</kbd> و کلیک انتخاب کن، یا همه را با <kbd>⌘A</kbd> انتخاب کن. اگر فقط یکی را عوض کنی، جفتش دیگر جور نیست.</li>
+    <li><strong>ابزار Scale را باز کن</strong>آیکون Scale را در نوار ابزار بزن یا کلید <kbd>S</kbd> را بزن (با کیبورد انگلیسی). پنل Scale باز می‌شود.</li>
+    <li><strong>درصد را وارد کن</strong>در ردیف <b>Scale</b> درصد را بنویس، مثلاً ۸۰. در ردیف <b>Size</b> همان ابعاد را به میلی‌متر می‌بینی.</li>
+    <li><strong>از ابزار بیرون بیا</strong>با دکمهٔ <b>return</b> بالای صفحه برگرد.</li>
+  </ol>
+  <figure class="shotfig">
+    <img src="img/ch12-scale-panel.webp" width="1058" height="394" loading="lazy" alt="پنل Scale با World coordinates و ردیف‌های Scale و Size و uniform scale">
+    <figcaption>پنل <b>Scale</b>. ۱: بخش مختصات با <b>World coordinates</b>. ۲: ردیف <b>Scale</b> بر حسب درصد. ۳: ردیف <b>Size</b> بر حسب میلی‌متر. ۴: <b>uniform scale</b> که برای حفظ نسبت‌ها تیک خورده است. ۵: آیکون کیبورد که میان‌بر ابزار را نشان می‌دهد.</figcaption>
+  </figure>
+  <figure class="shotfig">
+    <img src="img/ch12-context-menu.webp" width="808" height="788" loading="lazy" alt="منوی راست‌کلیک با Scale to print volume و Add negative part انتخاب‌شده">
+    <figcaption>منوی راست‌کلیک روی قطعه. ۱: <b>Scale to print volume</b> که قطعه را طوری کوچک می‌کند که در حجم صفحه جا شود. <span class="badge unv">تأییدنشده</span> این توضیح از نام گزینه است. ۲: <b>Add negative part</b> که برای ساختن حفرهٔ اندازه‌ثابت بعد از تغییر اندازه به کار می‌آید.</figcaption>
+  </figure>
+
+  <h3>بعد از تغییر اندازه، این‌ها را دوباره بساز</h3>
+  <ul>
+    <li><b>کانکتور</b>: اندازه، عمق و تلرانسش را دوباره با میلی‌متر چک کن. کانکتورها در فصل ۶ با Size و Depth ratio ساخته می‌شوند و بعد از درصد باید دوباره تنظیم شوند.</li>
+    <li><b>جای پیچ و آهنربا</b>: حفره‌ها را بعد از تغییر اندازه با <b>Add negative part</b> و اندازهٔ دقیق میلی‌متری بساز. زیرمنوی آن مثل Add part است (در فصل ۱۳ فهرستش را ببین). <span class="badge unv">تأییدنشده</span> فهرست دقیق زیرمنوی Add negative part را هنوز جدا تأیید نکرده‌ام.</li>
+    <li><b>اندازهٔ حفره</b>: اندازه را در پنل Size تایپ کن. جابه‌جا کردن با موس دقت کافی ندارد.</li>
+  </ul>
+
+  <h3>جبران خطا در تنظیم‌های برنامه (Process › Quality)</h3>
+  <p>این تنظیم‌ها را در تب <b>Quality</b> پیدا می‌کنی. <span class="badge">طبق مستندات رسمی</span></p>
+  <div class="tablewrap"><table>
+    <thead><tr><th>تنظیم</th><th>کاربرد</th><th>نکته</th></tr></thead>
+    <tbody>
+      <tr><td><span class="path">X–Y hole compensation</span></td><td>سوراخ‌های بستهٔ داخل قطعه را جبران می‌کند</td><td>فقط حفره‌های داخلی؛ عدد مثبت حفره را بزرگ‌تر می‌کند. پیش‌فرض ۰ است.</td></tr>
+      <tr><td><span class="path">X–Y contour compensation</span></td><td>خط بیرونی قطعه را جبران می‌کند</td><td>کل محیط بیرونی را جابه‌جا می‌کند.</td></tr>
+      <tr><td><span class="path">Elephant foot compensation</span></td><td>پهن‌شدن لبهٔ کف را جبران می‌کند</td><td>عدد کم، مثلاً ۰٫۱ تا ۰٫۱۵ (فصل ۴).</td></tr>
+      <tr><td><span class="path">Precise Z height</span></td><td>ارتفاع دقیق قطعه</td><td>در فصل ۴ دیده‌ای.</td></tr>
+      <tr><td><span class="path">Auto circle contour-hole compensation</span></td><td>جبران خودکار دایره‌ها</td><td>در مستندات آمده و بیشتر برای H2D است؛ روی A1 mini تأیید نکرده‌ام. <span class="badge unv">تأییدنشده</span></td></tr>
+    </tbody>
+  </table></div>
+  <ul>
+    <li>نقطهٔ شروع پیشنهادی برای <b>hole compensation</b>: ۰٫۰۵ میلی‌متر برای PLA، ۰٫۱ برای PETG و ABS، و ۰٫۱۵ برای نایلون. <span class="badge">طبق مستندات رسمی</span></li>
+    <li>برای اندازه‌گیری: یک قطعهٔ تست با چند سوراخ چاپ کن، قطر واقعی‌شان را اندازه بگیر، میانگین خطا را حساب کن و عدد را بر دو تقسیم کن (چون هر دو طرف سوراخ اثر می‌گیرد). <span class="badge">طبق مستندات رسمی</span></li>
+    <li><b>ضریب انقباض</b> در تنظیم‌های فیلامنت هم هست (پیش‌فرض ۱۰۰٪). عدد را از اندازهٔ اندازه‌گیری‌شده و اندازهٔ طراحی بساز و جهت اعمالش را با یک تست کوچک بسنج. <span class="badge">طبق مستندات رسمی</span></li>
+  </ul>
+
+  <h3>تلرانس نقطه‌شروع برای نازل ۰٫۴</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>نوع چفت</th><th>تلرانس هر طرف (میلی‌متر)</th><th>یادداشت</th></tr></thead>
+    <tbody>
+      <tr><td>جای فشاری (Press fit)</td><td class="num">0.05 تا 0.15</td><td>کم‌ترین فاصله؛ برای جای سفت <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>لغزشی (Sliding fit)</td><td class="num">0.2 تا 0.3 (PLA: 0.15 تا 0.25)</td><td>برای قطعهٔ جداشدنی <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>اسنپ (Snap fit)</td><td class="num">حداقل 0.3 به‌علاوهٔ یک فنر طراحی‌شده</td><td>فنر باید در طراحی باشد <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>متحرک یا چاپ‌درجا</td><td class="num">حدود 0.3 تا 0.4 در کل</td><td>قطعه‌های متحرک که بعد از چاپ آزادند <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+    </tbody>
+  </table></div>
+  <p>خطای معمول چاپ حدود ±۰٫۲ تا ۰٫۵ میلی‌متر است. <span class="badge comm">تجربهٔ کاربران</span> اگر تلرانس از این خطا کوچک‌تر باشد، قطعه شانس کمی برای چفت شدن دارد.</p>
+
+  <h3>ضخامت، جهت و نازل</h3>
+  <ul>
+    <li>سوراخ‌ها در جهت XY معمولاً کوچک‌تر چاپ می‌شوند. یا آن‌ها را با hole compensation جبران کن، یا بعد از چاپ با مته یا ریمر بازشان کن.</li>
+    <li>وقتی اندازه زیر حدود ۷۰ تا ۸۰٪ می‌آید، دیواره‌ها و جزئیات ریز اول خراب می‌شوند. <span class="badge unv">تأییدنشده</span> این عدد تجربی است.</li>
+    <li>برای نازل ۰٫۴، دیوارهٔ حدود ۰٫۸ تا ۱٫۲ میلی‌متر قاعدهٔ تجربی است. <span class="badge unv">تأییدنشده</span></li>
+    <li>نازل ۰٫۲ میلی‌متری: مشخصات A1 mini آن را پشتیبانی می‌کند، ولی در Printer › Nozzle › Diameter الان ۰٫۴ نشان داده می‌شود. اگر جزئیات خیلی ریز لازم داری، این گزینه را در تنظیم‌ها ببین. <span class="badge unv">تأییدنشده</span></li>
+  </ul>
+
+  <h3>مثال عددی</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>اندازهٔ اصلی</th><th>مقیاس</th><th>اندازهٔ نهایی</th><th>فاصلهٔ ۰٫۲ میلی‌متری تبدیل می‌شود به</th><th>ارزیابی</th></tr></thead>
+    <tbody>
+      <tr><td class="num">20 mm</td><td class="num">50%</td><td class="num">10 mm</td><td class="num">0.10 mm</td><td>خیلی تنگ. ۰٫۴ را در ۱۰۰٪ طراحی کن تا در ۵۰٪ به ۰٫۲ برسد، یا ۰٫۰۵ به جبران حفره اضافه کن.</td></tr>
+      <tr><td class="num">20 mm</td><td class="num">75%</td><td class="num">15 mm</td><td class="num">0.15 mm</td><td>مرزی برای جفت لغزشی</td></tr>
+      <tr><td class="num">40 mm</td><td class="num">50%</td><td class="num">20 mm</td><td class="num">0.10 mm</td><td>تنگ</td></tr>
+      <tr><td class="num">40 mm</td><td class="num">80%</td><td class="num">32 mm</td><td class="num">0.16 mm</td><td>احتمالاً برای جفت لغزشی مناسب است</td></tr>
+    </tbody>
+  </table></div>
+  <p>این جدول محاسبهٔ خودِ راهنماست، نه اندازه‌گیری روی پرینتر. <span class="badge unv">تأییدنشده</span></p>
+
+  <div class="tip"><strong>تست قبل از پرینت اصلی:</strong> یک قطعهٔ کوچک با همان سوراخ و همان کانکتور چاپ کن. چند دقیقه طول می‌کشد. اگر چفت نشد، عدد را یک پله تنظیم کن و دوباره امتحان کن.</div>
+
+  <h3>چک‌لیست</h3>
+  <ul>
+    <li>همهٔ قطعه‌های جفت‌شونده را با یک درصد عوض کرده‌ام.</li>
+    <li>کانکتور و تلرانس را با میلی‌متر دوباره چک کرده‌ام.</li>
+    <li>جای پیچ و آهنربا را بعد از تغییر دوباره ساخته‌ام.</li>
+    <li>hole compensation را با یک تست تنظیم کرده‌ام.</li>
+    <li>دیواره‌ها بالای ۰٫۸ میلی‌متر هستند.</li>
+  </ul>
+  <button class="done-btn" data-done="scale" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 13 -->
+<section id="svg">
+  <h2><span class="n">۱۳</span>لوگو روی شکل (SVG)</h2>
+  <p class="lead">لوگو را برجسته، حکاکی‌شده یا رنگی روی یک قطعه می‌گذاری. این فصل مسیر SVG را می‌گوید. برای نوشتن متن با ابزار <kbd>T</kbd>، فصل ۸ را ببین.</p>
+
+  <h3>آماده کردن فایل SVG</h3>
+  <ol class="steps">
+    <li><strong>تک‌رنگ و ساده کن</strong>اگر لوگو PNG است، در Inkscape با <b>Path › Trace Bitmap</b> به SVG تبدیلش کن. لوگوی ساده و تک‌رنگ بهترین نتیجه را می‌دهد. <span class="badge comm">تجربهٔ کاربران</span></li>
+    <li><strong>متن‌ها و خط‌ها را به مسیر تبدیل کن</strong>اگر برنامه خطای <span class="path">SVG does not contain a single path to be embossed</span> داد، یعنی فایل هنوز متن یا خط دارد. همه را به Path تبدیل کن. <span class="badge comm">تجربهٔ کاربران</span></li>
+    <li><strong>خط‌های خیلی نازک را حذف کن</strong>خطی کمتر از ۰٫۸ میلی‌متر چاپ نمی‌شود یا خراب می‌شود.</li>
+  </ol>
+
+  <h3>ساختن شکل پایه</h3>
+  <p>روی قطعه راست‌کلیک کن و از <b>Add part</b> یکی از شکل‌های <b>Cube</b> یا <b>Cylinder</b> یا <b>Rounded Rectangle</b> را بزن. برای پلاک اسم، می‌توانی <b>Load...</b> را بزنی و مدل خودت را وارد کنی.</p>
+
+  <h3>افزودن لوگو: برجسته، حکاکی یا رنگی</h3>
+  <ol class="steps">
+    <li><strong>گزینهٔ مناسب را انتخاب کن</strong>روی شکل پایه راست‌کلیک کن و یکی از این سه گزینه را بزن: <b>Add part</b> و بعد <b>SVG</b> برای لوگوی برجسته، <b>Add negative part</b> و بعد <b>SVG</b> برای لوگوی حکاکی‌شده، یا <b>Add modifier</b> برای رنگ هم‌سطح. <span class="badge unv">تأییدنشده</span> زیرمنوی Modifier را هنوز ندیده‌ام.</li>
+    <li><strong>فایل را انتخاب کن</strong>در پنجرهٔ باز شدن فایل SVG را بزن. کشیدن فایل SVG روی صفحهٔ سه‌بعدی هم پنجرهٔ همین کار را باز می‌کند. <span class="badge comm">تجربهٔ کاربران</span></li>
+    <li><strong>روی سطح بگذار</strong>لوگو را با موس روی سطح بگذار. گزینهٔ <b>Use surface</b> لوگو را روی سطح تصویر می‌کند و روی استوانه دور آن نمی‌پیچد. <span class="badge comm">تجربهٔ کاربران</span></li>
+    <li><strong>اندازه و عمق را تنظیم کن</strong>برای تغییر عمق بعداً، روی بخش SVG راست‌کلیک کن و <b>Edit SVG</b> را بزن. <span class="badge comm">تجربهٔ کاربران</span></li>
+    <li><strong>رنگ بده</strong>بخش SVG را در لیست Objects انتخاب کن و فیلامنت ۱ تا ۴ را به آن بده.</li>
+  </ol>
+  <figure class="shotfig">
+    <img src="img/ch13-add-part-menu.webp" width="844" height="788" loading="lazy" alt="منوی Add part با زیرمنوی SVG و منوهای Add negative part و Add modifier">
+    <figcaption>منوی راست‌کلیک و زیرمنوی <b>Add part</b>. ۱: <b>Add part</b>. ۲: <b>Add negative part</b> برای حکاکی. ۳: <b>Add modifier</b> برای رنگ هم‌سطح. ۴: <b>SVG</b> که انتهای فهرست Add part است. فهرست Add part شامل Load، Cube، Cylinder، Hexagonal Prism، Sphere، Cone، Double Tear Romboid Cylinder، Disc، Torus، Rounded Rectangle و TearDrop است.</figcaption>
+  </figure>
+
+  <div class="tip"><strong>تمیزترین لوگوی رنگی:</strong> لوگو را روی کف قطعه بگذار، یعنی سطحی که روی صفحه می‌نشیند، و عمق آن را دو لایه بگیر (۰٫۴ میلی‌متر برای لایهٔ ۰٫۲). لایهٔ اول تخت و تیز چاپ می‌شود و فقط دو تعویض رنگ لازم است. برای لوگوی هم‌سطح با رنگ دیگر، از Modifier استفاده کن. <span class="badge comm">تجربهٔ کاربران</span></div>
+
+  <h3>ابزار متن به‌جای SVG</h3>
+  <p>ابزار <b>T</b> در نوار ابزار متن را می‌سازد. پنلش فیلدهای <b>Input text</b> و <b>Font</b> و <b>Size</b> (پیش‌فرض ۱۳ میلی‌متر) و <b>Thickness</b> و <b>Embedded depth</b> و <b>Text Gap</b> و <b>Line Gap</b> و <b>Angle</b> و <b>Mode</b> و <b>Operation</b> را دارد؛ جزئیات در فصل ۸ است. اگر کیبورد فارسی است، اول انگلیسی کن؛ وگرنه کلید <kbd>T</kbd> کار نمی‌کند.</p>
+
+  <h3>مشکلات رایج</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>مشکل</th><th>اول این را امتحان کن</th></tr></thead>
+    <tbody>
+      <tr><td>لوگو دیده نمی‌شود</td><td>عمق صفر است یا ارتفاعش برابر سطح است. عمق را بالای صفر بگذار. <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>لوگو لایهٔ اول نیست</td><td>قطعه را برعکس بگذار تا کف لوگو روی صفحه بیفتد و لوگو روی لایه‌های اول چاپ شود. <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>خطا یا کرش هنگام افزودن روی سطح دوم</td><td>اول یک سطح را کامل کن، پروژه را با <kbd>⌘S</kbd> ذخیره کن و بعد سطح دوم را اضافه کن. <span class="badge comm">تجربهٔ کاربران</span></td></tr>
+      <tr><td>فایل SVG سنگین است یا کند باز می‌شود</td><td>مسیرها را ساده کن و جزئیات ریز را حذف کن.</td></tr>
+    </tbody>
+  </table></div>
+  <button class="done-btn" data-done="svg" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 14 -->
+<section id="profiles">
+  <h2><span class="n">۱۴</span>پروفایل‌ها: ذخیره، ایمپورت و اکسپورت</h2>
+  <p class="lead">تنظیم‌هایی را که خودت ساخته‌ای به‌صورت پروفایل نگه می‌داری، با دیگران رد و بدل می‌کنی یا حذف می‌کنی. ساختن پروفایل خودت را از فصل ۴ شروع کن.</p>
+
+  <h3>منوی File</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>گزینه</th><th>کاربرد</th></tr></thead>
+    <tbody>
+      <tr><td><b>New Window</b> و <b>New Project</b></td><td>پنجرهٔ جدید یا پروژهٔ تازه</td></tr>
+      <tr><td><b>Open Project...</b> و <b>Recent projects</b></td><td>باز کردن پروژه یا فهرست پروژه‌های اخیر</td></tr>
+      <tr><td><b>Save Project</b> و <b>Save Project as...</b></td><td>ذخیرهٔ پروژه (فایل 3MF با مدل و تنظیم‌ها)</td></tr>
+      <tr><td><b>Show Project in Folder</b></td><td>نشان دادن پروژه در پوشهٔ آن</td></tr>
+      <tr><td><b>Import ›</b></td><td>وارد کردن هندسه (3MF و STL و STEP و SVG و OBJ و AMF) و <b>Import Configs...</b></td></tr>
+      <tr><td><b>Export ›</b></td><td>خروجی‌های اسلایس و مدل که در فصل ۱۵ آمده‌اند، و <b>Export Preset Bundle...</b></td></tr>
+      <tr><td><b>Publish to MakerWorld</b></td><td>انتشار مدل در سایت MakerWorld</td></tr>
+      <tr><td><b>Batch Preset Management</b></td><td>مدیریت و حذف پروفایل‌های کاربر</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>ذخیرهٔ تنظیم خودت</h3>
+  <ol class="steps">
+    <li><strong>تنظیم‌ها را عوض کن</strong>مثلاً ارتفاع لایه یا سرعت را در بخش Process تغییر بده.</li>
+    <li><strong>روی Save current Process بزن</strong>آیکون دیسک کنار نام پروفایل را بزن و اسم بده. پروفایل به فهرست بالای پنل اضافه می‌شود.</li>
+  </ol>
+  <figure class="shotfig">
+    <img src="img/ch14-preset-bar.webp" width="1111" height="226" loading="lazy" alt="ردیف پروفایل Process با نام 0.20mm Standard و آیکون‌های ذخیره، جست‌وجو، نمایش تنظیم‌ها و مقایسه">
+    <figcaption>ردیف پروفایل <b>Process</b>. ۱: فهرست پروفایل (<b>0.20mm Standard @BBL A1M</b>). ۲: <b>Save current Process</b>. ۳: <b>Search in preset</b>. ۴: <b>View all object's settings</b>. ۵: <b>Compare presets</b>.</figcaption>
+  </figure>
+
+  <h3>خروجی گرفتن: File › Export › Export Preset Bundle</h3>
+  <ul>
+    <li>پروفایل پرینتر (<span class="path">.bbscfg</span>) همراه پروفایل پرینتر کاربر و فیلامنت و پروسسِ مرتبط آن را دارد.</li>
+    <li>باندل فیلامنت با فرمت <span class="path">.bbsflmt</span> ساخته می‌شود.</li>
+    <li>فایل <span class="path">.zip</span> برای پرینتر، فیلامنت یا پروسس هم هست.</li>
+    <li>فقط پروفایل‌های کاربر فهرست می‌شوند؛ پروفایل‌های سیستمی خروجی گرفته نمی‌شوند.</li>
+    <li>بعد از خروجی، پیام تأیید ظاهر می‌شود. <span class="badge">طبق مستندات رسمی</span></li>
+  </ul>
+
+  <h3>وارد کردن پروفایل دیگران</h3>
+  <ol class="steps">
+    <li><strong>File › Import › Import Configs...</strong>فایل را انتخاب کن. فرمت‌های پذیرفته‌شده <span class="path">.json</span> و <span class="path">.bbsflmt</span> و <span class="path">.bbscfg</span> و <span class="path">.zip</span> هستند. <span class="badge">طبق مستندات رسمی</span></li>
+    <li><strong>پرینتر و نازل را مطابق کن</strong>در Printer، همان پرینتر و نازلی را انتخاب کن که پروفایل برایشان ساخته شده. ناسازگاری بیشترین خطای این کار است.</li>
+    <li><strong>بررسی کن</strong>پروفایل را در فهرست بالای پنل پیدا کن. برای دیدن تفاوت‌ها با تنظیم فعلی، <b>Compare presets</b> را بزن.</li>
+  </ol>
+
+  <h3>حذف پروفایل: Batch Preset Management</h3>
+  <p>این پنجره سه تب دارد: <b>Printer presets</b> و <b>Filament presets</b> و <b>Process presets</b>. با جست‌وجو و <b>Select All</b> می‌توانی انتخاب کنی و با <b>Delete</b> پاک کنی. دکمهٔ Delete وقتی چیزی انتخاب نشده خاکستری است.</p>
+  <figure class="shotfig">
+    <img src="img/ch14-batch-preset.webp" width="1222" height="880" loading="lazy" alt="پنجرهٔ Management user presets با تب‌های Printer و Filament و Process و دکمه‌های Select All و Delete">
+    <figcaption>پنجرهٔ <b>Management user presets</b>. ۱: تب Printer presets. ۲: تب Filament presets. ۳: تب Process presets. ۴: جست‌وجو. ۵: Select All. ۶: Delete. در این عکس هیچ پروفایل کاربری نیست.</figcaption>
+  </figure>
+  <div class="note"><b>هشدار:</b> <b>Delete</b> پروفایل‌های کاربر را حذف می‌کند و برگشتی ندارد. قبل از حذف، از پروفایلی که می‌خواهی نگه داری خروجی بگیر.</div>
+
+  <h3>از Cura چه؟</h3>
+  <div class="note">Bambu Studio پروفایل Cura را مستقیم وارد نمی‌کند؛ در یک پاسخ انجمن توصیه شده پروفایل را دوباره بسازی. <span class="badge comm">تجربهٔ کاربران</span> Studio از خانوادهٔ نرم‌افزارهای PrusaSlicer و OrcaSlicer است. راه عملی این است که اعداد اصلی (ارتفاع لایه، عرض خط، سرعت‌ها، دما و Retraction) را دستی به یک پروفایل Studio منتقل کنی و ذخیره کنی. پرینترهای Bambu از قبل پروفایل سیستمی خودشان را در Studio دارند، و فیلامنت‌سازها گاهی فایل <span class="path">.json</span> پروفایل Studio منتشر می‌کنند. این راهنما وارد کردن فایل‌ها را آزمایش نکرده است.</div>
+
+  <h3>مدیریت فایل‌های پروفایل</h3>
+  <p>از منوی <b>Help</b> گزینهٔ <b>Show Configuration Folder</b> پوشهٔ تنظیم‌ها را باز می‌کند و <b>Check for Presets Update</b> به‌روزرسانی پروفایل‌های سیستمی را بررسی می‌کند.</p>
+  <button class="done-btn" data-done="profiles" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<!-- 15 -->
+<section id="extras">
+  <h2><span class="n">۱۵</span>منوها، خروجی‌ها و میان‌برها</h2>
+  <p class="lead">این فصل چیزهایی را جمع می‌کند که در فصل‌های قبل جا نشدند: انواع خروجی، میان‌برهای برنامه و منوهای اصلی.</p>
+
+  <h3>کدام خروجی؟</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>گزینه</th><th>کی استفاده کنم</th></tr></thead>
+    <tbody>
+      <tr><td><b>Export plate sliced file...</b> (<kbd>⌘G</kbd>)</td><td>فایل اسلایس‌شدهٔ همین صفحه، برای کارت microSD یا پرینتر دیگر</td></tr>
+      <tr><td><b>Export all plate sliced file...</b></td><td>فایل اسلایس‌شدهٔ همهٔ صفحه‌ها</td></tr>
+      <tr><td><b>Export G-code...</b></td><td>فایل G-code خام، برای بررسی یا نرم‌افزار دیگر</td></tr>
+      <tr><td><b>Export Generic 3MF...</b></td><td>فایل 3MF عمومی برای برنامهٔ دیگر. برای ادامهٔ کار در Studio، <kbd>⌘S</kbd> (Save Project) را بزن.</td></tr>
+      <tr><td><b>Export all objects as one STL...</b> و <b>as STLs...</b></td><td>مدل برای برنامهٔ دیگر یا سرویس چاپ، یک فایل یا هر قطعه جدا</td></tr>
+      <tr><td><b>Export toolpaths as OBJ...</b></td><td>مسیرهای چاپ برای نمایش در نرم‌افزار سه‌بعدی</td></tr>
+    </tbody>
+  </table></div>
+
+  <h3>میان‌برهای کلیدی</h3>
+  <figure class="shotfig">
+    <img src="img/ch15-shortcuts.webp" width="1278" height="640" loading="lazy" alt="فهرست میان‌برهای Global در Keyboard Shortcuts">
+    <figcaption>فهرست <b>Keyboard Shortcuts</b> بخش Global. ۱: <kbd>⌘S</kbd> برای Save Project. ۲: <kbd>⌘G</kbd> برای Export plate sliced file. ۳: <kbd>⌘⇧G</kbd> برای Print plate. ۴: <kbd>⌘X</kbd> برای Cut در کلیپ‌بورد.</figcaption>
+  </figure>
+  <div class="tablewrap"><table>
+    <thead><tr><th>میان‌بر</th><th>کار</th></tr></thead>
+    <tbody>
+      <tr><td><kbd>⌘N</kbd></td><td>پروژهٔ تازه (New Project)</td></tr>
+      <tr><td><kbd>⌘O</kbd></td><td>باز کردن پروژه</td></tr>
+      <tr><td><kbd>⌘S</kbd> و <kbd>⌘⇧S</kbd></td><td>ذخیرهٔ پروژه و ذخیرهٔ پروژه با نام تازه</td></tr>
+      <tr><td><kbd>⌘I</kbd></td><td>وارد کردن هندسه از فایل STL یا STEP یا 3MF یا OBJ یا AMF</td></tr>
+      <tr><td><kbd>⌘R</kbd></td><td>اسلایس صفحه (Slice plate)</td></tr>
+      <tr><td><kbd>⌘⇧G</kbd></td><td>Print plate؛ <b>هشدار:</b> این میان‌بر فرایند ارسال به پرینتر را شروع می‌کند. قبل از زدنش مطمئن شو.</td></tr>
+      <tr><td><kbd>⌘X</kbd> و <kbd>⌘C</kbd> و <kbd>⌘V</kbd></td><td>برش و کپی و چسباندن در کلیپ‌بورد</td></tr>
+      <tr><td><kbd>⌘,</kbd></td><td>تنظیمات (Preferences)</td></tr>
+      <tr><td><kbd>BackSpace</kbd></td><td>حذف قطعهٔ انتخاب‌شده</td></tr>
+      <tr><td><kbd>Shift+?</kbd></td><td>نشان دادن همین فهرست</td></tr>
+    </tbody>
+  </table></div>
+  <p>میان‌برهای تک‌حرفی ابزارها را باز می‌کنند: <kbd>C</kbd> ابزار برش (تست‌شده)، <kbd>T</kbd> متن، <kbd>N</kbd> Color Painting، <kbd>L</kbd> Support painting، <kbd>P</kbd> Seam painting، <kbd>U</kbd> Measure، <kbd>F</kbd> Lay on face، <kbd>S</kbd> Scale، <kbd>H</kbd> Fuzzy skin painting، و <kbd>E</kbd> Brim ears (از روی تولتیپ‌ها). توجه کن که <kbd>C</kbd> ابزار برش است؛ ولی <kbd>⌘X</kbd> برش در کلیپ‌بورد است و کار دیگری می‌کند.</p>
+  <div class="tip"><strong>کیبورد انگلیسی:</strong> همهٔ میان‌برهای تک‌حرفی فقط با چیدمان انگلیسی کار می‌کنند. با چیدمان فارسی، کلیدها کار نمی‌کنند و گاهی متن را داخل فیلد نام پروژه یا فیلدهای دیگر می‌نویسند.</div>
+  <div class="note"><b>احتیاط:</b> یک‌بار بعد از تایپ در فیلد نام، <b>Edit › Undo</b> برنامه را دوباره راه‌اندازی کرد. علت را نمی‌دانم. پس قبل از آزمایش‌های بزرگ، پروژه را با <kbd>⌘S</kbd> ذخیره کن. <span class="badge unv">تأییدنشده</span></div>
+
+  <h3>منوی View</h3>
+  <ul>
+    <li>نماهای آماده: <b>Default View</b> و <b>Top</b> و <b>Bottom</b> و <b>Front</b> و <b>Rear</b> و <b>Left</b> و <b>Right</b> و <b>Isometric</b>.</li>
+    <li><b>Fit Camera</b> برای جا کردن همهٔ مدل در صفحه، و <b>Use Perspective View</b> یا <b>Use Orthogonal View</b> برای تغییر نوع دوربین.</li>
+    <li><b>Show 3D Navigator</b> و <b>Reset Window Layout</b> (برگرداندن چیدمان پنجره) و <b>Show Labels by Layer</b> و <b>Show Overhang</b>.</li>
+  </ul>
+
+  <h3>منوی Edit</h3>
+  <ul>
+    <li><b>Undo</b> و <b>Redo</b> و <b>Cut</b> و <b>Copy</b> و <b>Paste</b>.</li>
+    <li><b>Delete all</b> و <b>Clone selected</b> و <b>Select all</b> و <b>Deselect all</b>.</li>
+    <li><b>AutoFill</b> (توضیح آن را در این راهنما ندیده‌ام). <span class="badge unv">تأییدنشده</span></li>
+  </ul>
+
+  <h3>منوی Help</h3>
+  <ul>
+    <li><b>Keyboard Shortcuts - Shift+?</b> و <b>Setup Wizard</b> و <b>Show Tip of the Day</b>.</li>
+    <li><b>Show Configuration Folder</b> و <b>Check for Presets Update</b> (فصل ۱۴).</li>
+    <li><b>Report issue</b> و <b>Check for Updates</b> و <b>Open Network Test</b>.</li>
+  </ul>
+
+  <h3>گزینه‌های کمتر دیده‌شدهٔ راست‌کلیک</h3>
+  <ul>
+    <li><b>Fill bed with copies</b>: صفحه را پر از کپی همان قطعه می‌کند.</li>
+    <li><b>Clone</b> (<kbd>⌘K</kbd>) و <b>Simplify Model</b> و <b>Mirror</b> و <b>Align/Distribute</b> و <b>Center</b>.</li>
+    <li><b>Mesh boolean</b> و <b>Subdivision mesh(Lost color)</b>. در عکسی که از یک قطعهٔ تکی گرفتم، Mesh boolean غیرفعال بود.</li>
+    <li><b>Height range Modifier</b> و <b>Edit Process Settings</b> (تنظیم‌های همین قطعه).</li>
+  </ul>
+
+  <h3>تب Calibration</h3>
+  <p>تب <b>Calibration</b> بالای برنامه هست. باز کردنش را آزمایش نکرده‌ام، پس جزئیاتش را اینجا نمی‌نویسم. <span class="badge unv">تأییدنشده</span></p>
+  <button class="done-btn" data-done="extras" aria-pressed="false">این فصل را یاد گرفتم</button>
+</section>
+
+<footer>
+  <p>همهٔ تصویرها عکس واقعی از Bambu Studio نسخهٔ ۲.۹ روی یک مک‌بوک است، با یک مدل نمونه (3DBenchy). نشان‌ها: «طبق مستندات رسمی» یعنی از راهنمای رسمی آمده و در برنامه ندیده‌ام؛ «تجربهٔ کاربران» یعنی عدد یا تجربهٔ کاربران است و تضمینی نیست؛ «تأییدنشده» یعنی منبع قطعی ندارد. بدون نشان یعنی خودم در برنامه دیده‌ام. اگر چیزی را پیدا نکردی، اسمش را در کادر جست‌وجوی بالای بخش Process تایپ کن.</p>
+</footer>
+</main>
+</div>
+
+<script>
+/* ---------- theme: auto / light / dark ---------- */
+const THEME_KEY='bambu-guide-theme';
+let themeMode='auto';
+try{const t=localStorage.getItem(THEME_KEY);if(t==='light'||t==='dark'||t==='auto')themeMode=t;}catch(e){}
+function applyTheme(mode){
+  themeMode=mode;
+  const root=document.documentElement;
+  if(mode==='light'||mode==='dark'){root.dataset.theme=mode;}else{root.removeAttribute('data-theme');}
+  document.querySelectorAll('.theme-group button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.mode===mode)));
+  try{localStorage.setItem(THEME_KEY,mode);}catch(e){}
+}
+document.querySelectorAll('.theme-group button').forEach(b=>b.addEventListener('click',()=>applyTheme(b.dataset.mode)));
+applyTheme(themeMode);
+
+const FA='۰۱۲۳۴۵۶۷۸۹';
+const fa=n=>String(n).replace(/\d/g,d=>FA[d]);
+
+/* ---------- app map (real screenshot hotspots) ---------- */
+const HS={
+ prepare:['Prepare','محل اصلی کار. مدل را وارد می‌کنی، روی صفحه می‌چینی، رنگ می‌دهی و تنظیم‌ها را عوض می‌کنی.'],
+ preview:['Preview','بعد از اسلایس به این تب می‌روی و نتیجه را لایه به لایه می‌بینی، با مصرف فیلامنت و زمان چاپ.'],
+ device:['Device','بخش مربوط به پرینتر و وضعیت آن. برای ارسال مستقیم و دیدن وضعیت، با حساب Bambu در دسترس است. برای وصل شدن پرینتر فصل ۱۱ را ببین. <span class="badge">طبق مستندات رسمی</span>'],
+ project:['Project','اطلاعات و تنظیمات مربوط به پروژه. <span class="badge">طبق مستندات رسمی</span>'],
+ calibration:['Calibration','بخش کالیبراسیون پرینتر. <span class="badge">طبق مستندات رسمی</span>'],
+ slice:['Slice plate','مدل را به مسیر حرکت نازل تبدیل می‌کند. بعد از هر تغییر باید دوباره اسلایس کنی. قبل از اسلایس، دکمهٔ Print plate خاکستری است.'],
+ print:['Print plate','بعد از اسلایس فعال می‌شود و پنجرهٔ ارسال را باز می‌کند. شرح آن پنجره در فصل ۳ آمده است.'],
+ printer:['Printer','کارت پرینتر. در این نسخه: Bambu Lab A1 mini.'],
+ plate:['Plate type','جنس صفحهٔ ساخت. در تصویر: Textured PEI Plate. باید با صفحهٔ واقعی دستگاهت یکی باشد.'],
+ sync:['Sync info','اطلاعات پرینتر و AMS lite را با برنامه هماهنگ می‌کند تا رنگ و جنس قرقره‌ها خوانده شود.'],
+ nozzle:['Nozzle','قطر نازل (در تصویر 0.4) و Flow (Standard).'],
+ filaments:['Project Filaments','چهار خانهٔ فیلامنت با شماره، دکمه‌های + و -، Add Mixed Filament، تگ نارنجی Purging volumes و چند آیکون کنار عنوان.'],
+ process:['Process: Global | Objects و Advanced','بالای پنل Process تاگل Global یا Objects است. در حالت Global یک ردیف پروفایل با نام «0.20mm Standard @BBL A1M» دیده می‌شود (این را در برنامه دیده‌ام)؛ در حالت Objects این ردیف پنهان است. برای دیدن یا انتخاب پروفایل، تاگل را روی Global بگذار. زیر آن تب‌های Quality و Strength و Speed و Support و Others هستند. کلید Advanced تنظیم‌های پیشرفته را نشان می‌دهد.'],
+ objects:['Objects','فهرست صفحه و قطعه‌ها با ستون‌های Name و Fila. (شماره فیلامنت). هر قطعه را می‌توانی جدا انتخاب کنی.'],
+ tabs:['Process tabs','Frequent و Quality و Strength و Speed و Support و Others. هر تب گروه‌های تنظیمات خودش را دارد.'],
+ values:['تنظیم‌های تب انتخاب‌شده','مقدارها و چک‌باکس‌ها. در تب Frequent: Layer height (۰٫۲ میلی‌متر)، Sparse infill density (۱۵٪)، Wall loops (۲) و Enable support.'],
+ toolbar:['نوار ابزار','ابزارهای ساخت و ویرایش مدل. با نگه داشتن موس روی هر آیکون، اسمش و گاهی میان‌برش دیده می‌شود، مثلاً Color Painting [N].'],
+ bed:['صفحهٔ ساخت','محیط ۱۸۰ در ۱۸۰ میلی‌متری A1 mini. با کلیک چپ و کشیدن می‌چرخی، با راست‌کلیک جابه‌جا می‌کنی و با چرخ موس زوم می‌کنی.']
+};
+const mapInfo=document.getElementById('mapinfo');
+const legend=document.getElementById('legend');
+function showHS(k){
+  const [t,d]=HS[k];
+  mapInfo.innerHTML='<h4>'+t+'</h4><p>'+d+'</p>';
+  document.querySelectorAll('#shot .hs').forEach(b=>b.classList.toggle('on',b.dataset.hs===k));
+  legend.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.hs===k)));
+}
+document.querySelectorAll('#shot .hs').forEach(b=>{
+  b.addEventListener('click',()=>showHS(b.dataset.hs));
+  b.addEventListener('mouseenter',()=>showHS(b.dataset.hs));
+  b.addEventListener('focus',()=>showHS(b.dataset.hs));
+});
+Object.keys(HS).forEach(k=>{
+  const li=document.createElement('li');
+  const btn=document.createElement('button');
+  btn.type='button';btn.dataset.hs=k;btn.textContent=HS[k][0].replace(/<[^>]+>/g,'');
+  btn.setAttribute('aria-pressed','false');
+  btn.onclick=()=>showHS(k);
+  li.appendChild(btn);legend.appendChild(li);
+});
+showHS('prepare');
+
+/* ---------- quality recipes (labels checked against the real app) ---------- */
+const Q=[
+ {k:'top',t:'سطح بالایی صاف',rows:[
+  ['Quality › Ironing Type','یکی از گزینه‌های ironing (از لیست بازشو)','نازل داغ یک‌بار دیگر روی آخرین سطح کشیده می‌شود و آن را صاف می‌کند',true],
+  ['Strength › Top shell layers','مثلاً ۵','سطح بالا روی پرکننده فرو نمی‌رود',true],
+  ['Strength › Sub-top surface pattern','Monotonic','خط‌ها در یک جهت می‌نشینند و یکنواخت‌تر دیده می‌شوند',false],
+  ['Speed › Top surface','حدود ۱۰۰ mm/s یا کمتر','سرعت کمتر، خط‌های یکنواخت‌تر',true]],
+  n:'Ironing زمان را بیشتر می‌کند و فقط روی سطح کاملاً تخت اثر دارد. روی سطح خمیده کاری نمی‌کند.'},
+ {k:'wall',t:'دیواره‌های صاف',rows:[
+  ['Process','0.12mm Fine یا 0.08mm Extra Fine','خط لایه‌ها تقریباً دیده نمی‌شود',false],
+  ['Speed › Outer wall','۶۰ تا ۱۰۰ mm/s','لرزش و موجِ کنار گوشه‌ها کم می‌شود',true],
+  ['Quality › Order of walls','گزینهٔ Inner/Outer','دیوارهٔ بیرونی به داخلی تکیه می‌کند و تمیزتر می‌نشیند',true],
+  ['Quality › Wall generator','Classic (در این نسخه) یا گزینهٔ دیگر','دیواره‌های نازک بدون شکاف پر می‌شوند',true]],
+  n:'اگر عجله نداری، روی خودِ پرینتر حالت Silent را هم بزن. کل پرینت آرام‌تر و سطح یکنواخت‌تر می‌شود.'},
+ {k:'curve',t:'منحنی و گنبد بدون پله',rows:[
+  ['Variable layer height','Adaptive و بعد Smooth','فقط قسمت‌های خمیده ریز می‌شوند و زمان خیلی زیاد نمی‌شود',false],
+  ['Process','0.16mm Optimal به‌عنوان پایه','ابزار بالا از این مقدار شروع می‌کند',false],
+  ['جهت قطعه','منحنی را عمودی بگذار','پله‌ها روی سطح نزدیک به افق بدترند',false]],
+  n:'بعد از Adaptive، رنگ‌ها روی قطعه نشان می‌دهند کجا لایه ریز شده است.'},
+ {k:'seam',t:'درزِ پنهان',rows:[
+  ['Quality › Smart scarf seam application','روشن (در این نسخه تیک خورده)','سر و ته دیواره روی هم شیب می‌گیرند و درز محو می‌شود',false],
+  ['Quality › Scarf joint for inner walls','روشن (در این نسخه تیک خورده)','درز دیوارهٔ داخلی هم همین کار را می‌کند',false],
+  ['ابزار Seam painting','کلید P','جای درز را خودت روی گوشهٔ پنهان می‌کشی',false],
+  ['Quality › Seam position','Back یا Aligned','درز یک خط مرتب در پشت قطعه می‌شود',true]],
+  n:'روی قطعهٔ گوشه‌دار، درز را روی یک گوشهٔ تیز بینداز. آن‌جا تقریباً دیده نمی‌شود.'},
+ {k:'bottom',t:'کفِ تمیز',rows:[
+  ['Plate type','Smooth PEI Plate','کف براق و یک‌دست',true],
+  ['Quality › Elephant foot compensation','۰٫۱ تا ۰٫۱۵ mm','لبهٔ پایین بیرون نمی‌زند',false],
+  ['Speed › Initial layer','۳۰ تا ۵۰ mm/s','لایهٔ اول فرصت چسبیدن دارد',true]],
+  n:'صفحهٔ کثیف یا چرب روی کف لکه می‌اندازد. قبل از هر کار نمایشی صفحه را بشوی.'}
+];
+const qc=document.getElementById('qchips'),qr=document.getElementById('qrecipe');
+const BADGE='<span class="badge">طبق مستندات رسمی</span>';
+function showQ(k){
+  const q=Q.find(x=>x.k===k);
+  qc.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.k===k)));
+  qr.innerHTML='<div class="tablewrap"><table><thead><tr><th>کجا</th><th>چه مقداری</th><th>چرا</th></tr></thead><tbody>'+
+   q.rows.map(r=>'<tr><td><span class="path">'+r[0]+'</span></td><td><b>'+r[1]+'</b></td><td>'+r[2]+(r[3]?' '+BADGE:'')+'</td></tr>').join('')+
+   '</tbody></table></div><p>'+q.n+'</p>';
+}
+Q.forEach(q=>{const b=document.createElement('button');b.type='button';b.dataset.k=q.k;b.textContent=q.t;b.setAttribute('aria-pressed','false');b.onclick=()=>showQ(q.k);qc.appendChild(b)});
+showQ('top');
+
+/* ---------- connector types (only what the app panel shows; descriptions are general) ---------- */
+const C=[
+ {k:'plug',t:'Plug',d:'<p><strong>ساده‌ترین حالت.</strong> یک زبانه روی یک تکه و سوراخ روی تکهٔ دیگر. کانکتور جدا لازم نیست.</p><ul><li>تکه‌ای که زبانه دارد روی سطح برش نمی‌نشیند؛ آن را در جهت دیگری چاپ کن یا Place on cut را روشن نگه دار.</li><li>در این نسخه Style روی <b>Prizm</b> و Shape روی <b>Circle</b> بود.</li><li>تلرانس را کم شروع کن و یک نمونهٔ کوچک چاپ کن.</li></ul>'},
+ {k:'dowel',t:'Dowel',d:'<p><strong>بیشترین کاربرد.</strong> سوراخ روی هر دو تکه و یک پین جدا که بین آن‌ها می‌نشیند.</p><ul><li>هر دو تکه روی سطح برش می‌نشینند و بدون ساپورت چاپ می‌شوند.</li><li>پین را جدا چاپ کن.</li><li>تلرانس کم برای جفت سفت، کمی بیشتر برای جداشدنی.</li></ul>'},
+ {k:'snap',t:'Snap',d:'<p><strong>اتصال فنری بدون چسب.</strong> پین با فشار قفل می‌شود و با باز و بسته شدن‌های زیاد شل می‌شود.</p><ul><li>برای PLA خوب است؛ برای تکرار باز و بسته شدن، مواد دوام‌دارتر بهترند.</li><li>پین را خوابیده چاپ کن تا لایه‌ها در طول پین باشند.</li><li>اندازهٔ خیلی کوچک شکننده است.</li></ul>'},
+ {k:'thread',t:'Thread',d:'<p><strong>اتصال پیچی (مهره‌ای).</strong> دو تکه با پیچ به هم بسته می‌شوند. <span class="badge">طبق مستندات رسمی</span></p><ul><li>تلرانس اهمیت زیادی دارد؛ قبل از چاپ قطعهٔ اصلی یک نمونه بساز.</li><li>جزئیات دقیق پیچ را در این نسخه روی عکس ندیده‌ام.</li></ul>'},
+ {k:'dove',t:'Dovetail',d:'<p><strong>دم‌چلچله‌ای.</strong> دو تکه از کنار در هم کشیده می‌شوند و کانکتور لازم ندارند. <span class="badge">طبق مستندات رسمی</span></p><ul><li>این گزینه در فهرست Type همین نسخه که در عکس دیده می‌شود نیست؛ اگر در نسخهٔ تو بود، از مستندات استفاده کن.</li></ul>'}
+];
+const cc=document.getElementById('cchips');
+function showC(k){
+  const c=C.find(x=>x.k===k);
+  cc.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.k===k)));
+  document.getElementById('cdesc').innerHTML=c.d;
+}
+C.forEach(c=>{const b=document.createElement('button');b.type='button';b.dataset.k=c.k;b.textContent=c.t;b.style.direction='ltr';b.setAttribute('aria-pressed','false');b.onclick=()=>showC(c.k);cc.appendChild(b)});
+showC('plug');
+
+/* ---------- progress ---------- */
+let done={};
+try{done=JSON.parse(localStorage.getItem('bambu-guide-done')||'{}')}catch(e){}
+const btns=[...document.querySelectorAll('.done-btn')];
+function paint(){
+  let n=0;
+  btns.forEach(b=>{
+    const k=b.dataset.done,on=!!done[k]; if(on)n++;
+    b.setAttribute('aria-pressed',String(on));
+    b.textContent=on?'یاد گرفتم ✓':'این فصل را یاد گرفتم';
+    const a=document.querySelector('nav a[href="#'+k+'"]'); if(a)a.classList.toggle('done',on);
+  });
+  document.getElementById('progtxt').textContent=fa(n)+' از '+fa(btns.length)+' فصل';
+  document.getElementById('progbar').style.width=(n/btns.length*100)+'%';
+}
+btns.forEach(b=>b.onclick=()=>{done[b.dataset.done]=!done[b.dataset.done];try{localStorage.setItem('bambu-guide-done',JSON.stringify(done))}catch(e){}paint()});
+paint();
+</script>
+</body>
+</html>
