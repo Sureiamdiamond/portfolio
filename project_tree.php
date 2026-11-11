@@ -48,7 +48,7 @@ function project_generated_files(array $p, string $lang, string $slug): array {
     // Headings and labels follow the page language; the description is the project's text in that language
     $fa = $lang === 'fa';
     $h = $fa
-        ? ['kind' => 'نوع', 'stack' => 'فناوری‌ها', 'links' => 'لینک‌ها', 'nolinks' => 'هنوز لینکی ثبت نشده است.', 'nodesc' => 'توضیحی ثبت نشده است.', 'role' => 'نقش پارسا بنی‌طبا: Contributor', 'owner' => 'صاحب پروژه',
+        ? ['kind' => 'نوع', 'stack' => 'فناوری‌ها', 'links' => 'لینک‌ها', 'nolinks' => 'هنوز لینکی ثبت نشده است.', 'nodesc' => 'توضیحی ثبت نشده است.', 'role' => 'نقش پارسا بنی طباء: Contributor', 'owner' => 'صاحب پروژه',
             'work' => 'کاری', 'academic' => 'دانشگاهی']
         : ['kind' => 'Kind', 'stack' => 'Tech stack', 'links' => 'Links', 'nolinks' => 'No links yet.', 'nodesc' => 'No description yet.', 'role' => 'Parsa Banitaba\'s role: Contributor', 'owner' => 'Owner',
             'work' => 'Work', 'academic' => 'Academic'];
